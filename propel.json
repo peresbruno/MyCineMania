@@ -1,0 +1,23 @@
+{
+    "propel": {
+        "database": {
+            "connections": {
+                "my_cine_mania": {
+                    "adapter": "pgsql",
+                    "dsn": "pgsql:host=127.0.1.1;port=5432;dbname=my_cine_mania;user=postgres;password=123456",
+                    "user": "postgres",
+                    "password": "123456",
+                    "attributes": []
+                }
+            }
+        },
+        "runtime": {
+            "defaultConnection": "my_cine_mania",
+            "connections": ["my_cine_mania"]
+        },
+        "generator": {
+            "defaultConnection": "my_cine_mania",
+            "connections": ["my_cine_mania"]
+        }
+    }
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="my_cine_mania" defaultIdMethod="native">
+  <table name="preferencia" phpName="Preferencia">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="descricao" type="varchar" size="255" required="true" 	/>
+  </table>
+</database>
