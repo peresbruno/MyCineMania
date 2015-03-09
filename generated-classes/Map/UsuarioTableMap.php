@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \Preferencia;
-use \PreferenciaQuery;
+use \Usuario;
+use \UsuarioQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'preferencias' table.
+ * This class defines the structure of the 'usuarios' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class PreferenciaTableMap extends TableMap
+class UsuarioTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class PreferenciaTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.PreferenciaTableMap';
+    const CLASS_NAME = '.Map.UsuarioTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class PreferenciaTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'preferencias';
+    const TABLE_NAME = 'usuarios';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Preferencia';
+    const OM_CLASS = '\\Usuario';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Preferencia';
+    const CLASS_DEFAULT = 'Usuario';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,17 +69,37 @@ class PreferenciaTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'preferencias.id';
+    const COL_ID = 'usuarios.id';
 
     /**
-     * the column name for the descricao field
+     * the column name for the data_inscricao field
      */
-    const COL_DESCRICAO = 'preferencias.descricao';
+    const COL_DATA_INSCRICAO = 'usuarios.data_inscricao';
+
+    /**
+     * the column name for the email field
+     */
+    const COL_EMAIL = 'usuarios.email';
+
+    /**
+     * the column name for the liberado field
+     */
+    const COL_LIBERADO = 'usuarios.liberado';
+
+    /**
+     * the column name for the nome_usuario field
+     */
+    const COL_NOME_USUARIO = 'usuarios.nome_usuario';
+
+    /**
+     * the column name for the senha field
+     */
+    const COL_SENHA = 'usuarios.senha';
 
     /**
      * The default string format for model objects of the related table
@@ -93,11 +113,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Descricao', ),
-        self::TYPE_CAMELNAME     => array('id', 'descricao', ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID, PreferenciaTableMap::COL_DESCRICAO, ),
-        self::TYPE_FIELDNAME     => array('id', 'descricao', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id', 'DataInscricao', 'Email', 'Liberado', 'NomeUsuario', 'Senha', ),
+        self::TYPE_CAMELNAME     => array('id', 'dataInscricao', 'email', 'liberado', 'nomeUsuario', 'senha', ),
+        self::TYPE_COLNAME       => array(UsuarioTableMap::COL_ID, UsuarioTableMap::COL_DATA_INSCRICAO, UsuarioTableMap::COL_EMAIL, UsuarioTableMap::COL_LIBERADO, UsuarioTableMap::COL_NOME_USUARIO, UsuarioTableMap::COL_SENHA, ),
+        self::TYPE_FIELDNAME     => array('id', 'data_inscricao', 'email', 'liberado', 'nome_usuario', 'senha', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -107,11 +127,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Descricao' => 1, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID => 0, PreferenciaTableMap::COL_DESCRICAO => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'DataInscricao' => 1, 'Email' => 2, 'Liberado' => 3, 'NomeUsuario' => 4, 'Senha' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'dataInscricao' => 1, 'email' => 2, 'liberado' => 3, 'nomeUsuario' => 4, 'senha' => 5, ),
+        self::TYPE_COLNAME       => array(UsuarioTableMap::COL_ID => 0, UsuarioTableMap::COL_DATA_INSCRICAO => 1, UsuarioTableMap::COL_EMAIL => 2, UsuarioTableMap::COL_LIBERADO => 3, UsuarioTableMap::COL_NOME_USUARIO => 4, UsuarioTableMap::COL_SENHA => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'data_inscricao' => 1, 'email' => 2, 'liberado' => 3, 'nome_usuario' => 4, 'senha' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -124,16 +144,20 @@ class PreferenciaTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('preferencias');
-        $this->setPhpName('Preferencia');
+        $this->setName('usuarios');
+        $this->setPhpName('Usuario');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Preferencia');
+        $this->setClassName('\\Usuario');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('preferencias_id_seq');
+        $this->setPrimaryKeyMethodInfo('usuarios_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('descricao', 'Descricao', 'VARCHAR', true, 255, null);
+        $this->addColumn('data_inscricao', 'DataInscricao', 'DATE', true, null, null);
+        $this->addColumn('email', 'Email', 'VARCHAR', true, 255, null);
+        $this->addColumn('liberado', 'Liberado', 'BOOLEAN', true, null, false);
+        $this->addColumn('nome_usuario', 'NomeUsuario', 'VARCHAR', true, 255, null);
+        $this->addColumn('senha', 'Senha', 'VARCHAR', true, 255, null);
     } // initialize()
 
     /**
@@ -141,14 +165,20 @@ class PreferenciaTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('BeneficiosPreferencias', '\\BeneficiosPreferencias', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Participante', '\\Participante', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
-    0 => ':preferencia_id',
+    0 => ':usuario_id',
     1 => ':id',
   ),
-), null, null, 'BeneficiosPreferenciass', false);
-        $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_MANY, array(), null, null, 'Beneficios');
+), null, null, 'Participantes', false);
+        $this->addRelation('UsuarioRedeCinema', '\\UsuarioRedeCinema', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':usuario_id',
+    1 => ':id',
+  ),
+), null, null, 'UsuarioRedeCinemas', false);
     } // buildRelations()
 
     /**
@@ -208,7 +238,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? PreferenciaTableMap::CLASS_DEFAULT : PreferenciaTableMap::OM_CLASS;
+        return $withPrefix ? UsuarioTableMap::CLASS_DEFAULT : UsuarioTableMap::OM_CLASS;
     }
 
     /**
@@ -222,22 +252,22 @@ class PreferenciaTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Preferencia object, last column rank)
+     * @return array           (Usuario object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+        $key = UsuarioTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = UsuarioTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + PreferenciaTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + UsuarioTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = PreferenciaTableMap::OM_CLASS;
-            /** @var Preferencia $obj */
+            $cls = UsuarioTableMap::OM_CLASS;
+            /** @var Usuario $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            PreferenciaTableMap::addInstanceToPool($obj, $key);
+            UsuarioTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -260,18 +290,18 @@ class PreferenciaTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+            $key = UsuarioTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = UsuarioTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Preferencia $obj */
+                /** @var Usuario $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                PreferenciaTableMap::addInstanceToPool($obj, $key);
+                UsuarioTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -292,11 +322,19 @@ class PreferenciaTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_ID);
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_DESCRICAO);
+            $criteria->addSelectColumn(UsuarioTableMap::COL_ID);
+            $criteria->addSelectColumn(UsuarioTableMap::COL_DATA_INSCRICAO);
+            $criteria->addSelectColumn(UsuarioTableMap::COL_EMAIL);
+            $criteria->addSelectColumn(UsuarioTableMap::COL_LIBERADO);
+            $criteria->addSelectColumn(UsuarioTableMap::COL_NOME_USUARIO);
+            $criteria->addSelectColumn(UsuarioTableMap::COL_SENHA);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.descricao');
+            $criteria->addSelectColumn($alias . '.data_inscricao');
+            $criteria->addSelectColumn($alias . '.email');
+            $criteria->addSelectColumn($alias . '.liberado');
+            $criteria->addSelectColumn($alias . '.nome_usuario');
+            $criteria->addSelectColumn($alias . '.senha');
         }
     }
 
@@ -309,7 +347,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME)->getTable(PreferenciaTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(UsuarioTableMap::DATABASE_NAME)->getTable(UsuarioTableMap::TABLE_NAME);
     }
 
     /**
@@ -317,16 +355,16 @@ class PreferenciaTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(PreferenciaTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new PreferenciaTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(UsuarioTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(UsuarioTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new UsuarioTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Preferencia or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Usuario or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Preferencia object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Usuario object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -337,27 +375,27 @@ class PreferenciaTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(UsuarioTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Preferencia) { // it's a model object
+        } elseif ($values instanceof \Usuario) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(PreferenciaTableMap::DATABASE_NAME);
-            $criteria->add(PreferenciaTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(UsuarioTableMap::DATABASE_NAME);
+            $criteria->add(UsuarioTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = UsuarioQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            PreferenciaTableMap::clearInstancePool();
+            UsuarioTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                PreferenciaTableMap::removeInstanceFromPool($singleval);
+                UsuarioTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -365,20 +403,20 @@ class PreferenciaTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the preferencias table.
+     * Deletes all rows from the usuarios table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return PreferenciaQuery::create()->doDeleteAll($con);
+        return UsuarioQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Preferencia or Criteria object.
+     * Performs an INSERT on the database, given a Usuario or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Preferencia object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Usuario object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -387,22 +425,22 @@ class PreferenciaTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(UsuarioTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Preferencia object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Usuario object
         }
 
-        if ($criteria->containsKey(PreferenciaTableMap::COL_ID) && $criteria->keyContainsValue(PreferenciaTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PreferenciaTableMap::COL_ID.')');
+        if ($criteria->containsKey(UsuarioTableMap::COL_ID) && $criteria->keyContainsValue(UsuarioTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.UsuarioTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = UsuarioQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -411,7 +449,7 @@ class PreferenciaTableMap extends TableMap
         });
     }
 
-} // PreferenciaTableMap
+} // UsuarioTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-PreferenciaTableMap::buildTableMap();
+UsuarioTableMap::buildTableMap();

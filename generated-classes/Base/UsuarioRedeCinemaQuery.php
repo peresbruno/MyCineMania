@@ -2,11 +2,11 @@
 
 namespace Base;
 
-use \Preferencia as ChildPreferencia;
-use \PreferenciaQuery as ChildPreferenciaQuery;
+use \UsuarioRedeCinema as ChildUsuarioRedeCinema;
+use \UsuarioRedeCinemaQuery as ChildUsuarioRedeCinemaQuery;
 use \Exception;
 use \PDO;
-use Map\PreferenciaTableMap;
+use Map\UsuarioRedeCinemaTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -16,74 +16,74 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'preferencias' table.
+ * Base class that represents a query for the 'usuarios_rede_cinema' table.
  *
  *
  *
- * @method     ChildPreferenciaQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildPreferenciaQuery orderByDescricao($order = Criteria::ASC) Order by the descricao column
+ * @method     ChildUsuarioRedeCinemaQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildUsuarioRedeCinemaQuery orderByUsuarioId($order = Criteria::ASC) Order by the usuario_id column
  *
- * @method     ChildPreferenciaQuery groupById() Group by the id column
- * @method     ChildPreferenciaQuery groupByDescricao() Group by the descricao column
+ * @method     ChildUsuarioRedeCinemaQuery groupById() Group by the id column
+ * @method     ChildUsuarioRedeCinemaQuery groupByUsuarioId() Group by the usuario_id column
  *
- * @method     ChildPreferenciaQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildPreferenciaQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildPreferenciaQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildUsuarioRedeCinemaQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildUsuarioRedeCinemaQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildUsuarioRedeCinemaQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildPreferenciaQuery leftJoinBeneficiosPreferencias($relationAlias = null) Adds a LEFT JOIN clause to the query using the BeneficiosPreferencias relation
- * @method     ChildPreferenciaQuery rightJoinBeneficiosPreferencias($relationAlias = null) Adds a RIGHT JOIN clause to the query using the BeneficiosPreferencias relation
- * @method     ChildPreferenciaQuery innerJoinBeneficiosPreferencias($relationAlias = null) Adds a INNER JOIN clause to the query using the BeneficiosPreferencias relation
+ * @method     ChildUsuarioRedeCinemaQuery leftJoinUsuario($relationAlias = null) Adds a LEFT JOIN clause to the query using the Usuario relation
+ * @method     ChildUsuarioRedeCinemaQuery rightJoinUsuario($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Usuario relation
+ * @method     ChildUsuarioRedeCinemaQuery innerJoinUsuario($relationAlias = null) Adds a INNER JOIN clause to the query using the Usuario relation
  *
- * @method     \BeneficiosPreferenciasQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \UsuarioQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
- * @method     ChildPreferencia findOne(ConnectionInterface $con = null) Return the first ChildPreferencia matching the query
- * @method     ChildPreferencia findOneOrCreate(ConnectionInterface $con = null) Return the first ChildPreferencia matching the query, or a new ChildPreferencia object populated from the query conditions when no match is found
+ * @method     ChildUsuarioRedeCinema findOne(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query
+ * @method     ChildUsuarioRedeCinema findOneOrCreate(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query, or a new ChildUsuarioRedeCinema object populated from the query conditions when no match is found
  *
- * @method     ChildPreferencia findOneById(int $id) Return the first ChildPreferencia filtered by the id column
- * @method     ChildPreferencia findOneByDescricao(string $descricao) Return the first ChildPreferencia filtered by the descricao column *
+ * @method     ChildUsuarioRedeCinema findOneById(int $id) Return the first ChildUsuarioRedeCinema filtered by the id column
+ * @method     ChildUsuarioRedeCinema findOneByUsuarioId(int $usuario_id) Return the first ChildUsuarioRedeCinema filtered by the usuario_id column *
 
- * @method     ChildPreferencia requirePk($key, ConnectionInterface $con = null) Return the ChildPreferencia by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildPreferencia requireOne(ConnectionInterface $con = null) Return the first ChildPreferencia matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUsuarioRedeCinema requirePk($key, ConnectionInterface $con = null) Return the ChildUsuarioRedeCinema by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUsuarioRedeCinema requireOne(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildPreferencia requireOneById(int $id) Return the first ChildPreferencia filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildPreferencia requireOneByDescricao(string $descricao) Return the first ChildPreferencia filtered by the descricao column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUsuarioRedeCinema requireOneById(int $id) Return the first ChildUsuarioRedeCinema filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUsuarioRedeCinema requireOneByUsuarioId(int $usuario_id) Return the first ChildUsuarioRedeCinema filtered by the usuario_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildPreferencia[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildPreferencia objects based on current ModelCriteria
- * @method     ChildPreferencia[]|ObjectCollection findById(int $id) Return ChildPreferencia objects filtered by the id column
- * @method     ChildPreferencia[]|ObjectCollection findByDescricao(string $descricao) Return ChildPreferencia objects filtered by the descricao column
- * @method     ChildPreferencia[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     ChildUsuarioRedeCinema[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildUsuarioRedeCinema objects based on current ModelCriteria
+ * @method     ChildUsuarioRedeCinema[]|ObjectCollection findById(int $id) Return ChildUsuarioRedeCinema objects filtered by the id column
+ * @method     ChildUsuarioRedeCinema[]|ObjectCollection findByUsuarioId(int $usuario_id) Return ChildUsuarioRedeCinema objects filtered by the usuario_id column
+ * @method     ChildUsuarioRedeCinema[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
-abstract class PreferenciaQuery extends ModelCriteria
+abstract class UsuarioRedeCinemaQuery extends ModelCriteria
 {
     protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
-     * Initializes internal state of \Base\PreferenciaQuery object.
+     * Initializes internal state of \Base\UsuarioRedeCinemaQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'my_cine_mania', $modelName = '\\Preferencia', $modelAlias = null)
+    public function __construct($dbName = 'my_cine_mania', $modelName = '\\UsuarioRedeCinema', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildPreferenciaQuery object.
+     * Returns a new ChildUsuarioRedeCinemaQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildPreferenciaQuery
+     * @return ChildUsuarioRedeCinemaQuery
      */
     public static function create($modelAlias = null, Criteria $criteria = null)
     {
-        if ($criteria instanceof ChildPreferenciaQuery) {
+        if ($criteria instanceof ChildUsuarioRedeCinemaQuery) {
             return $criteria;
         }
-        $query = new ChildPreferenciaQuery();
+        $query = new ChildUsuarioRedeCinemaQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -106,19 +106,19 @@ abstract class PreferenciaQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildPreferencia|array|mixed the result, formatted by the current formatter
+     * @return ChildUsuarioRedeCinema|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, ConnectionInterface $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = PreferenciaTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = UsuarioRedeCinemaTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(UsuarioRedeCinemaTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -139,11 +139,11 @@ abstract class PreferenciaQuery extends ModelCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildPreferencia A model object, or null if the key is not found
+     * @return ChildUsuarioRedeCinema A model object, or null if the key is not found
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, descricao FROM preferencias WHERE id = :p0';
+        $sql = 'SELECT id, usuario_id FROM usuarios_rede_cinema WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -154,10 +154,10 @@ abstract class PreferenciaQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildPreferencia $obj */
-            $obj = new ChildPreferencia();
+            /** @var ChildUsuarioRedeCinema $obj */
+            $obj = new ChildUsuarioRedeCinema();
             $obj->hydrate($row);
-            PreferenciaTableMap::addInstanceToPool($obj, (string) $key);
+            UsuarioRedeCinemaTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -170,7 +170,7 @@ abstract class PreferenciaQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildPreferencia|array|mixed the result, formatted by the current formatter
+     * @return ChildUsuarioRedeCinema|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, ConnectionInterface $con)
     {
@@ -212,12 +212,12 @@ abstract class PreferenciaQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildPreferenciaQuery The current query, for fluid interface
+     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(PreferenciaTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -225,12 +225,12 @@ abstract class PreferenciaQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildPreferenciaQuery The current query, for fluid interface
+     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(PreferenciaTableMap::COL_ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -249,18 +249,18 @@ abstract class PreferenciaQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildPreferenciaQuery The current query, for fluid interface
+     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(PreferenciaTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(PreferenciaTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -271,73 +271,91 @@ abstract class PreferenciaQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(PreferenciaTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $id, $comparison);
     }
 
     /**
-     * Filter the query on the descricao column
+     * Filter the query on the usuario_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByDescricao('fooValue');   // WHERE descricao = 'fooValue'
-     * $query->filterByDescricao('%fooValue%'); // WHERE descricao LIKE '%fooValue%'
+     * $query->filterByUsuarioId(1234); // WHERE usuario_id = 1234
+     * $query->filterByUsuarioId(array(12, 34)); // WHERE usuario_id IN (12, 34)
+     * $query->filterByUsuarioId(array('min' => 12)); // WHERE usuario_id > 12
      * </code>
      *
-     * @param     string $descricao The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @see       filterByUsuario()
+     *
+     * @param     mixed $usuarioId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildPreferenciaQuery The current query, for fluid interface
+     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
      */
-    public function filterByDescricao($descricao = null, $comparison = null)
+    public function filterByUsuarioId($usuarioId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($descricao)) {
+        if (is_array($usuarioId)) {
+            $useMinMax = false;
+            if (isset($usuarioId['min'])) {
+                $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $usuarioId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($usuarioId['max'])) {
+                $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $usuarioId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $descricao)) {
-                $descricao = str_replace('*', '%', $descricao);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(PreferenciaTableMap::COL_DESCRICAO, $descricao, $comparison);
+        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $usuarioId, $comparison);
     }
 
     /**
-     * Filter the query by a related \BeneficiosPreferencias object
+     * Filter the query by a related \Usuario object
      *
-     * @param \BeneficiosPreferencias|ObjectCollection $beneficiosPreferencias the related object to use as filter
+     * @param \Usuario|ObjectCollection $usuario The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildPreferenciaQuery The current query, for fluid interface
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildUsuarioRedeCinemaQuery The current query, for fluid interface
      */
-    public function filterByBeneficiosPreferencias($beneficiosPreferencias, $comparison = null)
+    public function filterByUsuario($usuario, $comparison = null)
     {
-        if ($beneficiosPreferencias instanceof \BeneficiosPreferencias) {
+        if ($usuario instanceof \Usuario) {
             return $this
-                ->addUsingAlias(PreferenciaTableMap::COL_ID, $beneficiosPreferencias->getPreferenciaId(), $comparison);
-        } elseif ($beneficiosPreferencias instanceof ObjectCollection) {
+                ->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $usuario->getId(), $comparison);
+        } elseif ($usuario instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useBeneficiosPreferenciasQuery()
-                ->filterByPrimaryKeys($beneficiosPreferencias->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $usuario->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByBeneficiosPreferencias() only accepts arguments of type \BeneficiosPreferencias or Collection');
+            throw new PropelException('filterByUsuario() only accepts arguments of type \Usuario or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the BeneficiosPreferencias relation
+     * Adds a JOIN clause to the query using the Usuario relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildPreferenciaQuery The current query, for fluid interface
+     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
      */
-    public function joinBeneficiosPreferencias($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinUsuario($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('BeneficiosPreferencias');
+        $relationMap = $tableMap->getRelation('Usuario');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -352,14 +370,14 @@ abstract class PreferenciaQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'BeneficiosPreferencias');
+            $this->addJoinObject($join, 'Usuario');
         }
 
         return $this;
     }
 
     /**
-     * Use the BeneficiosPreferencias relation BeneficiosPreferencias object
+     * Use the Usuario relation Usuario object
      *
      * @see useQuery()
      *
@@ -367,50 +385,33 @@ abstract class PreferenciaQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \BeneficiosPreferenciasQuery A secondary query class using the current class as primary query
+     * @return \UsuarioQuery A secondary query class using the current class as primary query
      */
-    public function useBeneficiosPreferenciasQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useUsuarioQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinBeneficiosPreferencias($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'BeneficiosPreferencias', '\BeneficiosPreferenciasQuery');
-    }
-
-    /**
-     * Filter the query by a related Beneficio object
-     * using the beneficios_preferencias table as cross reference
-     *
-     * @param Beneficio $beneficio the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildPreferenciaQuery The current query, for fluid interface
-     */
-    public function filterByBeneficio($beneficio, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useBeneficiosPreferenciasQuery()
-            ->filterByBeneficio($beneficio, $comparison)
-            ->endUse();
+            ->joinUsuario($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Usuario', '\UsuarioQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildPreferencia $preferencia Object to remove from the list of results
+     * @param   ChildUsuarioRedeCinema $usuarioRedeCinema Object to remove from the list of results
      *
-     * @return $this|ChildPreferenciaQuery The current query, for fluid interface
+     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
      */
-    public function prune($preferencia = null)
+    public function prune($usuarioRedeCinema = null)
     {
-        if ($preferencia) {
-            $this->addUsingAlias(PreferenciaTableMap::COL_ID, $preferencia->getId(), Criteria::NOT_EQUAL);
+        if ($usuarioRedeCinema) {
+            $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $usuarioRedeCinema->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the preferencias table.
+     * Deletes all rows from the usuarios_rede_cinema table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -418,7 +419,7 @@ abstract class PreferenciaQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(UsuarioRedeCinemaTableMap::DATABASE_NAME);
         }
 
         // use transaction because $criteria could contain info
@@ -429,8 +430,8 @@ abstract class PreferenciaQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            PreferenciaTableMap::clearInstancePool();
-            PreferenciaTableMap::clearRelatedInstancePool();
+            UsuarioRedeCinemaTableMap::clearInstancePool();
+            UsuarioRedeCinemaTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
@@ -448,26 +449,26 @@ abstract class PreferenciaQuery extends ModelCriteria
     public function delete(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(UsuarioRedeCinemaTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(PreferenciaTableMap::DATABASE_NAME);
+        $criteria->setDbName(UsuarioRedeCinemaTableMap::DATABASE_NAME);
 
         // use transaction because $criteria could contain info
         // for more than one table or we could emulating ON DELETE CASCADE, etc.
         return $con->transaction(function () use ($con, $criteria) {
             $affectedRows = 0; // initialize var to track total num of affected rows
 
-            PreferenciaTableMap::removeInstanceFromPool($criteria);
+            UsuarioRedeCinemaTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            PreferenciaTableMap::clearRelatedInstancePool();
+            UsuarioRedeCinemaTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
     }
 
-} // PreferenciaQuery
+} // UsuarioRedeCinemaQuery

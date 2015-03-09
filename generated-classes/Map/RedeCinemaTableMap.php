@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \Preferencia;
-use \PreferenciaQuery;
+use \RedeCinema;
+use \RedeCinemaQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'preferencias' table.
+ * This class defines the structure of the 'redes_cinema' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class PreferenciaTableMap extends TableMap
+class RedeCinemaTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class PreferenciaTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.PreferenciaTableMap';
+    const CLASS_NAME = '.Map.RedeCinemaTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class PreferenciaTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'preferencias';
+    const TABLE_NAME = 'redes_cinema';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Preferencia';
+    const OM_CLASS = '\\RedeCinema';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Preferencia';
+    const CLASS_DEFAULT = 'RedeCinema';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,17 +69,32 @@ class PreferenciaTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'preferencias.id';
+    const COL_ID = 'redes_cinema.id';
 
     /**
-     * the column name for the descricao field
+     * the column name for the cnpj field
      */
-    const COL_DESCRICAO = 'preferencias.descricao';
+    const COL_CNPJ = 'redes_cinema.cnpj';
+
+    /**
+     * the column name for the nome_fantasia field
+     */
+    const COL_NOME_FANTASIA = 'redes_cinema.nome_fantasia';
+
+    /**
+     * the column name for the razao_social field
+     */
+    const COL_RAZAO_SOCIAL = 'redes_cinema.razao_social';
+
+    /**
+     * the column name for the endereco field
+     */
+    const COL_ENDERECO = 'redes_cinema.endereco';
 
     /**
      * The default string format for model objects of the related table
@@ -93,11 +108,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Descricao', ),
-        self::TYPE_CAMELNAME     => array('id', 'descricao', ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID, PreferenciaTableMap::COL_DESCRICAO, ),
-        self::TYPE_FIELDNAME     => array('id', 'descricao', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id', 'Cnpj', 'NomeFantasia', 'RazaoSocial', 'Endereco', ),
+        self::TYPE_CAMELNAME     => array('id', 'cnpj', 'nomeFantasia', 'razaoSocial', 'endereco', ),
+        self::TYPE_COLNAME       => array(RedeCinemaTableMap::COL_ID, RedeCinemaTableMap::COL_CNPJ, RedeCinemaTableMap::COL_NOME_FANTASIA, RedeCinemaTableMap::COL_RAZAO_SOCIAL, RedeCinemaTableMap::COL_ENDERECO, ),
+        self::TYPE_FIELDNAME     => array('id', 'cnpj', 'nome_fantasia', 'razao_social', 'endereco', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -107,11 +122,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Descricao' => 1, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID => 0, PreferenciaTableMap::COL_DESCRICAO => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Cnpj' => 1, 'NomeFantasia' => 2, 'RazaoSocial' => 3, 'Endereco' => 4, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'cnpj' => 1, 'nomeFantasia' => 2, 'razaoSocial' => 3, 'endereco' => 4, ),
+        self::TYPE_COLNAME       => array(RedeCinemaTableMap::COL_ID => 0, RedeCinemaTableMap::COL_CNPJ => 1, RedeCinemaTableMap::COL_NOME_FANTASIA => 2, RedeCinemaTableMap::COL_RAZAO_SOCIAL => 3, RedeCinemaTableMap::COL_ENDERECO => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'cnpj' => 1, 'nome_fantasia' => 2, 'razao_social' => 3, 'endereco' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -124,16 +139,19 @@ class PreferenciaTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('preferencias');
-        $this->setPhpName('Preferencia');
+        $this->setName('redes_cinema');
+        $this->setPhpName('RedeCinema');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Preferencia');
+        $this->setClassName('\\RedeCinema');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('preferencias_id_seq');
+        $this->setPrimaryKeyMethodInfo('redes_cinema_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('descricao', 'Descricao', 'VARCHAR', true, 255, null);
+        $this->addColumn('cnpj', 'Cnpj', 'VARCHAR', true, 50, null);
+        $this->addColumn('nome_fantasia', 'NomeFantasia', 'VARCHAR', true, 255, null);
+        $this->addColumn('razao_social', 'RazaoSocial', 'VARCHAR', true, 255, null);
+        $this->addColumn('endereco', 'Endereco', 'LONGVARCHAR', true, null, null);
     } // initialize()
 
     /**
@@ -141,14 +159,13 @@ class PreferenciaTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('BeneficiosPreferencias', '\\BeneficiosPreferencias', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Beneficio', '\\Beneficio', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
-    0 => ':preferencia_id',
+    0 => ':rede_cinema_id',
     1 => ':id',
   ),
-), null, null, 'BeneficiosPreferenciass', false);
-        $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_MANY, array(), null, null, 'Beneficios');
+), null, null, 'Beneficios', false);
     } // buildRelations()
 
     /**
@@ -208,7 +225,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? PreferenciaTableMap::CLASS_DEFAULT : PreferenciaTableMap::OM_CLASS;
+        return $withPrefix ? RedeCinemaTableMap::CLASS_DEFAULT : RedeCinemaTableMap::OM_CLASS;
     }
 
     /**
@@ -222,22 +239,22 @@ class PreferenciaTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Preferencia object, last column rank)
+     * @return array           (RedeCinema object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+        $key = RedeCinemaTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = RedeCinemaTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + PreferenciaTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + RedeCinemaTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = PreferenciaTableMap::OM_CLASS;
-            /** @var Preferencia $obj */
+            $cls = RedeCinemaTableMap::OM_CLASS;
+            /** @var RedeCinema $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            PreferenciaTableMap::addInstanceToPool($obj, $key);
+            RedeCinemaTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -260,18 +277,18 @@ class PreferenciaTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+            $key = RedeCinemaTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = RedeCinemaTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Preferencia $obj */
+                /** @var RedeCinema $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                PreferenciaTableMap::addInstanceToPool($obj, $key);
+                RedeCinemaTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -292,11 +309,17 @@ class PreferenciaTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_ID);
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_DESCRICAO);
+            $criteria->addSelectColumn(RedeCinemaTableMap::COL_ID);
+            $criteria->addSelectColumn(RedeCinemaTableMap::COL_CNPJ);
+            $criteria->addSelectColumn(RedeCinemaTableMap::COL_NOME_FANTASIA);
+            $criteria->addSelectColumn(RedeCinemaTableMap::COL_RAZAO_SOCIAL);
+            $criteria->addSelectColumn(RedeCinemaTableMap::COL_ENDERECO);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.descricao');
+            $criteria->addSelectColumn($alias . '.cnpj');
+            $criteria->addSelectColumn($alias . '.nome_fantasia');
+            $criteria->addSelectColumn($alias . '.razao_social');
+            $criteria->addSelectColumn($alias . '.endereco');
         }
     }
 
@@ -309,7 +332,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME)->getTable(PreferenciaTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(RedeCinemaTableMap::DATABASE_NAME)->getTable(RedeCinemaTableMap::TABLE_NAME);
     }
 
     /**
@@ -317,16 +340,16 @@ class PreferenciaTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(PreferenciaTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new PreferenciaTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(RedeCinemaTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(RedeCinemaTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new RedeCinemaTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Preferencia or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a RedeCinema or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Preferencia object or primary key or array of primary keys
+     * @param mixed               $values Criteria or RedeCinema object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -337,27 +360,27 @@ class PreferenciaTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RedeCinemaTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Preferencia) { // it's a model object
+        } elseif ($values instanceof \RedeCinema) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(PreferenciaTableMap::DATABASE_NAME);
-            $criteria->add(PreferenciaTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(RedeCinemaTableMap::DATABASE_NAME);
+            $criteria->add(RedeCinemaTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = RedeCinemaQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            PreferenciaTableMap::clearInstancePool();
+            RedeCinemaTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                PreferenciaTableMap::removeInstanceFromPool($singleval);
+                RedeCinemaTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -365,20 +388,20 @@ class PreferenciaTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the preferencias table.
+     * Deletes all rows from the redes_cinema table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return PreferenciaQuery::create()->doDeleteAll($con);
+        return RedeCinemaQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Preferencia or Criteria object.
+     * Performs an INSERT on the database, given a RedeCinema or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Preferencia object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or RedeCinema object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -387,22 +410,22 @@ class PreferenciaTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RedeCinemaTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Preferencia object
+            $criteria = $criteria->buildCriteria(); // build Criteria from RedeCinema object
         }
 
-        if ($criteria->containsKey(PreferenciaTableMap::COL_ID) && $criteria->keyContainsValue(PreferenciaTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PreferenciaTableMap::COL_ID.')');
+        if ($criteria->containsKey(RedeCinemaTableMap::COL_ID) && $criteria->keyContainsValue(RedeCinemaTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.RedeCinemaTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = RedeCinemaQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -411,7 +434,7 @@ class PreferenciaTableMap extends TableMap
         });
     }
 
-} // PreferenciaTableMap
+} // RedeCinemaTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-PreferenciaTableMap::buildTableMap();
+RedeCinemaTableMap::buildTableMap();

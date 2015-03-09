@@ -1,7 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database name="my_cine_mania" defaultIdMethod="native">
-  <table name="preferencia" phpName="Preferencia">
+
+  <table name="preferencias" phpName="Preferencia">
     <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-    <column name="descricao" type="varchar" size="255" required="true" 	/>
+    <column name="descricao" type="varchar" size="255" required="true" />
   </table>
+
+  <table name="usuarios" phpName="Usuario">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="data_inscricao" type="date" required="true" />
+    <column name="email" type="varchar" size="255" required="true" />
+    <column name="liberado" type="boolean" defaultValue="false" required="true" />
+    <column name="nome_usuario" type="varchar" size="255" required="true" />
+    <column name="senha" type="varchar" size="255" required="true" />
+  </table>
+
+  <table name="participantes" phpName="Participante">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="usuario_id" type="integer" required="true" />
+    <column name="cpf" type="varchar" size="50" required="true" />
+    <column name="fim_validade" type="date" />
+    <column name="nome" type="varchar" size="255" />
+    <column name="sobrenome" type="varchar" size="255" />
+    <foreign-key foreignTable="usuarios">
+      <reference local="usuario_id" foreign="id" />
+    </foreign-key>
+    <behavior name="delegate">
+      <parameter name="to" value="usuarios" />
+    </behavior>
+  </table>
+
+  <table name="redes_cinema" phpName="RedeCinema">
+      <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+      <column name="cnpj" type="varchar" size="50" required="true" />
+      <column name="nome_fantasia" type="varchar" size="255" required="true" />
+      <column name="razao_social" type="varchar" size="255" required="true" />
+      <column name="endereco" type="longvarchar" required="true" />
+  </table>
+
+  <table name="usuarios_rede_cinema" phpName="UsuarioRedeCinema">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="usuario_id" type="integer" required="true" />
+    <foreign-key foreignTable="usuarios">
+      <reference local="usuario_id" foreign="id" />
+    </foreign-key>
+    <behavior name="delegate">
+      <parameter name="to" value="usuarios" />
+    </behavior>
+  </table>
+
+  <table name="beneficios" phpName="Beneficio">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="rede_cinema_id" type="integer" required="true" 	/>
+    <column name="titulo" type="varchar" size="255" required="true" />
+    <column name="inicio_validade" type="date" required="true" />
+    <column name="fim_validade" type="date" required="true" />
+    <column name="descricao" type="longvarchar" required="true" />
+    <column name="condicoes" type="longvarchar" required="true" />
+    <foreign-key foreignTable="redes_cinema">
+      <reference local="rede_cinema_id" foreign="id" />
+    </foreign-key>
+  </table>
+
+  <table name="beneficios_preferencias" isCrossRef="true">
+    <column name="preferencia_id" type="integer" primaryKey="true"/>
+    <column name="beneficio_id" type="integer" primaryKey="true"/>
+    <foreign-key foreignTable="preferencias">
+      <reference local="preferencia_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="beneficios">
+      <reference local="beneficio_id" foreign="id"/>
+    </foreign-key>
+  </table>
+
+  <table name="participantes_preferencias" isCrossRef="true">
+    <column name="participante_id" type="integer" primaryKey="true"/>
+    <column name="beneficio_id" type="integer" primaryKey="true"/>
+    <foreign-key foreignTable="participantes">
+      <reference local="participante_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="beneficios">
+      <reference local="beneficio_id" foreign="id"/>
+    </foreign-key>
+  </table>
+
+  <table name="pagamentos" phpName="Pagamento">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="participante_id" type="integer" required="true" />
+    <column name="data_pagamento" type="date" />
+    <column name="data_vencimento" type="date" required="true" />
+    <column name="numero_boleto" type="varchar" size="50" />
+    <column name="valor" type="double" required="true" />
+    <foreign-key foreignTable="participantes">
+      <reference local="participante_id" foreign="id" />
+    </foreign-key>
+  </table>
+
+  <table name="vouchers" phpName="Voucher">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="beneficio_id" type="integer" required="true" />
+    <column name="participante_id" type="integer" required="true" />
+    <column name="status" type="varchar" size="50" required="true" />
+    <column name="codigo" type="varchar" size="50" required="true" />
+    <column name="data_emissao" type="date" required="true" />
+    <column name="hora_emissao" type="time"  required="true" />
+    <foreign-key foreignTable="beneficios">
+      <reference local="beneficio_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="participantes">
+      <reference local="participante_id" foreign="id"/>
+    </foreign-key>
+  </table>
+
 </database>

@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \Preferencia;
-use \PreferenciaQuery;
+use \Participante;
+use \ParticipanteQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'preferencias' table.
+ * This class defines the structure of the 'participantes' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class PreferenciaTableMap extends TableMap
+class ParticipanteTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class PreferenciaTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.PreferenciaTableMap';
+    const CLASS_NAME = '.Map.ParticipanteTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class PreferenciaTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'preferencias';
+    const TABLE_NAME = 'participantes';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Preferencia';
+    const OM_CLASS = '\\Participante';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Preferencia';
+    const CLASS_DEFAULT = 'Participante';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,17 +69,37 @@ class PreferenciaTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'preferencias.id';
+    const COL_ID = 'participantes.id';
 
     /**
-     * the column name for the descricao field
+     * the column name for the usuario_id field
      */
-    const COL_DESCRICAO = 'preferencias.descricao';
+    const COL_USUARIO_ID = 'participantes.usuario_id';
+
+    /**
+     * the column name for the cpf field
+     */
+    const COL_CPF = 'participantes.cpf';
+
+    /**
+     * the column name for the fim_validade field
+     */
+    const COL_FIM_VALIDADE = 'participantes.fim_validade';
+
+    /**
+     * the column name for the nome field
+     */
+    const COL_NOME = 'participantes.nome';
+
+    /**
+     * the column name for the sobrenome field
+     */
+    const COL_SOBRENOME = 'participantes.sobrenome';
 
     /**
      * The default string format for model objects of the related table
@@ -93,11 +113,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Descricao', ),
-        self::TYPE_CAMELNAME     => array('id', 'descricao', ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID, PreferenciaTableMap::COL_DESCRICAO, ),
-        self::TYPE_FIELDNAME     => array('id', 'descricao', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id', 'UsuarioId', 'Cpf', 'FimValidade', 'Nome', 'Sobrenome', ),
+        self::TYPE_CAMELNAME     => array('id', 'usuarioId', 'cpf', 'fimValidade', 'nome', 'sobrenome', ),
+        self::TYPE_COLNAME       => array(ParticipanteTableMap::COL_ID, ParticipanteTableMap::COL_USUARIO_ID, ParticipanteTableMap::COL_CPF, ParticipanteTableMap::COL_FIM_VALIDADE, ParticipanteTableMap::COL_NOME, ParticipanteTableMap::COL_SOBRENOME, ),
+        self::TYPE_FIELDNAME     => array('id', 'usuario_id', 'cpf', 'fim_validade', 'nome', 'sobrenome', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -107,11 +127,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Descricao' => 1, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID => 0, PreferenciaTableMap::COL_DESCRICAO => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'UsuarioId' => 1, 'Cpf' => 2, 'FimValidade' => 3, 'Nome' => 4, 'Sobrenome' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'usuarioId' => 1, 'cpf' => 2, 'fimValidade' => 3, 'nome' => 4, 'sobrenome' => 5, ),
+        self::TYPE_COLNAME       => array(ParticipanteTableMap::COL_ID => 0, ParticipanteTableMap::COL_USUARIO_ID => 1, ParticipanteTableMap::COL_CPF => 2, ParticipanteTableMap::COL_FIM_VALIDADE => 3, ParticipanteTableMap::COL_NOME => 4, ParticipanteTableMap::COL_SOBRENOME => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'usuario_id' => 1, 'cpf' => 2, 'fim_validade' => 3, 'nome' => 4, 'sobrenome' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -124,16 +144,20 @@ class PreferenciaTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('preferencias');
-        $this->setPhpName('Preferencia');
+        $this->setName('participantes');
+        $this->setPhpName('Participante');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Preferencia');
+        $this->setClassName('\\Participante');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('preferencias_id_seq');
+        $this->setPrimaryKeyMethodInfo('participantes_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('descricao', 'Descricao', 'VARCHAR', true, 255, null);
+        $this->addForeignKey('usuario_id', 'UsuarioId', 'INTEGER', 'usuarios', 'id', true, null, null);
+        $this->addColumn('cpf', 'Cpf', 'VARCHAR', true, 50, null);
+        $this->addColumn('fim_validade', 'FimValidade', 'DATE', false, null, null);
+        $this->addColumn('nome', 'Nome', 'VARCHAR', false, 255, null);
+        $this->addColumn('sobrenome', 'Sobrenome', 'VARCHAR', false, 255, null);
     } // initialize()
 
     /**
@@ -141,15 +165,49 @@ class PreferenciaTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('BeneficiosPreferencias', '\\BeneficiosPreferencias', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Usuario', '\\Usuario', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':preferencia_id',
+    0 => ':usuario_id',
     1 => ':id',
   ),
-), null, null, 'BeneficiosPreferenciass', false);
+), null, null, null, false);
+        $this->addRelation('ParticipantesPreferencias', '\\ParticipantesPreferencias', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':participante_id',
+    1 => ':id',
+  ),
+), null, null, 'ParticipantesPreferenciass', false);
+        $this->addRelation('Pagamento', '\\Pagamento', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':participante_id',
+    1 => ':id',
+  ),
+), null, null, 'Pagamentos', false);
+        $this->addRelation('Voucher', '\\Voucher', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':participante_id',
+    1 => ':id',
+  ),
+), null, null, 'Vouchers', false);
         $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_MANY, array(), null, null, 'Beneficios');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'delegate' => array('to' => 'usuarios', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -208,7 +266,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? PreferenciaTableMap::CLASS_DEFAULT : PreferenciaTableMap::OM_CLASS;
+        return $withPrefix ? ParticipanteTableMap::CLASS_DEFAULT : ParticipanteTableMap::OM_CLASS;
     }
 
     /**
@@ -222,22 +280,22 @@ class PreferenciaTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Preferencia object, last column rank)
+     * @return array           (Participante object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+        $key = ParticipanteTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ParticipanteTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + PreferenciaTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ParticipanteTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = PreferenciaTableMap::OM_CLASS;
-            /** @var Preferencia $obj */
+            $cls = ParticipanteTableMap::OM_CLASS;
+            /** @var Participante $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            PreferenciaTableMap::addInstanceToPool($obj, $key);
+            ParticipanteTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -260,18 +318,18 @@ class PreferenciaTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+            $key = ParticipanteTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ParticipanteTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Preferencia $obj */
+                /** @var Participante $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                PreferenciaTableMap::addInstanceToPool($obj, $key);
+                ParticipanteTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -292,11 +350,19 @@ class PreferenciaTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_ID);
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_DESCRICAO);
+            $criteria->addSelectColumn(ParticipanteTableMap::COL_ID);
+            $criteria->addSelectColumn(ParticipanteTableMap::COL_USUARIO_ID);
+            $criteria->addSelectColumn(ParticipanteTableMap::COL_CPF);
+            $criteria->addSelectColumn(ParticipanteTableMap::COL_FIM_VALIDADE);
+            $criteria->addSelectColumn(ParticipanteTableMap::COL_NOME);
+            $criteria->addSelectColumn(ParticipanteTableMap::COL_SOBRENOME);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.descricao');
+            $criteria->addSelectColumn($alias . '.usuario_id');
+            $criteria->addSelectColumn($alias . '.cpf');
+            $criteria->addSelectColumn($alias . '.fim_validade');
+            $criteria->addSelectColumn($alias . '.nome');
+            $criteria->addSelectColumn($alias . '.sobrenome');
         }
     }
 
@@ -309,7 +375,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME)->getTable(PreferenciaTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ParticipanteTableMap::DATABASE_NAME)->getTable(ParticipanteTableMap::TABLE_NAME);
     }
 
     /**
@@ -317,16 +383,16 @@ class PreferenciaTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(PreferenciaTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new PreferenciaTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ParticipanteTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(ParticipanteTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new ParticipanteTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Preferencia or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Participante or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Preferencia object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Participante object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -337,27 +403,27 @@ class PreferenciaTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ParticipanteTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Preferencia) { // it's a model object
+        } elseif ($values instanceof \Participante) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(PreferenciaTableMap::DATABASE_NAME);
-            $criteria->add(PreferenciaTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ParticipanteTableMap::DATABASE_NAME);
+            $criteria->add(ParticipanteTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = ParticipanteQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            PreferenciaTableMap::clearInstancePool();
+            ParticipanteTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                PreferenciaTableMap::removeInstanceFromPool($singleval);
+                ParticipanteTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -365,20 +431,20 @@ class PreferenciaTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the preferencias table.
+     * Deletes all rows from the participantes table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return PreferenciaQuery::create()->doDeleteAll($con);
+        return ParticipanteQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Preferencia or Criteria object.
+     * Performs an INSERT on the database, given a Participante or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Preferencia object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Participante object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -387,22 +453,22 @@ class PreferenciaTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ParticipanteTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Preferencia object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Participante object
         }
 
-        if ($criteria->containsKey(PreferenciaTableMap::COL_ID) && $criteria->keyContainsValue(PreferenciaTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PreferenciaTableMap::COL_ID.')');
+        if ($criteria->containsKey(ParticipanteTableMap::COL_ID) && $criteria->keyContainsValue(ParticipanteTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ParticipanteTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = ParticipanteQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -411,7 +477,7 @@ class PreferenciaTableMap extends TableMap
         });
     }
 
-} // PreferenciaTableMap
+} // ParticipanteTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-PreferenciaTableMap::buildTableMap();
+ParticipanteTableMap::buildTableMap();

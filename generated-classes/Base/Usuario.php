@@ -2,15 +2,16 @@
 
 namespace Base;
 
-use \Beneficio as ChildBeneficio;
-use \BeneficioQuery as ChildBeneficioQuery;
-use \BeneficiosPreferencias as ChildBeneficiosPreferencias;
-use \BeneficiosPreferenciasQuery as ChildBeneficiosPreferenciasQuery;
-use \Preferencia as ChildPreferencia;
-use \PreferenciaQuery as ChildPreferenciaQuery;
+use \Participante as ChildParticipante;
+use \ParticipanteQuery as ChildParticipanteQuery;
+use \Usuario as ChildUsuario;
+use \UsuarioQuery as ChildUsuarioQuery;
+use \UsuarioRedeCinema as ChildUsuarioRedeCinema;
+use \UsuarioRedeCinemaQuery as ChildUsuarioRedeCinemaQuery;
+use \DateTime;
 use \Exception;
 use \PDO;
-use Map\PreferenciaTableMap;
+use Map\UsuarioTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -23,20 +24,21 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Util\PropelDateTime;
 
 /**
- * Base class that represents a row from the 'preferencias' table.
+ * Base class that represents a row from the 'usuarios' table.
  *
  *
  *
 * @package    propel.generator..Base
 */
-abstract class Preferencia implements ActiveRecordInterface
+abstract class Usuario implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\PreferenciaTableMap';
+    const TABLE_MAP = '\\Map\\UsuarioTableMap';
 
 
     /**
@@ -72,26 +74,47 @@ abstract class Preferencia implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the descricao field.
+     * The value for the data_inscricao field.
+     * @var        \DateTime
+     */
+    protected $data_inscricao;
+
+    /**
+     * The value for the email field.
      * @var        string
      */
-    protected $descricao;
+    protected $email;
 
     /**
-     * @var        ObjectCollection|ChildBeneficiosPreferencias[] Collection to store aggregation of ChildBeneficiosPreferencias objects.
+     * The value for the liberado field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
      */
-    protected $collBeneficiosPreferenciass;
-    protected $collBeneficiosPreferenciassPartial;
+    protected $liberado;
 
     /**
-     * @var        ObjectCollection|ChildBeneficio[] Cross Collection to store aggregation of ChildBeneficio objects.
+     * The value for the nome_usuario field.
+     * @var        string
      */
-    protected $collBeneficios;
+    protected $nome_usuario;
 
     /**
-     * @var bool
+     * The value for the senha field.
+     * @var        string
      */
-    protected $collBeneficiosPartial;
+    protected $senha;
+
+    /**
+     * @var        ObjectCollection|ChildParticipante[] Collection to store aggregation of ChildParticipante objects.
+     */
+    protected $collParticipantes;
+    protected $collParticipantesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildUsuarioRedeCinema[] Collection to store aggregation of ChildUsuarioRedeCinema objects.
+     */
+    protected $collUsuarioRedeCinemas;
+    protected $collUsuarioRedeCinemasPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -103,21 +126,34 @@ abstract class Preferencia implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildBeneficio[]
+     * @var ObjectCollection|ChildParticipante[]
      */
-    protected $beneficiosScheduledForDeletion = null;
+    protected $participantesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildBeneficiosPreferencias[]
+     * @var ObjectCollection|ChildUsuarioRedeCinema[]
      */
-    protected $beneficiosPreferenciassScheduledForDeletion = null;
+    protected $usuarioRedeCinemasScheduledForDeletion = null;
 
     /**
-     * Initializes internal state of Base\Preferencia object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->liberado = false;
+    }
+
+    /**
+     * Initializes internal state of Base\Usuario object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -209,9 +245,9 @@ abstract class Preferencia implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Preferencia</code> instance.  If
-     * <code>obj</code> is an instance of <code>Preferencia</code>, delegates to
-     * <code>equals(Preferencia)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Usuario</code> instance.  If
+     * <code>obj</code> is an instance of <code>Usuario</code>, delegates to
+     * <code>equals(Usuario)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -277,7 +313,7 @@ abstract class Preferencia implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Preferencia The current object, for fluid interface
+     * @return $this|Usuario The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -341,20 +377,80 @@ abstract class Preferencia implements ActiveRecordInterface
     }
 
     /**
-     * Get the [descricao] column value.
+     * Get the [optionally formatted] temporal [data_inscricao] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getDataInscricao($format = NULL)
+    {
+        if ($format === null) {
+            return $this->data_inscricao;
+        } else {
+            return $this->data_inscricao instanceof \DateTime ? $this->data_inscricao->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [email] column value.
      *
      * @return string
      */
-    public function getDescricao()
+    public function getEmail()
     {
-        return $this->descricao;
+        return $this->email;
+    }
+
+    /**
+     * Get the [liberado] column value.
+     *
+     * @return boolean
+     */
+    public function getLiberado()
+    {
+        return $this->liberado;
+    }
+
+    /**
+     * Get the [liberado] column value.
+     *
+     * @return boolean
+     */
+    public function isLiberado()
+    {
+        return $this->getLiberado();
+    }
+
+    /**
+     * Get the [nome_usuario] column value.
+     *
+     * @return string
+     */
+    public function getNomeUsuario()
+    {
+        return $this->nome_usuario;
+    }
+
+    /**
+     * Get the [senha] column value.
+     *
+     * @return string
+     */
+    public function getSenha()
+    {
+        return $this->senha;
     }
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\Preferencia The current object (for fluent API support)
+     * @return $this|\Usuario The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -364,31 +460,119 @@ abstract class Preferencia implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[PreferenciaTableMap::COL_ID] = true;
+            $this->modifiedColumns[UsuarioTableMap::COL_ID] = true;
         }
 
         return $this;
     } // setId()
 
     /**
-     * Set the value of [descricao] column.
+     * Sets the value of [data_inscricao] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\Usuario The current object (for fluent API support)
+     */
+    public function setDataInscricao($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->data_inscricao !== null || $dt !== null) {
+            if ($dt !== $this->data_inscricao) {
+                $this->data_inscricao = $dt;
+                $this->modifiedColumns[UsuarioTableMap::COL_DATA_INSCRICAO] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setDataInscricao()
+
+    /**
+     * Set the value of [email] column.
      *
      * @param string $v new value
-     * @return $this|\Preferencia The current object (for fluent API support)
+     * @return $this|\Usuario The current object (for fluent API support)
      */
-    public function setDescricao($v)
+    public function setEmail($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->descricao !== $v) {
-            $this->descricao = $v;
-            $this->modifiedColumns[PreferenciaTableMap::COL_DESCRICAO] = true;
+        if ($this->email !== $v) {
+            $this->email = $v;
+            $this->modifiedColumns[UsuarioTableMap::COL_EMAIL] = true;
         }
 
         return $this;
-    } // setDescricao()
+    } // setEmail()
+
+    /**
+     * Sets the value of the [liberado] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param  boolean|integer|string $v The new value
+     * @return $this|\Usuario The current object (for fluent API support)
+     */
+    public function setLiberado($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->liberado !== $v) {
+            $this->liberado = $v;
+            $this->modifiedColumns[UsuarioTableMap::COL_LIBERADO] = true;
+        }
+
+        return $this;
+    } // setLiberado()
+
+    /**
+     * Set the value of [nome_usuario] column.
+     *
+     * @param string $v new value
+     * @return $this|\Usuario The current object (for fluent API support)
+     */
+    public function setNomeUsuario($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->nome_usuario !== $v) {
+            $this->nome_usuario = $v;
+            $this->modifiedColumns[UsuarioTableMap::COL_NOME_USUARIO] = true;
+        }
+
+        return $this;
+    } // setNomeUsuario()
+
+    /**
+     * Set the value of [senha] column.
+     *
+     * @param string $v new value
+     * @return $this|\Usuario The current object (for fluent API support)
+     */
+    public function setSenha($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->senha !== $v) {
+            $this->senha = $v;
+            $this->modifiedColumns[UsuarioTableMap::COL_SENHA] = true;
+        }
+
+        return $this;
+    } // setSenha()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -400,6 +584,10 @@ abstract class Preferencia implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->liberado !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -426,11 +614,23 @@ abstract class Preferencia implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : PreferenciaTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : UsuarioTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : PreferenciaTableMap::translateFieldName('Descricao', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->descricao = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : UsuarioTableMap::translateFieldName('DataInscricao', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->data_inscricao = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : UsuarioTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->email = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : UsuarioTableMap::translateFieldName('Liberado', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->liberado = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : UsuarioTableMap::translateFieldName('NomeUsuario', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->nome_usuario = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : UsuarioTableMap::translateFieldName('Senha', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->senha = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -439,10 +639,10 @@ abstract class Preferencia implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = PreferenciaTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = UsuarioTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\Preferencia'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Usuario'), 0, $e);
         }
     }
 
@@ -484,13 +684,13 @@ abstract class Preferencia implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(UsuarioTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildPreferenciaQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildUsuarioQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -500,9 +700,10 @@ abstract class Preferencia implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collBeneficiosPreferenciass = null;
+            $this->collParticipantes = null;
 
-            $this->collBeneficios = null;
+            $this->collUsuarioRedeCinemas = null;
+
         } // if (deep)
     }
 
@@ -512,8 +713,8 @@ abstract class Preferencia implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Preferencia::setDeleted()
-     * @see Preferencia::isDeleted()
+     * @see Usuario::setDeleted()
+     * @see Usuario::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -522,11 +723,11 @@ abstract class Preferencia implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(UsuarioTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildPreferenciaQuery::create()
+            $deleteQuery = ChildUsuarioQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -557,7 +758,7 @@ abstract class Preferencia implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(UsuarioTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -576,7 +777,7 @@ abstract class Preferencia implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                PreferenciaTableMap::addInstanceToPool($this);
+                UsuarioTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -613,46 +814,34 @@ abstract class Preferencia implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->beneficiosScheduledForDeletion !== null) {
-                if (!$this->beneficiosScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    foreach ($this->beneficiosScheduledForDeletion as $entry) {
-                        $entryPk = [];
-
-                        $entryPk[0] = $this->getId();
-                        $entryPk[1] = $entry->getId();
-                        $pks[] = $entryPk;
-                    }
-
-                    \BeneficiosPreferenciasQuery::create()
-                        ->filterByPrimaryKeys($pks)
+            if ($this->participantesScheduledForDeletion !== null) {
+                if (!$this->participantesScheduledForDeletion->isEmpty()) {
+                    \ParticipanteQuery::create()
+                        ->filterByPrimaryKeys($this->participantesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-
-                    $this->beneficiosScheduledForDeletion = null;
+                    $this->participantesScheduledForDeletion = null;
                 }
-
             }
 
-            if ($this->collBeneficios) {
-                foreach ($this->collBeneficios as $beneficio) {
-                    if (!$beneficio->isDeleted() && ($beneficio->isNew() || $beneficio->isModified())) {
-                        $beneficio->save($con);
+            if ($this->collParticipantes !== null) {
+                foreach ($this->collParticipantes as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
                     }
                 }
             }
 
-
-            if ($this->beneficiosPreferenciassScheduledForDeletion !== null) {
-                if (!$this->beneficiosPreferenciassScheduledForDeletion->isEmpty()) {
-                    \BeneficiosPreferenciasQuery::create()
-                        ->filterByPrimaryKeys($this->beneficiosPreferenciassScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->usuarioRedeCinemasScheduledForDeletion !== null) {
+                if (!$this->usuarioRedeCinemasScheduledForDeletion->isEmpty()) {
+                    \UsuarioRedeCinemaQuery::create()
+                        ->filterByPrimaryKeys($this->usuarioRedeCinemasScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->beneficiosPreferenciassScheduledForDeletion = null;
+                    $this->usuarioRedeCinemasScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collBeneficiosPreferenciass !== null) {
-                foreach ($this->collBeneficiosPreferenciass as $referrerFK) {
+            if ($this->collUsuarioRedeCinemas !== null) {
+                foreach ($this->collUsuarioRedeCinemas as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -679,13 +868,13 @@ abstract class Preferencia implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[PreferenciaTableMap::COL_ID] = true;
+        $this->modifiedColumns[UsuarioTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . PreferenciaTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . UsuarioTableMap::COL_ID . ')');
         }
         if (null === $this->id) {
             try {
-                $dataFetcher = $con->query("SELECT nextval('preferencias_id_seq')");
+                $dataFetcher = $con->query("SELECT nextval('usuarios_id_seq')");
                 $this->id = $dataFetcher->fetchColumn();
             } catch (Exception $e) {
                 throw new PropelException('Unable to get sequence id.', 0, $e);
@@ -694,15 +883,27 @@ abstract class Preferencia implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(PreferenciaTableMap::COL_ID)) {
+        if ($this->isColumnModified(UsuarioTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(PreferenciaTableMap::COL_DESCRICAO)) {
-            $modifiedColumns[':p' . $index++]  = 'descricao';
+        if ($this->isColumnModified(UsuarioTableMap::COL_DATA_INSCRICAO)) {
+            $modifiedColumns[':p' . $index++]  = 'data_inscricao';
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_EMAIL)) {
+            $modifiedColumns[':p' . $index++]  = 'email';
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_LIBERADO)) {
+            $modifiedColumns[':p' . $index++]  = 'liberado';
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_NOME_USUARIO)) {
+            $modifiedColumns[':p' . $index++]  = 'nome_usuario';
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_SENHA)) {
+            $modifiedColumns[':p' . $index++]  = 'senha';
         }
 
         $sql = sprintf(
-            'INSERT INTO preferencias (%s) VALUES (%s)',
+            'INSERT INTO usuarios (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -714,8 +915,20 @@ abstract class Preferencia implements ActiveRecordInterface
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'descricao':
-                        $stmt->bindValue($identifier, $this->descricao, PDO::PARAM_STR);
+                    case 'data_inscricao':
+                        $stmt->bindValue($identifier, $this->data_inscricao ? $this->data_inscricao->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case 'email':
+                        $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
+                        break;
+                    case 'liberado':
+                        $stmt->bindValue($identifier, $this->liberado, PDO::PARAM_BOOL);
+                        break;
+                    case 'nome_usuario':
+                        $stmt->bindValue($identifier, $this->nome_usuario, PDO::PARAM_STR);
+                        break;
+                    case 'senha':
+                        $stmt->bindValue($identifier, $this->senha, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -756,7 +969,7 @@ abstract class Preferencia implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = PreferenciaTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = UsuarioTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -776,7 +989,19 @@ abstract class Preferencia implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getDescricao();
+                return $this->getDataInscricao();
+                break;
+            case 2:
+                return $this->getEmail();
+                break;
+            case 3:
+                return $this->getLiberado();
+                break;
+            case 4:
+                return $this->getNomeUsuario();
+                break;
+            case 5:
+                return $this->getSenha();
                 break;
             default:
                 return null;
@@ -802,35 +1027,62 @@ abstract class Preferencia implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['Preferencia'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['Usuario'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Preferencia'][$this->hashCode()] = true;
-        $keys = PreferenciaTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Usuario'][$this->hashCode()] = true;
+        $keys = UsuarioTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getDescricao(),
+            $keys[1] => $this->getDataInscricao(),
+            $keys[2] => $this->getEmail(),
+            $keys[3] => $this->getLiberado(),
+            $keys[4] => $this->getNomeUsuario(),
+            $keys[5] => $this->getSenha(),
         );
+
+        $utc = new \DateTimeZone('utc');
+        if ($result[$keys[1]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[1]];
+            $result[$keys[1]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        }
+
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collBeneficiosPreferenciass) {
+            if (null !== $this->collParticipantes) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'beneficiosPreferenciass';
+                        $key = 'participantes';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'beneficios_preferenciass';
+                        $key = 'participantess';
                         break;
                     default:
-                        $key = 'BeneficiosPreferenciass';
+                        $key = 'Participantes';
                 }
 
-                $result[$key] = $this->collBeneficiosPreferenciass->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->collParticipantes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collUsuarioRedeCinemas) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'usuarioRedeCinemas';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'usuarios_rede_cinemas';
+                        break;
+                    default:
+                        $key = 'UsuarioRedeCinemas';
+                }
+
+                $result[$key] = $this->collUsuarioRedeCinemas->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -846,11 +1098,11 @@ abstract class Preferencia implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Preferencia
+     * @return $this|\Usuario
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = PreferenciaTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = UsuarioTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -861,7 +1113,7 @@ abstract class Preferencia implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\Preferencia
+     * @return $this|\Usuario
      */
     public function setByPosition($pos, $value)
     {
@@ -870,7 +1122,19 @@ abstract class Preferencia implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setDescricao($value);
+                $this->setDataInscricao($value);
+                break;
+            case 2:
+                $this->setEmail($value);
+                break;
+            case 3:
+                $this->setLiberado($value);
+                break;
+            case 4:
+                $this->setNomeUsuario($value);
+                break;
+            case 5:
+                $this->setSenha($value);
                 break;
         } // switch()
 
@@ -896,13 +1160,25 @@ abstract class Preferencia implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = PreferenciaTableMap::getFieldNames($keyType);
+        $keys = UsuarioTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setDescricao($arr[$keys[1]]);
+            $this->setDataInscricao($arr[$keys[1]]);
+        }
+        if (array_key_exists($keys[2], $arr)) {
+            $this->setEmail($arr[$keys[2]]);
+        }
+        if (array_key_exists($keys[3], $arr)) {
+            $this->setLiberado($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setNomeUsuario($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setSenha($arr[$keys[5]]);
         }
     }
 
@@ -923,7 +1199,7 @@ abstract class Preferencia implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\Preferencia The current object, for fluid interface
+     * @return $this|\Usuario The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -943,13 +1219,25 @@ abstract class Preferencia implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(PreferenciaTableMap::DATABASE_NAME);
+        $criteria = new Criteria(UsuarioTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(PreferenciaTableMap::COL_ID)) {
-            $criteria->add(PreferenciaTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(UsuarioTableMap::COL_ID)) {
+            $criteria->add(UsuarioTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(PreferenciaTableMap::COL_DESCRICAO)) {
-            $criteria->add(PreferenciaTableMap::COL_DESCRICAO, $this->descricao);
+        if ($this->isColumnModified(UsuarioTableMap::COL_DATA_INSCRICAO)) {
+            $criteria->add(UsuarioTableMap::COL_DATA_INSCRICAO, $this->data_inscricao);
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_EMAIL)) {
+            $criteria->add(UsuarioTableMap::COL_EMAIL, $this->email);
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_LIBERADO)) {
+            $criteria->add(UsuarioTableMap::COL_LIBERADO, $this->liberado);
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_NOME_USUARIO)) {
+            $criteria->add(UsuarioTableMap::COL_NOME_USUARIO, $this->nome_usuario);
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_SENHA)) {
+            $criteria->add(UsuarioTableMap::COL_SENHA, $this->senha);
         }
 
         return $criteria;
@@ -967,8 +1255,8 @@ abstract class Preferencia implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildPreferenciaQuery::create();
-        $criteria->add(PreferenciaTableMap::COL_ID, $this->id);
+        $criteria = ChildUsuarioQuery::create();
+        $criteria->add(UsuarioTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1030,23 +1318,33 @@ abstract class Preferencia implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Preferencia (or compatible) type.
+     * @param      object $copyObj An object of \Usuario (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setDescricao($this->getDescricao());
+        $copyObj->setDataInscricao($this->getDataInscricao());
+        $copyObj->setEmail($this->getEmail());
+        $copyObj->setLiberado($this->getLiberado());
+        $copyObj->setNomeUsuario($this->getNomeUsuario());
+        $copyObj->setSenha($this->getSenha());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getBeneficiosPreferenciass() as $relObj) {
+            foreach ($this->getParticipantes() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addBeneficiosPreferencias($relObj->copy($deepCopy));
+                    $copyObj->addParticipante($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getUsuarioRedeCinemas() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addUsuarioRedeCinema($relObj->copy($deepCopy));
                 }
             }
 
@@ -1067,7 +1365,7 @@ abstract class Preferencia implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Preferencia Clone of current object.
+     * @return \Usuario Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1091,37 +1389,40 @@ abstract class Preferencia implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('BeneficiosPreferencias' == $relationName) {
-            return $this->initBeneficiosPreferenciass();
+        if ('Participante' == $relationName) {
+            return $this->initParticipantes();
+        }
+        if ('UsuarioRedeCinema' == $relationName) {
+            return $this->initUsuarioRedeCinemas();
         }
     }
 
     /**
-     * Clears out the collBeneficiosPreferenciass collection
+     * Clears out the collParticipantes collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addBeneficiosPreferenciass()
+     * @see        addParticipantes()
      */
-    public function clearBeneficiosPreferenciass()
+    public function clearParticipantes()
     {
-        $this->collBeneficiosPreferenciass = null; // important to set this to NULL since that means it is uninitialized
+        $this->collParticipantes = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collBeneficiosPreferenciass collection loaded partially.
+     * Reset is the collParticipantes collection loaded partially.
      */
-    public function resetPartialBeneficiosPreferenciass($v = true)
+    public function resetPartialParticipantes($v = true)
     {
-        $this->collBeneficiosPreferenciassPartial = $v;
+        $this->collParticipantesPartial = $v;
     }
 
     /**
-     * Initializes the collBeneficiosPreferenciass collection.
+     * Initializes the collParticipantes collection.
      *
-     * By default this just sets the collBeneficiosPreferenciass collection to an empty array (like clearcollBeneficiosPreferenciass());
+     * By default this just sets the collParticipantes collection to an empty array (like clearcollParticipantes());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1130,456 +1431,404 @@ abstract class Preferencia implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initBeneficiosPreferenciass($overrideExisting = true)
+    public function initParticipantes($overrideExisting = true)
     {
-        if (null !== $this->collBeneficiosPreferenciass && !$overrideExisting) {
+        if (null !== $this->collParticipantes && !$overrideExisting) {
             return;
         }
-        $this->collBeneficiosPreferenciass = new ObjectCollection();
-        $this->collBeneficiosPreferenciass->setModel('\BeneficiosPreferencias');
+        $this->collParticipantes = new ObjectCollection();
+        $this->collParticipantes->setModel('\Participante');
     }
 
     /**
-     * Gets an array of ChildBeneficiosPreferencias objects which contain a foreign key that references this object.
+     * Gets an array of ChildParticipante objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildPreferencia is new, it will return
+     * If this ChildUsuario is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildBeneficiosPreferencias[] List of ChildBeneficiosPreferencias objects
+     * @return ObjectCollection|ChildParticipante[] List of ChildParticipante objects
      * @throws PropelException
      */
-    public function getBeneficiosPreferenciass(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getParticipantes(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collBeneficiosPreferenciassPartial && !$this->isNew();
-        if (null === $this->collBeneficiosPreferenciass || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collBeneficiosPreferenciass) {
+        $partial = $this->collParticipantesPartial && !$this->isNew();
+        if (null === $this->collParticipantes || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collParticipantes) {
                 // return empty collection
-                $this->initBeneficiosPreferenciass();
+                $this->initParticipantes();
             } else {
-                $collBeneficiosPreferenciass = ChildBeneficiosPreferenciasQuery::create(null, $criteria)
-                    ->filterByPreferencia($this)
+                $collParticipantes = ChildParticipanteQuery::create(null, $criteria)
+                    ->filterByUsuario($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collBeneficiosPreferenciassPartial && count($collBeneficiosPreferenciass)) {
-                        $this->initBeneficiosPreferenciass(false);
+                    if (false !== $this->collParticipantesPartial && count($collParticipantes)) {
+                        $this->initParticipantes(false);
 
-                        foreach ($collBeneficiosPreferenciass as $obj) {
-                            if (false == $this->collBeneficiosPreferenciass->contains($obj)) {
-                                $this->collBeneficiosPreferenciass->append($obj);
+                        foreach ($collParticipantes as $obj) {
+                            if (false == $this->collParticipantes->contains($obj)) {
+                                $this->collParticipantes->append($obj);
                             }
                         }
 
-                        $this->collBeneficiosPreferenciassPartial = true;
+                        $this->collParticipantesPartial = true;
                     }
 
-                    return $collBeneficiosPreferenciass;
+                    return $collParticipantes;
                 }
 
-                if ($partial && $this->collBeneficiosPreferenciass) {
-                    foreach ($this->collBeneficiosPreferenciass as $obj) {
+                if ($partial && $this->collParticipantes) {
+                    foreach ($this->collParticipantes as $obj) {
                         if ($obj->isNew()) {
-                            $collBeneficiosPreferenciass[] = $obj;
+                            $collParticipantes[] = $obj;
                         }
                     }
                 }
 
-                $this->collBeneficiosPreferenciass = $collBeneficiosPreferenciass;
-                $this->collBeneficiosPreferenciassPartial = false;
+                $this->collParticipantes = $collParticipantes;
+                $this->collParticipantesPartial = false;
             }
         }
 
-        return $this->collBeneficiosPreferenciass;
+        return $this->collParticipantes;
     }
 
     /**
-     * Sets a collection of ChildBeneficiosPreferencias objects related by a one-to-many relationship
+     * Sets a collection of ChildParticipante objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $beneficiosPreferenciass A Propel collection.
+     * @param      Collection $participantes A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildPreferencia The current object (for fluent API support)
+     * @return $this|ChildUsuario The current object (for fluent API support)
      */
-    public function setBeneficiosPreferenciass(Collection $beneficiosPreferenciass, ConnectionInterface $con = null)
+    public function setParticipantes(Collection $participantes, ConnectionInterface $con = null)
     {
-        /** @var ChildBeneficiosPreferencias[] $beneficiosPreferenciassToDelete */
-        $beneficiosPreferenciassToDelete = $this->getBeneficiosPreferenciass(new Criteria(), $con)->diff($beneficiosPreferenciass);
+        /** @var ChildParticipante[] $participantesToDelete */
+        $participantesToDelete = $this->getParticipantes(new Criteria(), $con)->diff($participantes);
 
 
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->beneficiosPreferenciassScheduledForDeletion = clone $beneficiosPreferenciassToDelete;
+        $this->participantesScheduledForDeletion = $participantesToDelete;
 
-        foreach ($beneficiosPreferenciassToDelete as $beneficiosPreferenciasRemoved) {
-            $beneficiosPreferenciasRemoved->setPreferencia(null);
+        foreach ($participantesToDelete as $participanteRemoved) {
+            $participanteRemoved->setUsuario(null);
         }
 
-        $this->collBeneficiosPreferenciass = null;
-        foreach ($beneficiosPreferenciass as $beneficiosPreferencias) {
-            $this->addBeneficiosPreferencias($beneficiosPreferencias);
+        $this->collParticipantes = null;
+        foreach ($participantes as $participante) {
+            $this->addParticipante($participante);
         }
 
-        $this->collBeneficiosPreferenciass = $beneficiosPreferenciass;
-        $this->collBeneficiosPreferenciassPartial = false;
+        $this->collParticipantes = $participantes;
+        $this->collParticipantesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related BeneficiosPreferencias objects.
+     * Returns the number of related Participante objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related BeneficiosPreferencias objects.
+     * @return int             Count of related Participante objects.
      * @throws PropelException
      */
-    public function countBeneficiosPreferenciass(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countParticipantes(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collBeneficiosPreferenciassPartial && !$this->isNew();
-        if (null === $this->collBeneficiosPreferenciass || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collBeneficiosPreferenciass) {
+        $partial = $this->collParticipantesPartial && !$this->isNew();
+        if (null === $this->collParticipantes || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collParticipantes) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getBeneficiosPreferenciass());
+                return count($this->getParticipantes());
             }
 
-            $query = ChildBeneficiosPreferenciasQuery::create(null, $criteria);
+            $query = ChildParticipanteQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
 
             return $query
-                ->filterByPreferencia($this)
+                ->filterByUsuario($this)
                 ->count($con);
         }
 
-        return count($this->collBeneficiosPreferenciass);
+        return count($this->collParticipantes);
     }
 
     /**
-     * Method called to associate a ChildBeneficiosPreferencias object to this object
-     * through the ChildBeneficiosPreferencias foreign key attribute.
+     * Method called to associate a ChildParticipante object to this object
+     * through the ChildParticipante foreign key attribute.
      *
-     * @param  ChildBeneficiosPreferencias $l ChildBeneficiosPreferencias
-     * @return $this|\Preferencia The current object (for fluent API support)
+     * @param  ChildParticipante $l ChildParticipante
+     * @return $this|\Usuario The current object (for fluent API support)
      */
-    public function addBeneficiosPreferencias(ChildBeneficiosPreferencias $l)
+    public function addParticipante(ChildParticipante $l)
     {
-        if ($this->collBeneficiosPreferenciass === null) {
-            $this->initBeneficiosPreferenciass();
-            $this->collBeneficiosPreferenciassPartial = true;
+        if ($this->collParticipantes === null) {
+            $this->initParticipantes();
+            $this->collParticipantesPartial = true;
         }
 
-        if (!$this->collBeneficiosPreferenciass->contains($l)) {
-            $this->doAddBeneficiosPreferencias($l);
+        if (!$this->collParticipantes->contains($l)) {
+            $this->doAddParticipante($l);
         }
 
         return $this;
     }
 
     /**
-     * @param ChildBeneficiosPreferencias $beneficiosPreferencias The ChildBeneficiosPreferencias object to add.
+     * @param ChildParticipante $participante The ChildParticipante object to add.
      */
-    protected function doAddBeneficiosPreferencias(ChildBeneficiosPreferencias $beneficiosPreferencias)
+    protected function doAddParticipante(ChildParticipante $participante)
     {
-        $this->collBeneficiosPreferenciass[]= $beneficiosPreferencias;
-        $beneficiosPreferencias->setPreferencia($this);
+        $this->collParticipantes[]= $participante;
+        $participante->setUsuario($this);
     }
 
     /**
-     * @param  ChildBeneficiosPreferencias $beneficiosPreferencias The ChildBeneficiosPreferencias object to remove.
-     * @return $this|ChildPreferencia The current object (for fluent API support)
+     * @param  ChildParticipante $participante The ChildParticipante object to remove.
+     * @return $this|ChildUsuario The current object (for fluent API support)
      */
-    public function removeBeneficiosPreferencias(ChildBeneficiosPreferencias $beneficiosPreferencias)
+    public function removeParticipante(ChildParticipante $participante)
     {
-        if ($this->getBeneficiosPreferenciass()->contains($beneficiosPreferencias)) {
-            $pos = $this->collBeneficiosPreferenciass->search($beneficiosPreferencias);
-            $this->collBeneficiosPreferenciass->remove($pos);
-            if (null === $this->beneficiosPreferenciassScheduledForDeletion) {
-                $this->beneficiosPreferenciassScheduledForDeletion = clone $this->collBeneficiosPreferenciass;
-                $this->beneficiosPreferenciassScheduledForDeletion->clear();
+        if ($this->getParticipantes()->contains($participante)) {
+            $pos = $this->collParticipantes->search($participante);
+            $this->collParticipantes->remove($pos);
+            if (null === $this->participantesScheduledForDeletion) {
+                $this->participantesScheduledForDeletion = clone $this->collParticipantes;
+                $this->participantesScheduledForDeletion->clear();
             }
-            $this->beneficiosPreferenciassScheduledForDeletion[]= clone $beneficiosPreferencias;
-            $beneficiosPreferencias->setPreferencia(null);
+            $this->participantesScheduledForDeletion[]= clone $participante;
+            $participante->setUsuario(null);
         }
 
         return $this;
     }
 
-
     /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Preferencia is new, it will return
-     * an empty collection; or if this Preferencia has previously
-     * been saved, it will retrieve related BeneficiosPreferenciass from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Preferencia.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildBeneficiosPreferencias[] List of ChildBeneficiosPreferencias objects
-     */
-    public function getBeneficiosPreferenciassJoinBeneficio(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildBeneficiosPreferenciasQuery::create(null, $criteria);
-        $query->joinWith('Beneficio', $joinBehavior);
-
-        return $this->getBeneficiosPreferenciass($query, $con);
-    }
-
-    /**
-     * Clears out the collBeneficios collection
+     * Clears out the collUsuarioRedeCinemas collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addBeneficios()
+     * @see        addUsuarioRedeCinemas()
      */
-    public function clearBeneficios()
+    public function clearUsuarioRedeCinemas()
     {
-        $this->collBeneficios = null; // important to set this to NULL since that means it is uninitialized
+        $this->collUsuarioRedeCinemas = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Initializes the collBeneficios crossRef collection.
+     * Reset is the collUsuarioRedeCinemas collection loaded partially.
+     */
+    public function resetPartialUsuarioRedeCinemas($v = true)
+    {
+        $this->collUsuarioRedeCinemasPartial = $v;
+    }
+
+    /**
+     * Initializes the collUsuarioRedeCinemas collection.
      *
-     * By default this just sets the collBeneficios collection to an empty collection (like clearBeneficios());
+     * By default this just sets the collUsuarioRedeCinemas collection to an empty array (like clearcollUsuarioRedeCinemas());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
      * @return void
      */
-    public function initBeneficios()
+    public function initUsuarioRedeCinemas($overrideExisting = true)
     {
-        $this->collBeneficios = new ObjectCollection();
-        $this->collBeneficiosPartial = true;
-
-        $this->collBeneficios->setModel('\Beneficio');
+        if (null !== $this->collUsuarioRedeCinemas && !$overrideExisting) {
+            return;
+        }
+        $this->collUsuarioRedeCinemas = new ObjectCollection();
+        $this->collUsuarioRedeCinemas->setModel('\UsuarioRedeCinema');
     }
 
     /**
-     * Checks if the collBeneficios collection is loaded.
-     *
-     * @return bool
-     */
-    public function isBeneficiosLoaded()
-    {
-        return null !== $this->collBeneficios;
-    }
-
-    /**
-     * Gets a collection of ChildBeneficio objects related by a many-to-many relationship
-     * to the current object by way of the beneficios_preferencias cross-reference table.
+     * Gets an array of ChildUsuarioRedeCinema objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildPreferencia is new, it will return
+     * If this ChildUsuario is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return ObjectCollection|ChildBeneficio[] List of ChildBeneficio objects
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildUsuarioRedeCinema[] List of ChildUsuarioRedeCinema objects
+     * @throws PropelException
      */
-    public function getBeneficios(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getUsuarioRedeCinemas(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collBeneficiosPartial && !$this->isNew();
-        if (null === $this->collBeneficios || null !== $criteria || $partial) {
-            if ($this->isNew()) {
+        $partial = $this->collUsuarioRedeCinemasPartial && !$this->isNew();
+        if (null === $this->collUsuarioRedeCinemas || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collUsuarioRedeCinemas) {
                 // return empty collection
-                if (null === $this->collBeneficios) {
-                    $this->initBeneficios();
-                }
+                $this->initUsuarioRedeCinemas();
             } else {
+                $collUsuarioRedeCinemas = ChildUsuarioRedeCinemaQuery::create(null, $criteria)
+                    ->filterByUsuario($this)
+                    ->find($con);
 
-                $query = ChildBeneficioQuery::create(null, $criteria)
-                    ->filterByPreferencia($this);
-                $collBeneficios = $query->find($con);
                 if (null !== $criteria) {
-                    return $collBeneficios;
+                    if (false !== $this->collUsuarioRedeCinemasPartial && count($collUsuarioRedeCinemas)) {
+                        $this->initUsuarioRedeCinemas(false);
+
+                        foreach ($collUsuarioRedeCinemas as $obj) {
+                            if (false == $this->collUsuarioRedeCinemas->contains($obj)) {
+                                $this->collUsuarioRedeCinemas->append($obj);
+                            }
+                        }
+
+                        $this->collUsuarioRedeCinemasPartial = true;
+                    }
+
+                    return $collUsuarioRedeCinemas;
                 }
 
-                if ($partial && $this->collBeneficios) {
-                    //make sure that already added objects gets added to the list of the database.
-                    foreach ($this->collBeneficios as $obj) {
-                        if (!$collBeneficios->contains($obj)) {
-                            $collBeneficios[] = $obj;
+                if ($partial && $this->collUsuarioRedeCinemas) {
+                    foreach ($this->collUsuarioRedeCinemas as $obj) {
+                        if ($obj->isNew()) {
+                            $collUsuarioRedeCinemas[] = $obj;
                         }
                     }
                 }
 
-                $this->collBeneficios = $collBeneficios;
-                $this->collBeneficiosPartial = false;
+                $this->collUsuarioRedeCinemas = $collUsuarioRedeCinemas;
+                $this->collUsuarioRedeCinemasPartial = false;
             }
         }
 
-        return $this->collBeneficios;
+        return $this->collUsuarioRedeCinemas;
     }
 
     /**
-     * Sets a collection of Beneficio objects related by a many-to-many relationship
-     * to the current object by way of the beneficios_preferencias cross-reference table.
+     * Sets a collection of ChildUsuarioRedeCinema objects related by a one-to-many relationship
+     * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $beneficios A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return $this|ChildPreferencia The current object (for fluent API support)
-     */
-    public function setBeneficios(Collection $beneficios, ConnectionInterface $con = null)
-    {
-        $this->clearBeneficios();
-        $currentBeneficios = $this->getBeneficios();
-
-        $beneficiosScheduledForDeletion = $currentBeneficios->diff($beneficios);
-
-        foreach ($beneficiosScheduledForDeletion as $toDelete) {
-            $this->removeBeneficio($toDelete);
-        }
-
-        foreach ($beneficios as $beneficio) {
-            if (!$currentBeneficios->contains($beneficio)) {
-                $this->doAddBeneficio($beneficio);
-            }
-        }
-
-        $this->collBeneficiosPartial = false;
-        $this->collBeneficios = $beneficios;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of Beneficio objects related by a many-to-many relationship
-     * to the current object by way of the beneficios_preferencias cross-reference table.
-     *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
+     * @param      Collection $usuarioRedeCinemas A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return int the number of related Beneficio objects
+     * @return $this|ChildUsuario The current object (for fluent API support)
      */
-    public function countBeneficios(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function setUsuarioRedeCinemas(Collection $usuarioRedeCinemas, ConnectionInterface $con = null)
     {
-        $partial = $this->collBeneficiosPartial && !$this->isNew();
-        if (null === $this->collBeneficios || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collBeneficios) {
-                return 0;
-            } else {
+        /** @var ChildUsuarioRedeCinema[] $usuarioRedeCinemasToDelete */
+        $usuarioRedeCinemasToDelete = $this->getUsuarioRedeCinemas(new Criteria(), $con)->diff($usuarioRedeCinemas);
 
-                if ($partial && !$criteria) {
-                    return count($this->getBeneficios());
-                }
 
-                $query = ChildBeneficioQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
+        $this->usuarioRedeCinemasScheduledForDeletion = $usuarioRedeCinemasToDelete;
 
-                return $query
-                    ->filterByPreferencia($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collBeneficios);
+        foreach ($usuarioRedeCinemasToDelete as $usuarioRedeCinemaRemoved) {
+            $usuarioRedeCinemaRemoved->setUsuario(null);
         }
+
+        $this->collUsuarioRedeCinemas = null;
+        foreach ($usuarioRedeCinemas as $usuarioRedeCinema) {
+            $this->addUsuarioRedeCinema($usuarioRedeCinema);
+        }
+
+        $this->collUsuarioRedeCinemas = $usuarioRedeCinemas;
+        $this->collUsuarioRedeCinemasPartial = false;
+
+        return $this;
     }
 
     /**
-     * Associate a ChildBeneficio to this object
-     * through the beneficios_preferencias cross reference table.
+     * Returns the number of related UsuarioRedeCinema objects.
      *
-     * @param ChildBeneficio $beneficio
-     * @return ChildPreferencia The current object (for fluent API support)
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related UsuarioRedeCinema objects.
+     * @throws PropelException
      */
-    public function addBeneficio(ChildBeneficio $beneficio)
+    public function countUsuarioRedeCinemas(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        if ($this->collBeneficios === null) {
-            $this->initBeneficios();
+        $partial = $this->collUsuarioRedeCinemasPartial && !$this->isNew();
+        if (null === $this->collUsuarioRedeCinemas || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collUsuarioRedeCinemas) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getUsuarioRedeCinemas());
+            }
+
+            $query = ChildUsuarioRedeCinemaQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUsuario($this)
+                ->count($con);
         }
 
-        if (!$this->getBeneficios()->contains($beneficio)) {
-            // only add it if the **same** object is not already associated
-            $this->collBeneficios->push($beneficio);
-            $this->doAddBeneficio($beneficio);
+        return count($this->collUsuarioRedeCinemas);
+    }
+
+    /**
+     * Method called to associate a ChildUsuarioRedeCinema object to this object
+     * through the ChildUsuarioRedeCinema foreign key attribute.
+     *
+     * @param  ChildUsuarioRedeCinema $l ChildUsuarioRedeCinema
+     * @return $this|\Usuario The current object (for fluent API support)
+     */
+    public function addUsuarioRedeCinema(ChildUsuarioRedeCinema $l)
+    {
+        if ($this->collUsuarioRedeCinemas === null) {
+            $this->initUsuarioRedeCinemas();
+            $this->collUsuarioRedeCinemasPartial = true;
+        }
+
+        if (!$this->collUsuarioRedeCinemas->contains($l)) {
+            $this->doAddUsuarioRedeCinema($l);
         }
 
         return $this;
     }
 
     /**
-     *
-     * @param ChildBeneficio $beneficio
+     * @param ChildUsuarioRedeCinema $usuarioRedeCinema The ChildUsuarioRedeCinema object to add.
      */
-    protected function doAddBeneficio(ChildBeneficio $beneficio)
+    protected function doAddUsuarioRedeCinema(ChildUsuarioRedeCinema $usuarioRedeCinema)
     {
-        $beneficiosPreferencias = new ChildBeneficiosPreferencias();
-
-        $beneficiosPreferencias->setBeneficio($beneficio);
-
-        $beneficiosPreferencias->setPreferencia($this);
-
-        $this->addBeneficiosPreferencias($beneficiosPreferencias);
-
-        // set the back reference to this object directly as using provided method either results
-        // in endless loop or in multiple relations
-        if (!$beneficio->isPreferenciasLoaded()) {
-            $beneficio->initPreferencias();
-            $beneficio->getPreferencias()->push($this);
-        } elseif (!$beneficio->getPreferencias()->contains($this)) {
-            $beneficio->getPreferencias()->push($this);
-        }
-
+        $this->collUsuarioRedeCinemas[]= $usuarioRedeCinema;
+        $usuarioRedeCinema->setUsuario($this);
     }
 
     /**
-     * Remove beneficio of this object
-     * through the beneficios_preferencias cross reference table.
-     *
-     * @param ChildBeneficio $beneficio
-     * @return ChildPreferencia The current object (for fluent API support)
+     * @param  ChildUsuarioRedeCinema $usuarioRedeCinema The ChildUsuarioRedeCinema object to remove.
+     * @return $this|ChildUsuario The current object (for fluent API support)
      */
-    public function removeBeneficio(ChildBeneficio $beneficio)
+    public function removeUsuarioRedeCinema(ChildUsuarioRedeCinema $usuarioRedeCinema)
     {
-        if ($this->getBeneficios()->contains($beneficio)) { $beneficiosPreferencias = new ChildBeneficiosPreferencias();
-
-            $beneficiosPreferencias->setBeneficio($beneficio);
-            if ($beneficio->isPreferenciasLoaded()) {
-                //remove the back reference if available
-                $beneficio->getPreferencias()->removeObject($this);
+        if ($this->getUsuarioRedeCinemas()->contains($usuarioRedeCinema)) {
+            $pos = $this->collUsuarioRedeCinemas->search($usuarioRedeCinema);
+            $this->collUsuarioRedeCinemas->remove($pos);
+            if (null === $this->usuarioRedeCinemasScheduledForDeletion) {
+                $this->usuarioRedeCinemasScheduledForDeletion = clone $this->collUsuarioRedeCinemas;
+                $this->usuarioRedeCinemasScheduledForDeletion->clear();
             }
-
-            $beneficiosPreferencias->setPreferencia($this);
-            $this->removeBeneficiosPreferencias(clone $beneficiosPreferencias);
-            $beneficiosPreferencias->clear();
-
-            $this->collBeneficios->remove($this->collBeneficios->search($beneficio));
-
-            if (null === $this->beneficiosScheduledForDeletion) {
-                $this->beneficiosScheduledForDeletion = clone $this->collBeneficios;
-                $this->beneficiosScheduledForDeletion->clear();
-            }
-
-            $this->beneficiosScheduledForDeletion->push($beneficio);
+            $this->usuarioRedeCinemasScheduledForDeletion[]= clone $usuarioRedeCinema;
+            $usuarioRedeCinema->setUsuario(null);
         }
-
 
         return $this;
     }
@@ -1592,9 +1841,14 @@ abstract class Preferencia implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->descricao = null;
+        $this->data_inscricao = null;
+        $this->email = null;
+        $this->liberado = null;
+        $this->nome_usuario = null;
+        $this->senha = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1611,20 +1865,20 @@ abstract class Preferencia implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collBeneficiosPreferenciass) {
-                foreach ($this->collBeneficiosPreferenciass as $o) {
+            if ($this->collParticipantes) {
+                foreach ($this->collParticipantes as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collBeneficios) {
-                foreach ($this->collBeneficios as $o) {
+            if ($this->collUsuarioRedeCinemas) {
+                foreach ($this->collUsuarioRedeCinemas as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        $this->collBeneficiosPreferenciass = null;
-        $this->collBeneficios = null;
+        $this->collParticipantes = null;
+        $this->collUsuarioRedeCinemas = null;
     }
 
     /**
@@ -1634,7 +1888,7 @@ abstract class Preferencia implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(PreferenciaTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(UsuarioTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

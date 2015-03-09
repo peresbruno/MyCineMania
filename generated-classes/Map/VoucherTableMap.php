@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \Preferencia;
-use \PreferenciaQuery;
+use \Voucher;
+use \VoucherQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'preferencias' table.
+ * This class defines the structure of the 'vouchers' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class PreferenciaTableMap extends TableMap
+class VoucherTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class PreferenciaTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.PreferenciaTableMap';
+    const CLASS_NAME = '.Map.VoucherTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class PreferenciaTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'preferencias';
+    const TABLE_NAME = 'vouchers';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Preferencia';
+    const OM_CLASS = '\\Voucher';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Preferencia';
+    const CLASS_DEFAULT = 'Voucher';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -69,17 +69,42 @@ class PreferenciaTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'preferencias.id';
+    const COL_ID = 'vouchers.id';
 
     /**
-     * the column name for the descricao field
+     * the column name for the beneficio_id field
      */
-    const COL_DESCRICAO = 'preferencias.descricao';
+    const COL_BENEFICIO_ID = 'vouchers.beneficio_id';
+
+    /**
+     * the column name for the participante_id field
+     */
+    const COL_PARTICIPANTE_ID = 'vouchers.participante_id';
+
+    /**
+     * the column name for the status field
+     */
+    const COL_STATUS = 'vouchers.status';
+
+    /**
+     * the column name for the codigo field
+     */
+    const COL_CODIGO = 'vouchers.codigo';
+
+    /**
+     * the column name for the data_emissao field
+     */
+    const COL_DATA_EMISSAO = 'vouchers.data_emissao';
+
+    /**
+     * the column name for the hora_emissao field
+     */
+    const COL_HORA_EMISSAO = 'vouchers.hora_emissao';
 
     /**
      * The default string format for model objects of the related table
@@ -93,11 +118,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Descricao', ),
-        self::TYPE_CAMELNAME     => array('id', 'descricao', ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID, PreferenciaTableMap::COL_DESCRICAO, ),
-        self::TYPE_FIELDNAME     => array('id', 'descricao', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id', 'BeneficioId', 'ParticipanteId', 'Status', 'Codigo', 'DataEmissao', 'HoraEmissao', ),
+        self::TYPE_CAMELNAME     => array('id', 'beneficioId', 'participanteId', 'status', 'codigo', 'dataEmissao', 'horaEmissao', ),
+        self::TYPE_COLNAME       => array(VoucherTableMap::COL_ID, VoucherTableMap::COL_BENEFICIO_ID, VoucherTableMap::COL_PARTICIPANTE_ID, VoucherTableMap::COL_STATUS, VoucherTableMap::COL_CODIGO, VoucherTableMap::COL_DATA_EMISSAO, VoucherTableMap::COL_HORA_EMISSAO, ),
+        self::TYPE_FIELDNAME     => array('id', 'beneficio_id', 'participante_id', 'status', 'codigo', 'data_emissao', 'hora_emissao', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -107,11 +132,11 @@ class PreferenciaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Descricao' => 1, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_COLNAME       => array(PreferenciaTableMap::COL_ID => 0, PreferenciaTableMap::COL_DESCRICAO => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'descricao' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'BeneficioId' => 1, 'ParticipanteId' => 2, 'Status' => 3, 'Codigo' => 4, 'DataEmissao' => 5, 'HoraEmissao' => 6, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'beneficioId' => 1, 'participanteId' => 2, 'status' => 3, 'codigo' => 4, 'dataEmissao' => 5, 'horaEmissao' => 6, ),
+        self::TYPE_COLNAME       => array(VoucherTableMap::COL_ID => 0, VoucherTableMap::COL_BENEFICIO_ID => 1, VoucherTableMap::COL_PARTICIPANTE_ID => 2, VoucherTableMap::COL_STATUS => 3, VoucherTableMap::COL_CODIGO => 4, VoucherTableMap::COL_DATA_EMISSAO => 5, VoucherTableMap::COL_HORA_EMISSAO => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'beneficio_id' => 1, 'participante_id' => 2, 'status' => 3, 'codigo' => 4, 'data_emissao' => 5, 'hora_emissao' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -124,16 +149,21 @@ class PreferenciaTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('preferencias');
-        $this->setPhpName('Preferencia');
+        $this->setName('vouchers');
+        $this->setPhpName('Voucher');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Preferencia');
+        $this->setClassName('\\Voucher');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('preferencias_id_seq');
+        $this->setPrimaryKeyMethodInfo('vouchers_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('descricao', 'Descricao', 'VARCHAR', true, 255, null);
+        $this->addForeignKey('beneficio_id', 'BeneficioId', 'INTEGER', 'beneficios', 'id', true, null, null);
+        $this->addForeignKey('participante_id', 'ParticipanteId', 'INTEGER', 'participantes', 'id', true, null, null);
+        $this->addColumn('status', 'Status', 'VARCHAR', true, 50, null);
+        $this->addColumn('codigo', 'Codigo', 'VARCHAR', true, 50, null);
+        $this->addColumn('data_emissao', 'DataEmissao', 'DATE', true, null, null);
+        $this->addColumn('hora_emissao', 'HoraEmissao', 'TIME', true, null, null);
     } // initialize()
 
     /**
@@ -141,14 +171,20 @@ class PreferenciaTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('BeneficiosPreferencias', '\\BeneficiosPreferencias', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':preferencia_id',
+    0 => ':beneficio_id',
     1 => ':id',
   ),
-), null, null, 'BeneficiosPreferenciass', false);
-        $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_MANY, array(), null, null, 'Beneficios');
+), null, null, null, false);
+        $this->addRelation('Participante', '\\Participante', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':participante_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -208,7 +244,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? PreferenciaTableMap::CLASS_DEFAULT : PreferenciaTableMap::OM_CLASS;
+        return $withPrefix ? VoucherTableMap::CLASS_DEFAULT : VoucherTableMap::OM_CLASS;
     }
 
     /**
@@ -222,22 +258,22 @@ class PreferenciaTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Preferencia object, last column rank)
+     * @return array           (Voucher object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+        $key = VoucherTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = VoucherTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + PreferenciaTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + VoucherTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = PreferenciaTableMap::OM_CLASS;
-            /** @var Preferencia $obj */
+            $cls = VoucherTableMap::OM_CLASS;
+            /** @var Voucher $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            PreferenciaTableMap::addInstanceToPool($obj, $key);
+            VoucherTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -260,18 +296,18 @@ class PreferenciaTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = PreferenciaTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = PreferenciaTableMap::getInstanceFromPool($key))) {
+            $key = VoucherTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = VoucherTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Preferencia $obj */
+                /** @var Voucher $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                PreferenciaTableMap::addInstanceToPool($obj, $key);
+                VoucherTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -292,11 +328,21 @@ class PreferenciaTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_ID);
-            $criteria->addSelectColumn(PreferenciaTableMap::COL_DESCRICAO);
+            $criteria->addSelectColumn(VoucherTableMap::COL_ID);
+            $criteria->addSelectColumn(VoucherTableMap::COL_BENEFICIO_ID);
+            $criteria->addSelectColumn(VoucherTableMap::COL_PARTICIPANTE_ID);
+            $criteria->addSelectColumn(VoucherTableMap::COL_STATUS);
+            $criteria->addSelectColumn(VoucherTableMap::COL_CODIGO);
+            $criteria->addSelectColumn(VoucherTableMap::COL_DATA_EMISSAO);
+            $criteria->addSelectColumn(VoucherTableMap::COL_HORA_EMISSAO);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.descricao');
+            $criteria->addSelectColumn($alias . '.beneficio_id');
+            $criteria->addSelectColumn($alias . '.participante_id');
+            $criteria->addSelectColumn($alias . '.status');
+            $criteria->addSelectColumn($alias . '.codigo');
+            $criteria->addSelectColumn($alias . '.data_emissao');
+            $criteria->addSelectColumn($alias . '.hora_emissao');
         }
     }
 
@@ -309,7 +355,7 @@ class PreferenciaTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME)->getTable(PreferenciaTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(VoucherTableMap::DATABASE_NAME)->getTable(VoucherTableMap::TABLE_NAME);
     }
 
     /**
@@ -317,16 +363,16 @@ class PreferenciaTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(PreferenciaTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(PreferenciaTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new PreferenciaTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(VoucherTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(VoucherTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new VoucherTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Preferencia or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Voucher or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Preferencia object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Voucher object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -337,27 +383,27 @@ class PreferenciaTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(VoucherTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Preferencia) { // it's a model object
+        } elseif ($values instanceof \Voucher) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(PreferenciaTableMap::DATABASE_NAME);
-            $criteria->add(PreferenciaTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(VoucherTableMap::DATABASE_NAME);
+            $criteria->add(VoucherTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = VoucherQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            PreferenciaTableMap::clearInstancePool();
+            VoucherTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                PreferenciaTableMap::removeInstanceFromPool($singleval);
+                VoucherTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -365,20 +411,20 @@ class PreferenciaTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the preferencias table.
+     * Deletes all rows from the vouchers table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return PreferenciaQuery::create()->doDeleteAll($con);
+        return VoucherQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Preferencia or Criteria object.
+     * Performs an INSERT on the database, given a Voucher or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Preferencia object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Voucher object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -387,22 +433,22 @@ class PreferenciaTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(PreferenciaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(VoucherTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Preferencia object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Voucher object
         }
 
-        if ($criteria->containsKey(PreferenciaTableMap::COL_ID) && $criteria->keyContainsValue(PreferenciaTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PreferenciaTableMap::COL_ID.')');
+        if ($criteria->containsKey(VoucherTableMap::COL_ID) && $criteria->keyContainsValue(VoucherTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.VoucherTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = PreferenciaQuery::create()->mergeWith($criteria);
+        $query = VoucherQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -411,7 +457,7 @@ class PreferenciaTableMap extends TableMap
         });
     }
 
-} // PreferenciaTableMap
+} // VoucherTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-PreferenciaTableMap::buildTableMap();
+VoucherTableMap::buildTableMap();
