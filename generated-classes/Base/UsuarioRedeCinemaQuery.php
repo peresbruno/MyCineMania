@@ -20,10 +20,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildUsuarioRedeCinemaQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildUsuarioRedeCinemaQuery orderByUsuarioId($order = Criteria::ASC) Order by the usuario_id column
  *
- * @method     ChildUsuarioRedeCinemaQuery groupById() Group by the id column
  * @method     ChildUsuarioRedeCinemaQuery groupByUsuarioId() Group by the usuario_id column
  *
  * @method     ChildUsuarioRedeCinemaQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -39,17 +37,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuarioRedeCinema findOne(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query
  * @method     ChildUsuarioRedeCinema findOneOrCreate(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query, or a new ChildUsuarioRedeCinema object populated from the query conditions when no match is found
  *
- * @method     ChildUsuarioRedeCinema findOneById(int $id) Return the first ChildUsuarioRedeCinema filtered by the id column
  * @method     ChildUsuarioRedeCinema findOneByUsuarioId(int $usuario_id) Return the first ChildUsuarioRedeCinema filtered by the usuario_id column *
 
  * @method     ChildUsuarioRedeCinema requirePk($key, ConnectionInterface $con = null) Return the ChildUsuarioRedeCinema by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUsuarioRedeCinema requireOne(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildUsuarioRedeCinema requireOneById(int $id) Return the first ChildUsuarioRedeCinema filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUsuarioRedeCinema requireOneByUsuarioId(int $usuario_id) Return the first ChildUsuarioRedeCinema filtered by the usuario_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildUsuarioRedeCinema[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildUsuarioRedeCinema objects based on current ModelCriteria
- * @method     ChildUsuarioRedeCinema[]|ObjectCollection findById(int $id) Return ChildUsuarioRedeCinema objects filtered by the id column
  * @method     ChildUsuarioRedeCinema[]|ObjectCollection findByUsuarioId(int $usuario_id) Return ChildUsuarioRedeCinema objects filtered by the usuario_id column
  * @method     ChildUsuarioRedeCinema[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -143,7 +138,7 @@ abstract class UsuarioRedeCinemaQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, usuario_id FROM usuarios_rede_cinema WHERE id = :p0';
+        $sql = 'SELECT usuario_id FROM usuarios_rede_cinema WHERE usuario_id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -217,7 +212,7 @@ abstract class UsuarioRedeCinemaQuery extends ModelCriteria
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -230,48 +225,7 @@ abstract class UsuarioRedeCinemaQuery extends ModelCriteria
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -404,7 +358,7 @@ abstract class UsuarioRedeCinemaQuery extends ModelCriteria
     public function prune($usuarioRedeCinema = null)
     {
         if ($usuarioRedeCinema) {
-            $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_ID, $usuarioRedeCinema->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $usuarioRedeCinema->getUsuarioId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

@@ -159,7 +159,7 @@ class VoucherTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('beneficio_id', 'BeneficioId', 'INTEGER', 'beneficios', 'id', true, null, null);
-        $this->addForeignKey('participante_id', 'ParticipanteId', 'INTEGER', 'participantes', 'id', true, null, null);
+        $this->addForeignKey('participante_id', 'ParticipanteId', 'INTEGER', 'participantes', 'usuario_id', true, null, null);
         $this->addColumn('status', 'Status', 'VARCHAR', true, 50, null);
         $this->addColumn('codigo', 'Codigo', 'VARCHAR', true, 50, null);
         $this->addColumn('data_emissao', 'DataEmissao', 'DATE', true, null, null);
@@ -182,7 +182,7 @@ class VoucherTableMap extends TableMap
   0 =>
   array (
     0 => ':participante_id',
-    1 => ':id',
+    1 => ':usuario_id',
   ),
 ), null, null, null, false);
     } // buildRelations()

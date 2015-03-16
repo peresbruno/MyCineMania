@@ -1,0 +1,176 @@
+<div class="espaco-topo">
+    <form name="cadastroParticipante" role="form" id="participante_cadastro" novalidate>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="row" ng-show="cadastroParticipante.$invalid && cadastroParticipante.submetido">
+                        <div class="alert alert-warning" role="alert">
+                             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                            <p ng-show="cadastroParticipante.nome.$error.required">O campo "Nome" é obrigatório</p>
+                            <p ng-show="cadastroParticipante.sobrenome.$error.required">O campo "Sobrenome" é obrigatório</p>
+                            <p ng-show="cadastroParticipante.usuario.$error.required">O campo "Usuário" é obrigatório</p>
+                            <p ng-show="cadastroParticipante.senha.$error.required">O campo "Senha" é obrigatório</p>
+                            <p ng-show="cadastroParticipante.repetirSenha.$error.required">O campo "Repetir senha" é obrigatório</p>
+                            <p ng-show="cadastroParticipante.email.$error.required">O campo "E-mail" é obrigatório</p>  
+                            <p ng-show="cadastroParticipante.email.$invalid">O e-mail digitado é inválido</p>
+                            <p ng-show="cadastroParticipante.repetirEmail.$error.required">O campo "Repetir E-mail" é obrigatório</p>  
+                            <p ng-show="cadastroParticipante.repetirEmail.$invalid">O e-mail digitado é inválido</p>
+                            <p ng-show="cadastroParticipante.cpf.$error.required">O campo "CPF" é obrigatório</p>  
+                            <p ng-show="!senhasIguais()">As senhas digitadas não são iguais</p>  
+                            <p ng-show="!emailsIguais()">Os emails digitados não são iguais</p>  
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2>Desejo me inscrever!</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nome" class="control-label">Nome: </label>
+                                <input name="nome" type="text" ng-model="participante.Nome" class="form-control" required id="nome" placeholder="Nome">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="sobrenome" class="control-label">Sobrenome: </label>
+                                <input name="sobrenome" type="text" ng-model="participante.Sobrenome" class="form-control" required id="sobrenome" placeholder="Sobrenome">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="usuario" class="control-label">Usuário: </label>
+                                <input name="usuario" type="text" ng-model="participante.NomeUsuario" class="form-control" required id="usuario" placeholder="Usuário">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">&nbsp;</label>
+                                <div>[verificando...]</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="senha">Senha: </label>
+                                <input name="senha" type="password" ng-model="participante.Senha" class="form-control" required id="senha" placeholder="Senha">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="senha_confirmacao">Repetir Senha: </label>
+                                <input name="repetirSenha" type="password" ng-model="participante.RepetirSenha" class="form-control" required id="senha_confirmacao" placeholder="Repetir Senha">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">E-mail: </label>
+                                <input name="email" type="email" ng-model="participante.Email" class="form-control" required id="email" placeholder="E-mail">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email_confirmacao">Repetir e-mail: </label>
+                                <input name="repetirEmail" type="email" ng-model="participante.RepetirEmail" class="form-control" required id="email_confirmacao" placeholder="Repetir e-mail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cpf" class="control-label">CPF: </label>
+                                <input name="cpf" type="text" ng-model="participante.Cpf" class="form-control" required id="cpf" placeholder="CPF" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Digite o CPF no formato nnn.nnn.nnn-nn">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">&nbsp;</label>
+                                <div><span style="color:darkgreen" class="glyphicon glyphicon-ok-sign"></span> Nome disponível</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="regulamento" class="control-label">Interesses:</label>
+                                <div>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="">
+                                        Suspense
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="">
+                                        Terror
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="">
+                                        Ação
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="">
+                                        Comédia
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="">
+                                        Drama
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="">
+                                        Animação
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="">
+                                        Ficção científica
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="regulamento">Regulamento e Termos: </label>
+                                <div class="checkbox">
+                                    <label>
+                                        <input ng-model="opcoes.regulamento" type="checkbox" value="" >
+                                        Estou ciente e concordo com o <a href="#">regulamento</a> do programa.
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input ng-model="opcoes.politica_privacidade" type="checkbox" value="" >
+                                        Estou ciente e concordo com a <a href="#">política de privacidade</a> do programa.
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button ng-click="salvar()" type="submit" class="btn btn-primary pull-right">Gerar boleto bancário e enviar por e-mail</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2>Já sou cadastrado</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a href="?pg=login">Faça login</a> para acessar a área privativa.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /container -->
+    </form>
+</div>

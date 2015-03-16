@@ -62,12 +62,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the usuario_id field.
      * @var        int
      */
@@ -304,16 +298,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [usuario_id] column value.
      *
      * @return int
@@ -322,26 +306,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     {
         return $this->usuario_id;
     }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param int $v new value
-     * @return $this|\UsuarioRedeCinema The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[UsuarioRedeCinemaTableMap::COL_ID] = true;
-        }
-
-        return $this;
-    } // setId()
 
     /**
      * Set the value of [usuario_id] column.
@@ -403,10 +367,7 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : UsuarioRedeCinemaTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : UsuarioRedeCinemaTableMap::translateFieldName('UsuarioId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : UsuarioRedeCinemaTableMap::translateFieldName('UsuarioId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->usuario_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -416,7 +377,7 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = UsuarioRedeCinemaTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 1; // 1 = UsuarioRedeCinemaTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\UsuarioRedeCinema'), 0, $e);
@@ -623,24 +584,8 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[UsuarioRedeCinemaTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . UsuarioRedeCinemaTableMap::COL_ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $dataFetcher = $con->query("SELECT nextval('usuarios_rede_cinema_id_seq')");
-                $this->id = $dataFetcher->fetchColumn();
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', 0, $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(UsuarioRedeCinemaTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
-        }
         if ($this->isColumnModified(UsuarioRedeCinemaTableMap::COL_USUARIO_ID)) {
             $modifiedColumns[':p' . $index++]  = 'usuario_id';
         }
@@ -655,9 +600,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'usuario_id':
                         $stmt->bindValue($identifier, $this->usuario_id, PDO::PARAM_INT);
                         break;
@@ -717,9 +659,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getUsuarioId();
                 break;
             default:
@@ -752,8 +691,7 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
         $alreadyDumpedObjects['UsuarioRedeCinema'][$this->hashCode()] = true;
         $keys = UsuarioRedeCinemaTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getUsuarioId(),
+            $keys[0] => $this->getUsuarioId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -811,9 +749,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setUsuarioId($value);
                 break;
         } // switch()
@@ -843,10 +778,7 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
         $keys = UsuarioRedeCinemaTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
-        }
-        if (array_key_exists($keys[1], $arr)) {
-            $this->setUsuarioId($arr[$keys[1]]);
+            $this->setUsuarioId($arr[$keys[0]]);
         }
     }
 
@@ -889,9 +821,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     {
         $criteria = new Criteria(UsuarioRedeCinemaTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(UsuarioRedeCinemaTableMap::COL_ID)) {
-            $criteria->add(UsuarioRedeCinemaTableMap::COL_ID, $this->id);
-        }
         if ($this->isColumnModified(UsuarioRedeCinemaTableMap::COL_USUARIO_ID)) {
             $criteria->add(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $this->usuario_id);
         }
@@ -912,7 +841,7 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = ChildUsuarioRedeCinemaQuery::create();
-        $criteria->add(UsuarioRedeCinemaTableMap::COL_ID, $this->id);
+        $criteria->add(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $this->usuario_id);
 
         return $criteria;
     }
@@ -925,10 +854,17 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getId();
+        $validPk = null !== $this->getUsuarioId();
 
-        $validPrimaryKeyFKs = 0;
+        $validPrimaryKeyFKs = 1;
         $primaryKeyFKs = [];
+
+        //relation usuarios_rede_cinema_fk_614747 to table usuarios
+        if ($this->aUsuario && $hash = spl_object_hash($this->aUsuario)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -945,18 +881,18 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        return $this->getUsuarioId();
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Generic method to set the primary key (usuario_id column).
      *
      * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
     {
-        $this->setId($key);
+        $this->setUsuarioId($key);
     }
 
     /**
@@ -965,7 +901,7 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return null === $this->getId();
+        return null === $this->getUsuarioId();
     }
 
     /**
@@ -984,7 +920,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
         $copyObj->setUsuarioId($this->getUsuarioId());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1027,10 +962,9 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
 
         $this->aUsuario = $v;
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildUsuario object, it will not be re-added.
+        // Add binding for other direction of this 1:1 relationship.
         if ($v !== null) {
-            $v->addUsuarioRedeCinema($this);
+            $v->setUsuarioRedeCinema($this);
         }
 
 
@@ -1049,13 +983,8 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     {
         if ($this->aUsuario === null && ($this->usuario_id !== null)) {
             $this->aUsuario = ChildUsuarioQuery::create()->findPk($this->usuario_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aUsuario->addUsuarioRedeCinemas($this);
-             */
+            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
+            $this->aUsuario->setUsuarioRedeCinema($this);
         }
 
         return $this->aUsuario;
@@ -1071,7 +1000,6 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
         if (null !== $this->aUsuario) {
             $this->aUsuario->removeUsuarioRedeCinema($this);
         }
-        $this->id = null;
         $this->usuario_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();

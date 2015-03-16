@@ -493,7 +493,7 @@ abstract class Voucher implements ActiveRecordInterface
             $this->modifiedColumns[VoucherTableMap::COL_PARTICIPANTE_ID] = true;
         }
 
-        if ($this->aParticipante !== null && $this->aParticipante->getId() !== $v) {
+        if ($this->aParticipante !== null && $this->aParticipante->getUsuarioId() !== $v) {
             $this->aParticipante = null;
         }
 
@@ -669,7 +669,7 @@ abstract class Voucher implements ActiveRecordInterface
         if ($this->aBeneficio !== null && $this->beneficio_id !== $this->aBeneficio->getId()) {
             $this->aBeneficio = null;
         }
-        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getId()) {
+        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getUsuarioId()) {
             $this->aParticipante = null;
         }
     } // ensureConsistency
@@ -1441,7 +1441,7 @@ abstract class Voucher implements ActiveRecordInterface
         if ($v === null) {
             $this->setParticipanteId(NULL);
         } else {
-            $this->setParticipanteId($v->getId());
+            $this->setParticipanteId($v->getUsuarioId());
         }
 
         $this->aParticipante = $v;

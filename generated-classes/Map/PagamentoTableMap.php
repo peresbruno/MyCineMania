@@ -153,7 +153,7 @@ class PagamentoTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('pagamentos_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('participante_id', 'ParticipanteId', 'INTEGER', 'participantes', 'id', true, null, null);
+        $this->addForeignKey('participante_id', 'ParticipanteId', 'INTEGER', 'participantes', 'usuario_id', true, null, null);
         $this->addColumn('data_pagamento', 'DataPagamento', 'DATE', false, null, null);
         $this->addColumn('data_vencimento', 'DataVencimento', 'DATE', true, null, null);
         $this->addColumn('numero_boleto', 'NumeroBoleto', 'VARCHAR', false, 50, null);
@@ -169,7 +169,7 @@ class PagamentoTableMap extends TableMap
   0 =>
   array (
     0 => ':participante_id',
-    1 => ':id',
+    1 => ':usuario_id',
   ),
 ), null, null, null, false);
     } // buildRelations()

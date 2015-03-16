@@ -349,14 +349,14 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
     {
         if ($participante instanceof \Participante) {
             return $this
-                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $participante->getId(), $comparison);
+                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $participante->getUsuarioId(), $comparison);
         } elseif ($participante instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $participante->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $participante->toKeyValue('PrimaryKey', 'UsuarioId'), $comparison);
         } else {
             throw new PropelException('filterByParticipante() only accepts arguments of type \Participante or Collection');
         }

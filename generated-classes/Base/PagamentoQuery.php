@@ -507,14 +507,14 @@ abstract class PagamentoQuery extends ModelCriteria
     {
         if ($participante instanceof \Participante) {
             return $this
-                ->addUsingAlias(PagamentoTableMap::COL_PARTICIPANTE_ID, $participante->getId(), $comparison);
+                ->addUsingAlias(PagamentoTableMap::COL_PARTICIPANTE_ID, $participante->getUsuarioId(), $comparison);
         } elseif ($participante instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(PagamentoTableMap::COL_PARTICIPANTE_ID, $participante->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(PagamentoTableMap::COL_PARTICIPANTE_ID, $participante->toKeyValue('PrimaryKey', 'UsuarioId'), $comparison);
         } else {
             throw new PropelException('filterByParticipante() only accepts arguments of type \Participante or Collection');
         }

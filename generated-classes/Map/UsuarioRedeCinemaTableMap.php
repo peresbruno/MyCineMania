@@ -59,7 +59,7 @@ class UsuarioRedeCinemaTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 1;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,7 @@ class UsuarioRedeCinemaTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
-
-    /**
-     * the column name for the id field
-     */
-    const COL_ID = 'usuarios_rede_cinema.id';
+    const NUM_HYDRATE_COLUMNS = 1;
 
     /**
      * the column name for the usuario_id field
@@ -93,11 +88,11 @@ class UsuarioRedeCinemaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'UsuarioId', ),
-        self::TYPE_CAMELNAME     => array('id', 'usuarioId', ),
-        self::TYPE_COLNAME       => array(UsuarioRedeCinemaTableMap::COL_ID, UsuarioRedeCinemaTableMap::COL_USUARIO_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'usuario_id', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('UsuarioId', ),
+        self::TYPE_CAMELNAME     => array('usuarioId', ),
+        self::TYPE_COLNAME       => array(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, ),
+        self::TYPE_FIELDNAME     => array('usuario_id', ),
+        self::TYPE_NUM           => array(0, )
     );
 
     /**
@@ -107,11 +102,11 @@ class UsuarioRedeCinemaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'UsuarioId' => 1, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'usuarioId' => 1, ),
-        self::TYPE_COLNAME       => array(UsuarioRedeCinemaTableMap::COL_ID => 0, UsuarioRedeCinemaTableMap::COL_USUARIO_ID => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'usuario_id' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('UsuarioId' => 0, ),
+        self::TYPE_CAMELNAME     => array('usuarioId' => 0, ),
+        self::TYPE_COLNAME       => array(UsuarioRedeCinemaTableMap::COL_USUARIO_ID => 0, ),
+        self::TYPE_FIELDNAME     => array('usuario_id' => 0, ),
+        self::TYPE_NUM           => array(0, )
     );
 
     /**
@@ -129,11 +124,9 @@ class UsuarioRedeCinemaTableMap extends TableMap
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\UsuarioRedeCinema');
         $this->setPackage('');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('usuarios_rede_cinema_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('usuario_id', 'UsuarioId', 'INTEGER', 'usuarios', 'id', true, null, null);
+        $this->addForeignPrimaryKey('usuario_id', 'UsuarioId', 'INTEGER' , 'usuarios', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -179,11 +172,11 @@ class UsuarioRedeCinemaTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('UsuarioId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('UsuarioId', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -203,7 +196,7 @@ class UsuarioRedeCinemaTableMap extends TableMap
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('UsuarioId', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
 
@@ -304,10 +297,8 @@ class UsuarioRedeCinemaTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(UsuarioRedeCinemaTableMap::COL_ID);
             $criteria->addSelectColumn(UsuarioRedeCinemaTableMap::COL_USUARIO_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.usuario_id');
         }
     }
@@ -360,7 +351,7 @@ class UsuarioRedeCinemaTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(UsuarioRedeCinemaTableMap::DATABASE_NAME);
-            $criteria->add(UsuarioRedeCinemaTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria->add(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, (array) $values, Criteria::IN);
         }
 
         $query = UsuarioRedeCinemaQuery::create()->mergeWith($criteria);
@@ -406,10 +397,6 @@ class UsuarioRedeCinemaTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from UsuarioRedeCinema object
-        }
-
-        if ($criteria->containsKey(UsuarioRedeCinemaTableMap::COL_ID) && $criteria->keyContainsValue(UsuarioRedeCinemaTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.UsuarioRedeCinemaTableMap::COL_ID.')');
         }
 
 

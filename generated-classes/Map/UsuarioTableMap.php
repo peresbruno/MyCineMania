@@ -165,20 +165,20 @@ class UsuarioTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Participante', '\\Participante', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Participante', '\\Participante', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (
     0 => ':usuario_id',
     1 => ':id',
   ),
-), null, null, 'Participantes', false);
-        $this->addRelation('UsuarioRedeCinema', '\\UsuarioRedeCinema', RelationMap::ONE_TO_MANY, array (
+), null, null, null, false);
+        $this->addRelation('UsuarioRedeCinema', '\\UsuarioRedeCinema', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (
     0 => ':usuario_id',
     1 => ':id',
   ),
-), null, null, 'UsuarioRedeCinemas', false);
+), null, null, null, false);
     } // buildRelations()
 
     /**

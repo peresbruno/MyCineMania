@@ -20,14 +20,12 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildParticipanteQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildParticipanteQuery orderByUsuarioId($order = Criteria::ASC) Order by the usuario_id column
  * @method     ChildParticipanteQuery orderByCpf($order = Criteria::ASC) Order by the cpf column
  * @method     ChildParticipanteQuery orderByFimValidade($order = Criteria::ASC) Order by the fim_validade column
  * @method     ChildParticipanteQuery orderByNome($order = Criteria::ASC) Order by the nome column
  * @method     ChildParticipanteQuery orderBySobrenome($order = Criteria::ASC) Order by the sobrenome column
  *
- * @method     ChildParticipanteQuery groupById() Group by the id column
  * @method     ChildParticipanteQuery groupByUsuarioId() Group by the usuario_id column
  * @method     ChildParticipanteQuery groupByCpf() Group by the cpf column
  * @method     ChildParticipanteQuery groupByFimValidade() Group by the fim_validade column
@@ -59,7 +57,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildParticipante findOne(ConnectionInterface $con = null) Return the first ChildParticipante matching the query
  * @method     ChildParticipante findOneOrCreate(ConnectionInterface $con = null) Return the first ChildParticipante matching the query, or a new ChildParticipante object populated from the query conditions when no match is found
  *
- * @method     ChildParticipante findOneById(int $id) Return the first ChildParticipante filtered by the id column
  * @method     ChildParticipante findOneByUsuarioId(int $usuario_id) Return the first ChildParticipante filtered by the usuario_id column
  * @method     ChildParticipante findOneByCpf(string $cpf) Return the first ChildParticipante filtered by the cpf column
  * @method     ChildParticipante findOneByFimValidade(string $fim_validade) Return the first ChildParticipante filtered by the fim_validade column
@@ -69,7 +66,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildParticipante requirePk($key, ConnectionInterface $con = null) Return the ChildParticipante by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildParticipante requireOne(ConnectionInterface $con = null) Return the first ChildParticipante matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildParticipante requireOneById(int $id) Return the first ChildParticipante filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildParticipante requireOneByUsuarioId(int $usuario_id) Return the first ChildParticipante filtered by the usuario_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildParticipante requireOneByCpf(string $cpf) Return the first ChildParticipante filtered by the cpf column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildParticipante requireOneByFimValidade(string $fim_validade) Return the first ChildParticipante filtered by the fim_validade column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -77,7 +73,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildParticipante requireOneBySobrenome(string $sobrenome) Return the first ChildParticipante filtered by the sobrenome column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildParticipante[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildParticipante objects based on current ModelCriteria
- * @method     ChildParticipante[]|ObjectCollection findById(int $id) Return ChildParticipante objects filtered by the id column
  * @method     ChildParticipante[]|ObjectCollection findByUsuarioId(int $usuario_id) Return ChildParticipante objects filtered by the usuario_id column
  * @method     ChildParticipante[]|ObjectCollection findByCpf(string $cpf) Return ChildParticipante objects filtered by the cpf column
  * @method     ChildParticipante[]|ObjectCollection findByFimValidade(string $fim_validade) Return ChildParticipante objects filtered by the fim_validade column
@@ -175,7 +170,7 @@ abstract class ParticipanteQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, usuario_id, cpf, fim_validade, nome, sobrenome FROM participantes WHERE id = :p0';
+        $sql = 'SELECT usuario_id, cpf, fim_validade, nome, sobrenome FROM participantes WHERE usuario_id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -249,7 +244,7 @@ abstract class ParticipanteQuery extends ModelCriteria
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(ParticipanteTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(ParticipanteTableMap::COL_USUARIO_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -262,48 +257,7 @@ abstract class ParticipanteQuery extends ModelCriteria
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(ParticipanteTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildParticipanteQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(ParticipanteTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(ParticipanteTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ParticipanteTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(ParticipanteTableMap::COL_USUARIO_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -568,7 +522,7 @@ abstract class ParticipanteQuery extends ModelCriteria
     {
         if ($participantesPreferencias instanceof \ParticipantesPreferencias) {
             return $this
-                ->addUsingAlias(ParticipanteTableMap::COL_ID, $participantesPreferencias->getParticipanteId(), $comparison);
+                ->addUsingAlias(ParticipanteTableMap::COL_USUARIO_ID, $participantesPreferencias->getParticipanteId(), $comparison);
         } elseif ($participantesPreferencias instanceof ObjectCollection) {
             return $this
                 ->useParticipantesPreferenciasQuery()
@@ -641,7 +595,7 @@ abstract class ParticipanteQuery extends ModelCriteria
     {
         if ($pagamento instanceof \Pagamento) {
             return $this
-                ->addUsingAlias(ParticipanteTableMap::COL_ID, $pagamento->getParticipanteId(), $comparison);
+                ->addUsingAlias(ParticipanteTableMap::COL_USUARIO_ID, $pagamento->getParticipanteId(), $comparison);
         } elseif ($pagamento instanceof ObjectCollection) {
             return $this
                 ->usePagamentoQuery()
@@ -714,7 +668,7 @@ abstract class ParticipanteQuery extends ModelCriteria
     {
         if ($voucher instanceof \Voucher) {
             return $this
-                ->addUsingAlias(ParticipanteTableMap::COL_ID, $voucher->getParticipanteId(), $comparison);
+                ->addUsingAlias(ParticipanteTableMap::COL_USUARIO_ID, $voucher->getParticipanteId(), $comparison);
         } elseif ($voucher instanceof ObjectCollection) {
             return $this
                 ->useVoucherQuery()
@@ -802,7 +756,7 @@ abstract class ParticipanteQuery extends ModelCriteria
     public function prune($participante = null)
     {
         if ($participante) {
-            $this->addUsingAlias(ParticipanteTableMap::COL_ID, $participante->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(ParticipanteTableMap::COL_USUARIO_ID, $participante->getUsuarioId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

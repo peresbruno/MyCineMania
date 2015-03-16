@@ -446,7 +446,7 @@ abstract class Pagamento implements ActiveRecordInterface
             $this->modifiedColumns[PagamentoTableMap::COL_PARTICIPANTE_ID] = true;
         }
 
-        if ($this->aParticipante !== null && $this->aParticipante->getId() !== $v) {
+        if ($this->aParticipante !== null && $this->aParticipante->getUsuarioId() !== $v) {
             $this->aParticipante = null;
         }
 
@@ -616,7 +616,7 @@ abstract class Pagamento implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getId()) {
+        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getUsuarioId()) {
             $this->aParticipante = null;
         }
     } // ensureConsistency
@@ -1294,7 +1294,7 @@ abstract class Pagamento implements ActiveRecordInterface
         if ($v === null) {
             $this->setParticipanteId(NULL);
         } else {
-            $this->setParticipanteId($v->getId());
+            $this->setParticipanteId($v->getUsuarioId());
         }
 
         $this->aParticipante = $v;
