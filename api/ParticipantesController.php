@@ -1,5 +1,24 @@
 <?php
 	class ParticipantesController {
+
+		private static function getParticipante	($id) {
+			$participante = ParticipanteQuery::create()->select(array(
+				'cpf' => 'Cpf',
+				'fim_validade' => 'FimValidade',
+				'nome' => 'Nome',
+				'sobrenome' => 'Sobrenome'
+			))
+			->join('Usuario')
+			->withColumn('Usuario.id', 'Id')
+			->withColumn('Usuario.data_inscricao', 'DataInscricao')
+			->withColumn('Usuario.email', 'Email')
+			->withColumn('Usuario.liberado', 'Liberado')
+			->withColumn('Usuario.nome_usuario', 'NomeUsuario')
+			->filterById($id)
+			->findOne();
+
+			return $participante;
+		}
 		
 		public static function post() {
 
@@ -10,37 +29,51 @@
 
 			$usuario = new Usuario();
 			$usuario->setDataInscricao('now');
+			$usuario->setTipo('participante');
 			$usuario->fromArray($postData);
+
+			$usuario->setSenha(md5($postData['Senha']));
 
 			$participante->setUsuario($usuario);
 			
 			try {
 				$participante->save();
+				$participante = ParticipantesController::getParticipante($participante->getId());
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 201 Created');
-				die($participante->toJSON());
+				die(json_encode($participante));				
 			} catch (Exception $e) {
 				var_dump($e);
-				header( $_SERVER["SERVER_PROTOCOL"] . ' 204 No Content');
+				header( $_SERVER["SERVER_PROTOCOL"] . ' 500 Internal Server Error');
 				exit;
 			}
 
 		}
 
+		public static function update() {
+			$postData = file_get_contents("php://input");
+			$postData = json_decode($postData, true);
+
+
+			$rede = UsuarioQuery::create()->filterById($postData['Id'])->findOne();
+			$rede->fromArray($postData);
+			$rede->getUsuario()->fromArray($postData);
+			$rede->save();
+			
+			try {
+				$redeCinema->update();
+				$redeCinema = RedesCinemaController::getRedeCinema($redeCinema->getId());
+				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
+				die(json_encode($redeCinema));
+			} catch (Exception $e) {
+				var_dump($e);
+				header( $_SERVER["SERVER_PROTOCOL"] . ' 500 Internal Server Error');
+				exit;
+			}
+		}
+
 		public static function get($id) {
-			$participante = UsuarioQuery::create()->select(array(
-				'id'
-			))
-			->join('Participante')
-			->withColumn('data_inscricao', 'DataInscricao')
-			->withColumn('email', 'Email')
-			->withColumn('liberado', 'Liberado')
-			->withColumn('nome_usuario', 'NomeUsuario')
-			->withColumn('Participante.cpf', 'Cpf')
-			->withColumn('Participante.fim_validade', 'FimValidade')
-			->withColumn('Participante.nome', 'Nome')
-			->withColumn('Participante.sobrenome', 'Sobrenome')
-			->filterById($id)
-			->findOne();
+			$participante = ParticipantesController::getParticipante($id);
+
 			if ($participante) {
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
 				die(json_encode($participante));				
@@ -52,10 +85,32 @@
 		}
 
 		public static function getAll() {
-			header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
-			$json = ParticipanteQuery::create()->find()->toJSON();
-			die($json);
 
+			$participantes = ParticipanteQuery::create()
+			->select(
+				array(
+					'id' => 'Id',
+					'cpf' => 'Cpf',
+					'fim_validade' => 'FimValidade',
+					'nome' => 'Nome',
+					'sobrenome' => 'Sobrenome'
+				)
+			)
+			->join('Usuario')
+		  ->withColumn('Usuario.data_inscricao', 'DataInscricao')
+		  ->withColumn('Usuario.email', 'Email')
+		  ->withColumn('Usuario.liberado', 'Liberado')
+		  ->withColumn('Usuario.nome_usuario', 'NomeUsuario')
+		  ->find()->toArray();
+
+		  if ($participantes) {
+				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
+				die(json_encode($participantes));
+		  }
+		  else {
+				header( $_SERVER["SERVER_PROTOCOL"] . ' 204 No Content');
+				exit;	  	
+		  }
 		}
 	}
 

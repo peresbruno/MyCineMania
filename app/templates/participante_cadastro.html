@@ -18,7 +18,7 @@
                             <p ng-show="cadastroParticipante.repetirEmail.$invalid">O e-mail digitado é inválido</p>
                             <p ng-show="cadastroParticipante.cpf.$error.required">O campo "CPF" é obrigatório</p>  
                             <p ng-show="!senhasIguais()">As senhas digitadas não são iguais</p>  
-                            <p ng-show="!emailsIguais()">Os emails digitados não são iguais</p>  
+                            <p ng-show="!emailsIguais()">Os emails digitados não são iguais</p>
                         </div>
                     </div>
                     <div class="row">
@@ -50,7 +50,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">&nbsp;</label>
-                                <div>[verificando...]</div>
+                                <div><span style="color:darkgreen" class="glyphicon glyphicon-ok-sign"></span> Nome disponível</div>
                             </div>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">&nbsp;</label>
-                                <div><span style="color:darkgreen" class="glyphicon glyphicon-ok-sign"></span> Nome disponível</div>
+                                <div><span style="color:darkgreen" class="glyphicon glyphicon-ok-sign"></span> CPF válido</div>
                             </div>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <a href="?pg=login">Faça login</a> para acessar a área privativa.
+                            <a href="#/login">Faça login</a> para acessar a área privativa.
                         </div>
                     </div>
                 </div>

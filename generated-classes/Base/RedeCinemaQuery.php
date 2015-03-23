@@ -22,12 +22,14 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildRedeCinemaQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildRedeCinemaQuery orderByCnpj($order = Criteria::ASC) Order by the cnpj column
+ * @method     ChildRedeCinemaQuery orderByUsuarioId($order = Criteria::ASC) Order by the usuario_id column
  * @method     ChildRedeCinemaQuery orderByNomeFantasia($order = Criteria::ASC) Order by the nome_fantasia column
  * @method     ChildRedeCinemaQuery orderByRazaoSocial($order = Criteria::ASC) Order by the razao_social column
  * @method     ChildRedeCinemaQuery orderByEndereco($order = Criteria::ASC) Order by the endereco column
  *
  * @method     ChildRedeCinemaQuery groupById() Group by the id column
  * @method     ChildRedeCinemaQuery groupByCnpj() Group by the cnpj column
+ * @method     ChildRedeCinemaQuery groupByUsuarioId() Group by the usuario_id column
  * @method     ChildRedeCinemaQuery groupByNomeFantasia() Group by the nome_fantasia column
  * @method     ChildRedeCinemaQuery groupByRazaoSocial() Group by the razao_social column
  * @method     ChildRedeCinemaQuery groupByEndereco() Group by the endereco column
@@ -36,17 +38,22 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRedeCinemaQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildRedeCinemaQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method     ChildRedeCinemaQuery leftJoinUsuario($relationAlias = null) Adds a LEFT JOIN clause to the query using the Usuario relation
+ * @method     ChildRedeCinemaQuery rightJoinUsuario($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Usuario relation
+ * @method     ChildRedeCinemaQuery innerJoinUsuario($relationAlias = null) Adds a INNER JOIN clause to the query using the Usuario relation
+ *
  * @method     ChildRedeCinemaQuery leftJoinBeneficio($relationAlias = null) Adds a LEFT JOIN clause to the query using the Beneficio relation
  * @method     ChildRedeCinemaQuery rightJoinBeneficio($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Beneficio relation
  * @method     ChildRedeCinemaQuery innerJoinBeneficio($relationAlias = null) Adds a INNER JOIN clause to the query using the Beneficio relation
  *
- * @method     \BeneficioQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \UsuarioQuery|\BeneficioQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildRedeCinema findOne(ConnectionInterface $con = null) Return the first ChildRedeCinema matching the query
  * @method     ChildRedeCinema findOneOrCreate(ConnectionInterface $con = null) Return the first ChildRedeCinema matching the query, or a new ChildRedeCinema object populated from the query conditions when no match is found
  *
  * @method     ChildRedeCinema findOneById(int $id) Return the first ChildRedeCinema filtered by the id column
  * @method     ChildRedeCinema findOneByCnpj(string $cnpj) Return the first ChildRedeCinema filtered by the cnpj column
+ * @method     ChildRedeCinema findOneByUsuarioId(int $usuario_id) Return the first ChildRedeCinema filtered by the usuario_id column
  * @method     ChildRedeCinema findOneByNomeFantasia(string $nome_fantasia) Return the first ChildRedeCinema filtered by the nome_fantasia column
  * @method     ChildRedeCinema findOneByRazaoSocial(string $razao_social) Return the first ChildRedeCinema filtered by the razao_social column
  * @method     ChildRedeCinema findOneByEndereco(string $endereco) Return the first ChildRedeCinema filtered by the endereco column *
@@ -56,6 +63,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildRedeCinema requireOneById(int $id) Return the first ChildRedeCinema filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRedeCinema requireOneByCnpj(string $cnpj) Return the first ChildRedeCinema filtered by the cnpj column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildRedeCinema requireOneByUsuarioId(int $usuario_id) Return the first ChildRedeCinema filtered by the usuario_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRedeCinema requireOneByNomeFantasia(string $nome_fantasia) Return the first ChildRedeCinema filtered by the nome_fantasia column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRedeCinema requireOneByRazaoSocial(string $razao_social) Return the first ChildRedeCinema filtered by the razao_social column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRedeCinema requireOneByEndereco(string $endereco) Return the first ChildRedeCinema filtered by the endereco column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -63,6 +71,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRedeCinema[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildRedeCinema objects based on current ModelCriteria
  * @method     ChildRedeCinema[]|ObjectCollection findById(int $id) Return ChildRedeCinema objects filtered by the id column
  * @method     ChildRedeCinema[]|ObjectCollection findByCnpj(string $cnpj) Return ChildRedeCinema objects filtered by the cnpj column
+ * @method     ChildRedeCinema[]|ObjectCollection findByUsuarioId(int $usuario_id) Return ChildRedeCinema objects filtered by the usuario_id column
  * @method     ChildRedeCinema[]|ObjectCollection findByNomeFantasia(string $nome_fantasia) Return ChildRedeCinema objects filtered by the nome_fantasia column
  * @method     ChildRedeCinema[]|ObjectCollection findByRazaoSocial(string $razao_social) Return ChildRedeCinema objects filtered by the razao_social column
  * @method     ChildRedeCinema[]|ObjectCollection findByEndereco(string $endereco) Return ChildRedeCinema objects filtered by the endereco column
@@ -158,7 +167,7 @@ abstract class RedeCinemaQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, cnpj, nome_fantasia, razao_social, endereco FROM redes_cinema WHERE id = :p0';
+        $sql = 'SELECT id, cnpj, usuario_id, nome_fantasia, razao_social, endereco FROM redes_cinema WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -319,6 +328,49 @@ abstract class RedeCinemaQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the usuario_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUsuarioId(1234); // WHERE usuario_id = 1234
+     * $query->filterByUsuarioId(array(12, 34)); // WHERE usuario_id IN (12, 34)
+     * $query->filterByUsuarioId(array('min' => 12)); // WHERE usuario_id > 12
+     * </code>
+     *
+     * @see       filterByUsuario()
+     *
+     * @param     mixed $usuarioId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildRedeCinemaQuery The current query, for fluid interface
+     */
+    public function filterByUsuarioId($usuarioId = null, $comparison = null)
+    {
+        if (is_array($usuarioId)) {
+            $useMinMax = false;
+            if (isset($usuarioId['min'])) {
+                $this->addUsingAlias(RedeCinemaTableMap::COL_USUARIO_ID, $usuarioId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($usuarioId['max'])) {
+                $this->addUsingAlias(RedeCinemaTableMap::COL_USUARIO_ID, $usuarioId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(RedeCinemaTableMap::COL_USUARIO_ID, $usuarioId, $comparison);
+    }
+
+    /**
      * Filter the query on the nome_fantasia column
      *
      * Example usage:
@@ -403,6 +455,83 @@ abstract class RedeCinemaQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(RedeCinemaTableMap::COL_ENDERECO, $endereco, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \Usuario object
+     *
+     * @param \Usuario|ObjectCollection $usuario The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildRedeCinemaQuery The current query, for fluid interface
+     */
+    public function filterByUsuario($usuario, $comparison = null)
+    {
+        if ($usuario instanceof \Usuario) {
+            return $this
+                ->addUsingAlias(RedeCinemaTableMap::COL_USUARIO_ID, $usuario->getId(), $comparison);
+        } elseif ($usuario instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(RedeCinemaTableMap::COL_USUARIO_ID, $usuario->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByUsuario() only accepts arguments of type \Usuario or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Usuario relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildRedeCinemaQuery The current query, for fluid interface
+     */
+    public function joinUsuario($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Usuario');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Usuario');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Usuario relation Usuario object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \UsuarioQuery A secondary query class using the current class as primary query
+     */
+    public function useUsuarioQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinUsuario($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Usuario', '\UsuarioQuery');
     }
 
     /**

@@ -59,7 +59,7 @@ class UsuarioTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class UsuarioTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the id field
@@ -102,9 +102,18 @@ class UsuarioTableMap extends TableMap
     const COL_SENHA = 'usuarios.senha';
 
     /**
+     * the column name for the tipo field
+     */
+    const COL_TIPO = 'usuarios.tipo';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
+
+    /** The enumerated values for the tipo field */
+    const COL_TIPO_PARTICIPANTE = 'participante';
+    const COL_TIPO_REDE_CINEMA = 'rede_cinema';
 
     /**
      * holds an array of fieldnames
@@ -113,11 +122,11 @@ class UsuarioTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'DataInscricao', 'Email', 'Liberado', 'NomeUsuario', 'Senha', ),
-        self::TYPE_CAMELNAME     => array('id', 'dataInscricao', 'email', 'liberado', 'nomeUsuario', 'senha', ),
-        self::TYPE_COLNAME       => array(UsuarioTableMap::COL_ID, UsuarioTableMap::COL_DATA_INSCRICAO, UsuarioTableMap::COL_EMAIL, UsuarioTableMap::COL_LIBERADO, UsuarioTableMap::COL_NOME_USUARIO, UsuarioTableMap::COL_SENHA, ),
-        self::TYPE_FIELDNAME     => array('id', 'data_inscricao', 'email', 'liberado', 'nome_usuario', 'senha', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'DataInscricao', 'Email', 'Liberado', 'NomeUsuario', 'Senha', 'Tipo', ),
+        self::TYPE_CAMELNAME     => array('id', 'dataInscricao', 'email', 'liberado', 'nomeUsuario', 'senha', 'tipo', ),
+        self::TYPE_COLNAME       => array(UsuarioTableMap::COL_ID, UsuarioTableMap::COL_DATA_INSCRICAO, UsuarioTableMap::COL_EMAIL, UsuarioTableMap::COL_LIBERADO, UsuarioTableMap::COL_NOME_USUARIO, UsuarioTableMap::COL_SENHA, UsuarioTableMap::COL_TIPO, ),
+        self::TYPE_FIELDNAME     => array('id', 'data_inscricao', 'email', 'liberado', 'nome_usuario', 'senha', 'tipo', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -127,12 +136,41 @@ class UsuarioTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'DataInscricao' => 1, 'Email' => 2, 'Liberado' => 3, 'NomeUsuario' => 4, 'Senha' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'dataInscricao' => 1, 'email' => 2, 'liberado' => 3, 'nomeUsuario' => 4, 'senha' => 5, ),
-        self::TYPE_COLNAME       => array(UsuarioTableMap::COL_ID => 0, UsuarioTableMap::COL_DATA_INSCRICAO => 1, UsuarioTableMap::COL_EMAIL => 2, UsuarioTableMap::COL_LIBERADO => 3, UsuarioTableMap::COL_NOME_USUARIO => 4, UsuarioTableMap::COL_SENHA => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'data_inscricao' => 1, 'email' => 2, 'liberado' => 3, 'nome_usuario' => 4, 'senha' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'DataInscricao' => 1, 'Email' => 2, 'Liberado' => 3, 'NomeUsuario' => 4, 'Senha' => 5, 'Tipo' => 6, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'dataInscricao' => 1, 'email' => 2, 'liberado' => 3, 'nomeUsuario' => 4, 'senha' => 5, 'tipo' => 6, ),
+        self::TYPE_COLNAME       => array(UsuarioTableMap::COL_ID => 0, UsuarioTableMap::COL_DATA_INSCRICAO => 1, UsuarioTableMap::COL_EMAIL => 2, UsuarioTableMap::COL_LIBERADO => 3, UsuarioTableMap::COL_NOME_USUARIO => 4, UsuarioTableMap::COL_SENHA => 5, UsuarioTableMap::COL_TIPO => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'data_inscricao' => 1, 'email' => 2, 'liberado' => 3, 'nome_usuario' => 4, 'senha' => 5, 'tipo' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
+
+    /** The enumerated values for this table */
+    protected static $enumValueSets = array(
+                UsuarioTableMap::COL_TIPO => array(
+                            self::COL_TIPO_PARTICIPANTE,
+            self::COL_TIPO_REDE_CINEMA,
+        ),
+    );
+
+    /**
+     * Gets the list of values for all ENUM columns
+     * @return array
+     */
+    public static function getValueSets()
+    {
+      return static::$enumValueSets;
+    }
+
+    /**
+     * Gets the list of values for an ENUM column
+     * @param string $colname
+     * @return array list of possible values for the column
+     */
+    public static function getValueSet($colname)
+    {
+        $valueSets = self::getValueSets();
+
+        return $valueSets[$colname];
+    }
 
     /**
      * Initialize the table attributes and columns
@@ -158,6 +196,11 @@ class UsuarioTableMap extends TableMap
         $this->addColumn('liberado', 'Liberado', 'BOOLEAN', true, null, false);
         $this->addColumn('nome_usuario', 'NomeUsuario', 'VARCHAR', true, 255, null);
         $this->addColumn('senha', 'Senha', 'VARCHAR', true, 255, null);
+        $this->addColumn('tipo', 'Tipo', 'ENUM', true, null, null);
+        $this->getColumn('tipo')->setValueSet(array (
+  0 => 'participante',
+  1 => 'rede_cinema',
+));
     } // initialize()
 
     /**
@@ -165,20 +208,20 @@ class UsuarioTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Participante', '\\Participante', RelationMap::ONE_TO_ONE, array (
+        $this->addRelation('Participante', '\\Participante', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
     0 => ':usuario_id',
     1 => ':id',
   ),
-), null, null, null, false);
-        $this->addRelation('UsuarioRedeCinema', '\\UsuarioRedeCinema', RelationMap::ONE_TO_ONE, array (
+), null, null, 'Participantes', false);
+        $this->addRelation('RedeCinema', '\\RedeCinema', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
     0 => ':usuario_id',
     1 => ':id',
   ),
-), null, null, null, false);
+), null, null, 'RedeCinemas', false);
     } // buildRelations()
 
     /**
@@ -328,6 +371,7 @@ class UsuarioTableMap extends TableMap
             $criteria->addSelectColumn(UsuarioTableMap::COL_LIBERADO);
             $criteria->addSelectColumn(UsuarioTableMap::COL_NOME_USUARIO);
             $criteria->addSelectColumn(UsuarioTableMap::COL_SENHA);
+            $criteria->addSelectColumn(UsuarioTableMap::COL_TIPO);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.data_inscricao');
@@ -335,6 +379,7 @@ class UsuarioTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.liberado');
             $criteria->addSelectColumn($alias . '.nome_usuario');
             $criteria->addSelectColumn($alias . '.senha');
+            $criteria->addSelectColumn($alias . '.tipo');
         }
     }
 

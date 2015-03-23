@@ -1,0 +1,51 @@
+<div class="espaco-topo">
+<script src="/js/redes_de_cinema.js"></script>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Redes de Cinema</h1>
+            <div class="well well-sm">
+                <form id="participantes" class="form-inline" role="form">
+                    <div class="form-group">
+                        <label for="rede" class="sr-only" class="control-label">Rede:</label>
+                        <input type="text" class="form-control" id="rede" placeholder="Rede" ng-model="filtros.rede" >
+                    </div>
+                    <div class="form-group">
+                        <label for="status" class="sr-only" class="control-label">Status:</label>
+                        <select class="form-control" id="status" ng-model="filtros.status" >
+                            <option value="true">Somente Aprovados</option>
+                            <option value="false">Somente Pendentes</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                    <tr>
+                        <th>Nome</th>
+                        <th>CNPJ</th>
+                        <th>Endereço</th>
+                        <th>Status</th>
+                        <th>Opções</th>
+                    </tr>
+                    <tr ng-repeat="rede in redes | filter : filtros.rede | filter : {Liberado:filtros.status} : filtroLiberado" >
+
+                        <td>{{rede.NomeFantasia}}</td>
+                        <td>{{rede.Cnpj}}</td>
+                        <td>{{rede.Endereco}}</td>
+                        <td>{{rede.Liberado ? "Liberado" : "Bloqueado"}}</td>
+                        <td>
+
+                            <div class="btn-group" >
+                                <!-- <a class="btn btn-sm btn-default" href="?pg=administracao/rede_de_cinema_edicao&id={{rede.id}}">Editar</a> -->
+                                <a ng-click="aprovar(rede)" class="btn btn-sm btn-primary" ng-hide="rede.Liberado"  data-toggle="modal">Aprovar inscrição</a>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> <!-- /container -->
+</div>

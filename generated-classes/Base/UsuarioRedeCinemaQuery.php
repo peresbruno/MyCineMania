@@ -32,7 +32,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuarioRedeCinemaQuery rightJoinUsuario($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Usuario relation
  * @method     ChildUsuarioRedeCinemaQuery innerJoinUsuario($relationAlias = null) Adds a INNER JOIN clause to the query using the Usuario relation
  *
- * @method     \UsuarioQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildUsuarioRedeCinemaQuery leftJoinRedeCinema($relationAlias = null) Adds a LEFT JOIN clause to the query using the RedeCinema relation
+ * @method     ChildUsuarioRedeCinemaQuery rightJoinRedeCinema($relationAlias = null) Adds a RIGHT JOIN clause to the query using the RedeCinema relation
+ * @method     ChildUsuarioRedeCinemaQuery innerJoinRedeCinema($relationAlias = null) Adds a INNER JOIN clause to the query using the RedeCinema relation
+ *
+ * @method     \UsuarioQuery|\RedeCinemaQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildUsuarioRedeCinema findOne(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query
  * @method     ChildUsuarioRedeCinema findOneOrCreate(ConnectionInterface $con = null) Return the first ChildUsuarioRedeCinema matching the query, or a new ChildUsuarioRedeCinema object populated from the query conditions when no match is found
@@ -346,6 +350,79 @@ abstract class UsuarioRedeCinemaQuery extends ModelCriteria
         return $this
             ->joinUsuario($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Usuario', '\UsuarioQuery');
+    }
+
+    /**
+     * Filter the query by a related \RedeCinema object
+     *
+     * @param \RedeCinema|ObjectCollection $redeCinema the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildUsuarioRedeCinemaQuery The current query, for fluid interface
+     */
+    public function filterByRedeCinema($redeCinema, $comparison = null)
+    {
+        if ($redeCinema instanceof \RedeCinema) {
+            return $this
+                ->addUsingAlias(UsuarioRedeCinemaTableMap::COL_USUARIO_ID, $redeCinema->getUsuarioRedeCinemaId(), $comparison);
+        } elseif ($redeCinema instanceof ObjectCollection) {
+            return $this
+                ->useRedeCinemaQuery()
+                ->filterByPrimaryKeys($redeCinema->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByRedeCinema() only accepts arguments of type \RedeCinema or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the RedeCinema relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildUsuarioRedeCinemaQuery The current query, for fluid interface
+     */
+    public function joinRedeCinema($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('RedeCinema');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'RedeCinema');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the RedeCinema relation RedeCinema object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \RedeCinemaQuery A secondary query class using the current class as primary query
+     */
+    public function useRedeCinemaQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinRedeCinema($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'RedeCinema', '\RedeCinemaQuery');
     }
 
     /**

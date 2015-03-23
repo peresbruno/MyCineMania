@@ -21,6 +21,9 @@
     "bootstrap": "~3.3.2",
     "angular-resource": "~1.3.14",
     "angular-ui-router": "~0.2.13",
-    "angular-sweetalert": "~1.0.4"
+    "angular-sweetalert": "~1.1.0",
+    "angular-http-loader": "~0.1.4",
+    "angular-spinner": "~0.6.1",
+    "angular-local-storage": "~0.1.5"
   }
 }

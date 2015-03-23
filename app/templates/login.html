@@ -1,0 +1,89 @@
+
+<div class="espaco-topo">
+    <form role="form" id="participante_cadastro">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2>Entrar!</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div style="height: 1px; background:#cdcdcd; margin: 20px 0px 20px 0px"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="usuario" class="control-label">Usuário: </label>
+                                <input ng-model="credencial.usuario" type="text" class="form-control" required id="usuario" placeholder="Usuário">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="senha">Senha: </label>
+                                <input ng-model="credencial.senha" type="password" class="form-control" required id="senha" placeholder="Senha">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="checkbox" class="" id="manter_conectado">
+                                Manter conectado
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="submit" ng-click="login()" class="btn btn-primary pull-right">Entrar</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a href="?pg=login&senha=new">
+                                   Esqueci minha senha
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                   Basta informar seu endereço de e-mail que você usou no cadastro que enviaremos a você uma nova senha:
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                   <input type="text" class="form-control" id="recupera_senha" placeholder="Endereço de e-mail">
+                                </div>
+                            </div>
+                        </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary pull-right">Enviar</button>
+                        </div>
+                    </div>                    
+
+                    
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2>Ainda não é cadastrado?</h2>
+                             <p>Faça seu cadastro como <a href="#/cadastrar_participante/">participante do programa</a> ou <a href="#/cadastrar_rede/">rede de cinema</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /container -->
+    </form>
+</div>

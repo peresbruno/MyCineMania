@@ -493,7 +493,7 @@ abstract class Voucher implements ActiveRecordInterface
             $this->modifiedColumns[VoucherTableMap::COL_PARTICIPANTE_ID] = true;
         }
 
-        if ($this->aParticipante !== null && $this->aParticipante->getUsuarioId() !== $v) {
+        if ($this->aParticipante !== null && $this->aParticipante->getId() !== $v) {
             $this->aParticipante = null;
         }
 
@@ -669,7 +669,7 @@ abstract class Voucher implements ActiveRecordInterface
         if ($this->aBeneficio !== null && $this->beneficio_id !== $this->aBeneficio->getId()) {
             $this->aBeneficio = null;
         }
-        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getUsuarioId()) {
+        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getId()) {
             $this->aParticipante = null;
         }
     } // ensureConsistency
@@ -1441,7 +1441,7 @@ abstract class Voucher implements ActiveRecordInterface
         if ($v === null) {
             $this->setParticipanteId(NULL);
         } else {
-            $this->setParticipanteId($v->getUsuarioId());
+            $this->setParticipanteId($v->getId());
         }
 
         $this->aParticipante = $v;
@@ -1467,7 +1467,9 @@ abstract class Voucher implements ActiveRecordInterface
     public function getParticipante(ConnectionInterface $con = null)
     {
         if ($this->aParticipante === null && ($this->participante_id !== null)) {
-            $this->aParticipante = ChildParticipanteQuery::create()->findPk($this->participante_id, $con);
+            $this->aParticipante = ChildParticipanteQuery::create()
+                ->filterByVoucher($this) // here
+                ->findOne($con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be

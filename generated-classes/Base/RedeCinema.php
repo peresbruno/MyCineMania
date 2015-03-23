@@ -6,6 +6,8 @@ use \Beneficio as ChildBeneficio;
 use \BeneficioQuery as ChildBeneficioQuery;
 use \RedeCinema as ChildRedeCinema;
 use \RedeCinemaQuery as ChildRedeCinemaQuery;
+use \Usuario as ChildUsuario;
+use \UsuarioQuery as ChildUsuarioQuery;
 use \Exception;
 use \PDO;
 use Map\RedeCinemaTableMap;
@@ -76,6 +78,12 @@ abstract class RedeCinema implements ActiveRecordInterface
     protected $cnpj;
 
     /**
+     * The value for the usuario_id field.
+     * @var        int
+     */
+    protected $usuario_id;
+
+    /**
      * The value for the nome_fantasia field.
      * @var        string
      */
@@ -92,6 +100,11 @@ abstract class RedeCinema implements ActiveRecordInterface
      * @var        string
      */
     protected $endereco;
+
+    /**
+     * @var        ChildUsuario
+     */
+    protected $aUsuario;
 
     /**
      * @var        ObjectCollection|ChildBeneficio[] Collection to store aggregation of ChildBeneficio objects.
@@ -351,6 +364,16 @@ abstract class RedeCinema implements ActiveRecordInterface
     }
 
     /**
+     * Get the [usuario_id] column value.
+     *
+     * @return int
+     */
+    public function getUsuarioId()
+    {
+        return $this->usuario_id;
+    }
+
+    /**
      * Get the [nome_fantasia] column value.
      *
      * @return string
@@ -419,6 +442,30 @@ abstract class RedeCinema implements ActiveRecordInterface
 
         return $this;
     } // setCnpj()
+
+    /**
+     * Set the value of [usuario_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\RedeCinema The current object (for fluent API support)
+     */
+    public function setUsuarioId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->usuario_id !== $v) {
+            $this->usuario_id = $v;
+            $this->modifiedColumns[RedeCinemaTableMap::COL_USUARIO_ID] = true;
+        }
+
+        if ($this->aUsuario !== null && $this->aUsuario->getId() !== $v) {
+            $this->aUsuario = null;
+        }
+
+        return $this;
+    } // setUsuarioId()
 
     /**
      * Set the value of [nome_fantasia] column.
@@ -522,13 +569,16 @@ abstract class RedeCinema implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RedeCinemaTableMap::translateFieldName('Cnpj', TableMap::TYPE_PHPNAME, $indexType)];
             $this->cnpj = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RedeCinemaTableMap::translateFieldName('NomeFantasia', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RedeCinemaTableMap::translateFieldName('UsuarioId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->usuario_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RedeCinemaTableMap::translateFieldName('NomeFantasia', TableMap::TYPE_PHPNAME, $indexType)];
             $this->nome_fantasia = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RedeCinemaTableMap::translateFieldName('RazaoSocial', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RedeCinemaTableMap::translateFieldName('RazaoSocial', TableMap::TYPE_PHPNAME, $indexType)];
             $this->razao_social = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RedeCinemaTableMap::translateFieldName('Endereco', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : RedeCinemaTableMap::translateFieldName('Endereco', TableMap::TYPE_PHPNAME, $indexType)];
             $this->endereco = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -538,7 +588,7 @@ abstract class RedeCinema implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = RedeCinemaTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = RedeCinemaTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\RedeCinema'), 0, $e);
@@ -560,6 +610,9 @@ abstract class RedeCinema implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aUsuario !== null && $this->usuario_id !== $this->aUsuario->getId()) {
+            $this->aUsuario = null;
+        }
     } // ensureConsistency
 
     /**
@@ -599,6 +652,7 @@ abstract class RedeCinema implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aUsuario = null;
             $this->collBeneficios = null;
 
         } // if (deep)
@@ -700,6 +754,18 @@ abstract class RedeCinema implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aUsuario !== null) {
+                if ($this->aUsuario->isModified() || $this->aUsuario->isNew()) {
+                    $affectedRows += $this->aUsuario->save($con);
+                }
+                $this->setUsuario($this->aUsuario);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -769,6 +835,9 @@ abstract class RedeCinema implements ActiveRecordInterface
         if ($this->isColumnModified(RedeCinemaTableMap::COL_CNPJ)) {
             $modifiedColumns[':p' . $index++]  = 'cnpj';
         }
+        if ($this->isColumnModified(RedeCinemaTableMap::COL_USUARIO_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'usuario_id';
+        }
         if ($this->isColumnModified(RedeCinemaTableMap::COL_NOME_FANTASIA)) {
             $modifiedColumns[':p' . $index++]  = 'nome_fantasia';
         }
@@ -794,6 +863,9 @@ abstract class RedeCinema implements ActiveRecordInterface
                         break;
                     case 'cnpj':
                         $stmt->bindValue($identifier, $this->cnpj, PDO::PARAM_STR);
+                        break;
+                    case 'usuario_id':
+                        $stmt->bindValue($identifier, $this->usuario_id, PDO::PARAM_INT);
                         break;
                     case 'nome_fantasia':
                         $stmt->bindValue($identifier, $this->nome_fantasia, PDO::PARAM_STR);
@@ -866,12 +938,15 @@ abstract class RedeCinema implements ActiveRecordInterface
                 return $this->getCnpj();
                 break;
             case 2:
-                return $this->getNomeFantasia();
+                return $this->getUsuarioId();
                 break;
             case 3:
-                return $this->getRazaoSocial();
+                return $this->getNomeFantasia();
                 break;
             case 4:
+                return $this->getRazaoSocial();
+                break;
+            case 5:
                 return $this->getEndereco();
                 break;
             default:
@@ -906,9 +981,10 @@ abstract class RedeCinema implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCnpj(),
-            $keys[2] => $this->getNomeFantasia(),
-            $keys[3] => $this->getRazaoSocial(),
-            $keys[4] => $this->getEndereco(),
+            $keys[2] => $this->getUsuarioId(),
+            $keys[3] => $this->getNomeFantasia(),
+            $keys[4] => $this->getRazaoSocial(),
+            $keys[5] => $this->getEndereco(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -916,6 +992,21 @@ abstract class RedeCinema implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->aUsuario) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'usuario';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'usuarios';
+                        break;
+                    default:
+                        $key = 'Usuario';
+                }
+
+                $result[$key] = $this->aUsuario->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collBeneficios) {
 
                 switch ($keyType) {
@@ -972,12 +1063,15 @@ abstract class RedeCinema implements ActiveRecordInterface
                 $this->setCnpj($value);
                 break;
             case 2:
-                $this->setNomeFantasia($value);
+                $this->setUsuarioId($value);
                 break;
             case 3:
-                $this->setRazaoSocial($value);
+                $this->setNomeFantasia($value);
                 break;
             case 4:
+                $this->setRazaoSocial($value);
+                break;
+            case 5:
                 $this->setEndereco($value);
                 break;
         } // switch()
@@ -1013,13 +1107,16 @@ abstract class RedeCinema implements ActiveRecordInterface
             $this->setCnpj($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setNomeFantasia($arr[$keys[2]]);
+            $this->setUsuarioId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setRazaoSocial($arr[$keys[3]]);
+            $this->setNomeFantasia($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setEndereco($arr[$keys[4]]);
+            $this->setRazaoSocial($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setEndereco($arr[$keys[5]]);
         }
     }
 
@@ -1067,6 +1164,9 @@ abstract class RedeCinema implements ActiveRecordInterface
         }
         if ($this->isColumnModified(RedeCinemaTableMap::COL_CNPJ)) {
             $criteria->add(RedeCinemaTableMap::COL_CNPJ, $this->cnpj);
+        }
+        if ($this->isColumnModified(RedeCinemaTableMap::COL_USUARIO_ID)) {
+            $criteria->add(RedeCinemaTableMap::COL_USUARIO_ID, $this->usuario_id);
         }
         if ($this->isColumnModified(RedeCinemaTableMap::COL_NOME_FANTASIA)) {
             $criteria->add(RedeCinemaTableMap::COL_NOME_FANTASIA, $this->nome_fantasia);
@@ -1164,6 +1264,7 @@ abstract class RedeCinema implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCnpj($this->getCnpj());
+        $copyObj->setUsuarioId($this->getUsuarioId());
         $copyObj->setNomeFantasia($this->getNomeFantasia());
         $copyObj->setRazaoSocial($this->getRazaoSocial());
         $copyObj->setEndereco($this->getEndereco());
@@ -1207,6 +1308,57 @@ abstract class RedeCinema implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+    /**
+     * Declares an association between this object and a ChildUsuario object.
+     *
+     * @param  ChildUsuario $v
+     * @return $this|\RedeCinema The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setUsuario(ChildUsuario $v = null)
+    {
+        if ($v === null) {
+            $this->setUsuarioId(NULL);
+        } else {
+            $this->setUsuarioId($v->getId());
+        }
+
+        $this->aUsuario = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildUsuario object, it will not be re-added.
+        if ($v !== null) {
+            $v->addRedeCinema($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildUsuario object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildUsuario The associated ChildUsuario object.
+     * @throws PropelException
+     */
+    public function getUsuario(ConnectionInterface $con = null)
+    {
+        if ($this->aUsuario === null && ($this->usuario_id !== null)) {
+            $this->aUsuario = ChildUsuarioQuery::create()->findPk($this->usuario_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aUsuario->addRedeCinemas($this);
+             */
+        }
+
+        return $this->aUsuario;
     }
 
 
@@ -1450,8 +1602,12 @@ abstract class RedeCinema implements ActiveRecordInterface
      */
     public function clear()
     {
+        if (null !== $this->aUsuario) {
+            $this->aUsuario->removeRedeCinema($this);
+        }
         $this->id = null;
         $this->cnpj = null;
+        $this->usuario_id = null;
         $this->nome_fantasia = null;
         $this->razao_social = null;
         $this->endereco = null;
@@ -1481,6 +1637,7 @@ abstract class RedeCinema implements ActiveRecordInterface
         } // if ($deep)
 
         $this->collBeneficios = null;
+        $this->aUsuario = null;
     }
 
     /**
@@ -1571,7 +1728,7 @@ abstract class RedeCinema implements ActiveRecordInterface
 
 
     /**
-     * Derived method to catches calls to undefined methods.
+     * Catches calls to undefined methods.
      *
      * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
      * Allows to define default __call() behavior if you overwrite __call()
@@ -1582,6 +1739,33 @@ abstract class RedeCinema implements ActiveRecordInterface
      * @return array|string
      */
     public function __call($name, $params)
+    {
+
+    // delegate behavior
+
+    if (is_callable(array('\Usuario', $name))) {
+        if (!$delegate = $this->getUsuario()) {
+            $delegate = new ChildUsuario();
+            $this->setUsuario($delegate);
+        }
+
+        return call_user_func_array(array($delegate, $name), $params);
+    }
+        return $this->__parentCall($name, $params);
+    }
+
+    /**
+     * Derived method to catches calls to undefined methods.
+     *
+     * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
+     * Allows to define default __call() behavior if you overwrite __call()
+     *
+     * @param string $name
+     * @param mixed  $params
+     *
+     * @return array|string
+     */
+    public function __parentCall($name, $params)
     {
         if (0 === strpos($name, 'get')) {
             $virtualColumn = substr($name, 3);

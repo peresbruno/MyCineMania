@@ -624,14 +624,14 @@ abstract class VoucherQuery extends ModelCriteria
     {
         if ($participante instanceof \Participante) {
             return $this
-                ->addUsingAlias(VoucherTableMap::COL_PARTICIPANTE_ID, $participante->getUsuarioId(), $comparison);
+                ->addUsingAlias(VoucherTableMap::COL_PARTICIPANTE_ID, $participante->getId(), $comparison);
         } elseif ($participante instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(VoucherTableMap::COL_PARTICIPANTE_ID, $participante->toKeyValue('PrimaryKey', 'UsuarioId'), $comparison);
+                ->addUsingAlias(VoucherTableMap::COL_PARTICIPANTE_ID, $participante->toKeyValue('Id', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByParticipante() only accepts arguments of type \Participante or Collection');
         }

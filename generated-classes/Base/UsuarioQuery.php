@@ -26,6 +26,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuarioQuery orderByLiberado($order = Criteria::ASC) Order by the liberado column
  * @method     ChildUsuarioQuery orderByNomeUsuario($order = Criteria::ASC) Order by the nome_usuario column
  * @method     ChildUsuarioQuery orderBySenha($order = Criteria::ASC) Order by the senha column
+ * @method     ChildUsuarioQuery orderByTipo($order = Criteria::ASC) Order by the tipo column
  *
  * @method     ChildUsuarioQuery groupById() Group by the id column
  * @method     ChildUsuarioQuery groupByDataInscricao() Group by the data_inscricao column
@@ -33,6 +34,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuarioQuery groupByLiberado() Group by the liberado column
  * @method     ChildUsuarioQuery groupByNomeUsuario() Group by the nome_usuario column
  * @method     ChildUsuarioQuery groupBySenha() Group by the senha column
+ * @method     ChildUsuarioQuery groupByTipo() Group by the tipo column
  *
  * @method     ChildUsuarioQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildUsuarioQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -42,11 +44,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuarioQuery rightJoinParticipante($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Participante relation
  * @method     ChildUsuarioQuery innerJoinParticipante($relationAlias = null) Adds a INNER JOIN clause to the query using the Participante relation
  *
- * @method     ChildUsuarioQuery leftJoinUsuarioRedeCinema($relationAlias = null) Adds a LEFT JOIN clause to the query using the UsuarioRedeCinema relation
- * @method     ChildUsuarioQuery rightJoinUsuarioRedeCinema($relationAlias = null) Adds a RIGHT JOIN clause to the query using the UsuarioRedeCinema relation
- * @method     ChildUsuarioQuery innerJoinUsuarioRedeCinema($relationAlias = null) Adds a INNER JOIN clause to the query using the UsuarioRedeCinema relation
+ * @method     ChildUsuarioQuery leftJoinRedeCinema($relationAlias = null) Adds a LEFT JOIN clause to the query using the RedeCinema relation
+ * @method     ChildUsuarioQuery rightJoinRedeCinema($relationAlias = null) Adds a RIGHT JOIN clause to the query using the RedeCinema relation
+ * @method     ChildUsuarioQuery innerJoinRedeCinema($relationAlias = null) Adds a INNER JOIN clause to the query using the RedeCinema relation
  *
- * @method     \ParticipanteQuery|\UsuarioRedeCinemaQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \ParticipanteQuery|\RedeCinemaQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildUsuario findOne(ConnectionInterface $con = null) Return the first ChildUsuario matching the query
  * @method     ChildUsuario findOneOrCreate(ConnectionInterface $con = null) Return the first ChildUsuario matching the query, or a new ChildUsuario object populated from the query conditions when no match is found
@@ -56,7 +58,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuario findOneByEmail(string $email) Return the first ChildUsuario filtered by the email column
  * @method     ChildUsuario findOneByLiberado(boolean $liberado) Return the first ChildUsuario filtered by the liberado column
  * @method     ChildUsuario findOneByNomeUsuario(string $nome_usuario) Return the first ChildUsuario filtered by the nome_usuario column
- * @method     ChildUsuario findOneBySenha(string $senha) Return the first ChildUsuario filtered by the senha column *
+ * @method     ChildUsuario findOneBySenha(string $senha) Return the first ChildUsuario filtered by the senha column
+ * @method     ChildUsuario findOneByTipo(int $tipo) Return the first ChildUsuario filtered by the tipo column *
 
  * @method     ChildUsuario requirePk($key, ConnectionInterface $con = null) Return the ChildUsuario by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUsuario requireOne(ConnectionInterface $con = null) Return the first ChildUsuario matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -67,6 +70,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuario requireOneByLiberado(boolean $liberado) Return the first ChildUsuario filtered by the liberado column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUsuario requireOneByNomeUsuario(string $nome_usuario) Return the first ChildUsuario filtered by the nome_usuario column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUsuario requireOneBySenha(string $senha) Return the first ChildUsuario filtered by the senha column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUsuario requireOneByTipo(int $tipo) Return the first ChildUsuario filtered by the tipo column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildUsuario[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildUsuario objects based on current ModelCriteria
  * @method     ChildUsuario[]|ObjectCollection findById(int $id) Return ChildUsuario objects filtered by the id column
@@ -75,6 +79,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUsuario[]|ObjectCollection findByLiberado(boolean $liberado) Return ChildUsuario objects filtered by the liberado column
  * @method     ChildUsuario[]|ObjectCollection findByNomeUsuario(string $nome_usuario) Return ChildUsuario objects filtered by the nome_usuario column
  * @method     ChildUsuario[]|ObjectCollection findBySenha(string $senha) Return ChildUsuario objects filtered by the senha column
+ * @method     ChildUsuario[]|ObjectCollection findByTipo(int $tipo) Return ChildUsuario objects filtered by the tipo column
  * @method     ChildUsuario[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -167,7 +172,7 @@ abstract class UsuarioQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, data_inscricao, email, liberado, nome_usuario, senha FROM usuarios WHERE id = :p0';
+        $sql = 'SELECT id, data_inscricao, email, liberado, nome_usuario, senha, tipo FROM usuarios WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -456,6 +461,39 @@ abstract class UsuarioQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the tipo column
+     *
+     * @param     mixed $tipo The value to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildUsuarioQuery The current query, for fluid interface
+     */
+    public function filterByTipo($tipo = null, $comparison = null)
+    {
+        $valueSet = UsuarioTableMap::getValueSet(UsuarioTableMap::COL_TIPO);
+        if (is_scalar($tipo)) {
+            if (!in_array($tipo, $valueSet)) {
+                throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $tipo));
+            }
+            $tipo = array_search($tipo, $valueSet);
+        } elseif (is_array($tipo)) {
+            $convertedValues = array();
+            foreach ($tipo as $value) {
+                if (!in_array($value, $valueSet)) {
+                    throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $value));
+                }
+                $convertedValues []= array_search($value, $valueSet);
+            }
+            $tipo = $convertedValues;
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(UsuarioTableMap::COL_TIPO, $tipo, $comparison);
+    }
+
+    /**
      * Filter the query by a related \Participante object
      *
      * @param \Participante|ObjectCollection $participante the related object to use as filter
@@ -529,40 +567,40 @@ abstract class UsuarioQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \UsuarioRedeCinema object
+     * Filter the query by a related \RedeCinema object
      *
-     * @param \UsuarioRedeCinema|ObjectCollection $usuarioRedeCinema the related object to use as filter
+     * @param \RedeCinema|ObjectCollection $redeCinema the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildUsuarioQuery The current query, for fluid interface
      */
-    public function filterByUsuarioRedeCinema($usuarioRedeCinema, $comparison = null)
+    public function filterByRedeCinema($redeCinema, $comparison = null)
     {
-        if ($usuarioRedeCinema instanceof \UsuarioRedeCinema) {
+        if ($redeCinema instanceof \RedeCinema) {
             return $this
-                ->addUsingAlias(UsuarioTableMap::COL_ID, $usuarioRedeCinema->getUsuarioId(), $comparison);
-        } elseif ($usuarioRedeCinema instanceof ObjectCollection) {
+                ->addUsingAlias(UsuarioTableMap::COL_ID, $redeCinema->getUsuarioId(), $comparison);
+        } elseif ($redeCinema instanceof ObjectCollection) {
             return $this
-                ->useUsuarioRedeCinemaQuery()
-                ->filterByPrimaryKeys($usuarioRedeCinema->getPrimaryKeys())
+                ->useRedeCinemaQuery()
+                ->filterByPrimaryKeys($redeCinema->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByUsuarioRedeCinema() only accepts arguments of type \UsuarioRedeCinema or Collection');
+            throw new PropelException('filterByRedeCinema() only accepts arguments of type \RedeCinema or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the UsuarioRedeCinema relation
+     * Adds a JOIN clause to the query using the RedeCinema relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildUsuarioQuery The current query, for fluid interface
      */
-    public function joinUsuarioRedeCinema($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinRedeCinema($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('UsuarioRedeCinema');
+        $relationMap = $tableMap->getRelation('RedeCinema');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -577,14 +615,14 @@ abstract class UsuarioQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'UsuarioRedeCinema');
+            $this->addJoinObject($join, 'RedeCinema');
         }
 
         return $this;
     }
 
     /**
-     * Use the UsuarioRedeCinema relation UsuarioRedeCinema object
+     * Use the RedeCinema relation RedeCinema object
      *
      * @see useQuery()
      *
@@ -592,13 +630,13 @@ abstract class UsuarioQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \UsuarioRedeCinemaQuery A secondary query class using the current class as primary query
+     * @return \RedeCinemaQuery A secondary query class using the current class as primary query
      */
-    public function useUsuarioRedeCinemaQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useRedeCinemaQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinUsuarioRedeCinema($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'UsuarioRedeCinema', '\UsuarioRedeCinemaQuery');
+            ->joinRedeCinema($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'RedeCinema', '\RedeCinemaQuery');
     }
 
     /**

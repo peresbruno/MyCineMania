@@ -1,0 +1,50 @@
+<div class="espaco-topo">
+<script src="/js/participantes.js"></script>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Participantes</h1>
+            <div class="well well-sm">
+                <form id="participantes" class="form-inline" role="form">
+                    <div class="form-group">
+                        <label for="participante" class="sr-only" class="control-label">Participante:</label>
+                        <input type="text" class="form-control" id="participante" placeholder="Sobrenome" ng-model="filtros.participante" >
+                    </div>
+                    <div class="form-group">
+                        <label for="status" class="sr-only" class="control-label">Status:</label>
+                        <select class="form-control" id="status" ng-model="filtros.status">
+                            <option value="true">Somente Aprovados</option>
+                            <option value="false">Somente Pendentes</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Data de Cadastro</th>
+                        <th>Data de Vencimento</th>
+                        <th>Status</th>
+                        <th>Opções</th>
+                    </tr>
+                    <tr ng-repeat="participante in participantes">
+                        <td>{{ participante.Nome }} {{ participante.Sobrenome }}</td>
+                        <td>{{participante.Cpf}}</td>
+                        <td>{{participante.DataCadastro}}</td>
+                        <td>{{participante.FimValidade}}</td>
+                        <td>{{participante.Liberado ? "Liberado" : "Bloqueado"}}</td>
+                        <td>
+                            <div class="btn-group">
+                                <!-- <a class="btn btn-sm btn-default" href="?pg=administracao/participante_edicao&id={{participante.id}}">Editar</a> -->
+                                <a class="btn btn-sm btn-primary" ng-hide="participante.Liberado">Aprovar inscrição</a>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> <!-- /container -->
+</div>

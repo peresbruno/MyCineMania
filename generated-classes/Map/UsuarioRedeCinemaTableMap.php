@@ -141,6 +141,13 @@ class UsuarioRedeCinemaTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('RedeCinema', '\\RedeCinema', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':usuario_rede_cinema_id',
+    1 => ':usuario_id',
+  ),
+), null, null, 'RedeCinemas', false);
     } // buildRelations()
 
     /**

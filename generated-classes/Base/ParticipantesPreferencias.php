@@ -347,7 +347,7 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
             $this->modifiedColumns[ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID] = true;
         }
 
-        if ($this->aParticipante !== null && $this->aParticipante->getUsuarioId() !== $v) {
+        if ($this->aParticipante !== null && $this->aParticipante->getId() !== $v) {
             $this->aParticipante = null;
         }
 
@@ -449,7 +449,7 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getUsuarioId()) {
+        if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getId()) {
             $this->aParticipante = null;
         }
         if ($this->aBeneficio !== null && $this->beneficio_id !== $this->aBeneficio->getId()) {
@@ -956,7 +956,7 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
         $validPrimaryKeyFKs = 2;
         $primaryKeyFKs = [];
 
-        //relation participantes_preferencias_fk_d58b2e to table participantes
+        //relation participantes_preferencias_fk_c65b3e to table participantes
         if ($this->aParticipante && $hash = spl_object_hash($this->aParticipante)) {
             $primaryKeyFKs[] = $hash;
         } else {
@@ -1068,7 +1068,7 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
         if ($v === null) {
             $this->setParticipanteId(NULL);
         } else {
-            $this->setParticipanteId($v->getUsuarioId());
+            $this->setParticipanteId($v->getId());
         }
 
         $this->aParticipante = $v;
@@ -1094,7 +1094,9 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     public function getParticipante(ConnectionInterface $con = null)
     {
         if ($this->aParticipante === null && ($this->participante_id !== null)) {
-            $this->aParticipante = ChildParticipanteQuery::create()->findPk($this->participante_id, $con);
+            $this->aParticipante = ChildParticipanteQuery::create()
+                ->filterByParticipantesPreferencias($this) // here
+                ->findOne($con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be

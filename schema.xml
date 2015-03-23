@@ -16,6 +16,7 @@
     <column name="liberado" type="boolean" defaultValue="false" required="true" />
     <column name="nome_usuario" type="varchar" size="255" required="true" />
     <column name="senha" type="varchar" size="255" required="true" />
+    <column name="tipo" type="enum" valueSet="participante,rede_cinema" required="true" />
     <unique>
       <unique-column name="email" />
     </unique>
@@ -25,6 +26,7 @@
   </table>
 
   <table name="participantes" phpName="Participante">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
     <column name="usuario_id" type="integer" required="true" primaryKey="true"/>
     <column name="cpf" type="varchar" size="50" required="true" />
     <column name="fim_validade" type="date" />
@@ -44,22 +46,19 @@
   <table name="redes_cinema" phpName="RedeCinema">
       <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
       <column name="cnpj" type="varchar" size="50" required="true" />
+      <column name="usuario_id" type="integer" required="true" />
       <column name="nome_fantasia" type="varchar" size="255" required="true" />
       <column name="razao_social" type="varchar" size="255" required="true" />
       <column name="endereco" type="longvarchar" required="true" />
       <unique>
         <unique-column name="cnpj" />
       </unique>
-  </table>
-
-  <table name="usuarios_rede_cinema" phpName="UsuarioRedeCinema">
-    <column name="usuario_id" type="integer" required="true" primaryKey="true" />
-    <foreign-key foreignTable="usuarios">
-      <reference local="usuario_id" foreign="id" />
-    </foreign-key>
-    <behavior name="delegate">
-      <parameter name="to" value="usuarios" />
-    </behavior>
+      <foreign-key foreignTable="usuarios">
+        <reference local="usuario_id" foreign="id" />
+      </foreign-key>
+      <behavior name="delegate">
+        <parameter name="to" value="usuarios" />
+      </behavior>
   </table>
 
   <table name="beneficios" phpName="Beneficio">
@@ -90,7 +89,7 @@
     <column name="participante_id" type="integer" primaryKey="true"/>
     <column name="beneficio_id" type="integer" primaryKey="true"/>
     <foreign-key foreignTable="participantes">
-      <reference local="participante_id" foreign="usuario_id"/>
+      <reference local="participante_id" foreign="id"/>
     </foreign-key>
     <foreign-key foreignTable="beneficios">
       <reference local="beneficio_id" foreign="id"/>
@@ -105,7 +104,7 @@
     <column name="numero_boleto" type="varchar" size="50" />
     <column name="valor" type="double" required="true" />
     <foreign-key foreignTable="participantes">
-      <reference local="participante_id" foreign="usuario_id" />
+      <reference local="participante_id" foreign="id" />
     </foreign-key>
   </table>
 
@@ -121,7 +120,7 @@
       <reference local="beneficio_id" foreign="id"/>
     </foreign-key>
     <foreign-key foreignTable="participantes">
-      <reference local="participante_id" foreign="usuario_id"/>
+      <reference local="participante_id" foreign="id"/>
     </foreign-key>
   </table>
 

@@ -132,7 +132,7 @@ class ParticipantesPreferenciasTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
-        $this->addForeignPrimaryKey('participante_id', 'ParticipanteId', 'INTEGER' , 'participantes', 'usuario_id', true, null, null);
+        $this->addForeignPrimaryKey('participante_id', 'ParticipanteId', 'INTEGER' , 'participantes', 'id', true, null, null);
         $this->addForeignPrimaryKey('beneficio_id', 'BeneficioId', 'INTEGER' , 'beneficios', 'id', true, null, null);
     } // initialize()
 
@@ -145,7 +145,7 @@ class ParticipantesPreferenciasTableMap extends TableMap
   0 =>
   array (
     0 => ':participante_id',
-    1 => ':usuario_id',
+    1 => ':id',
   ),
 ), null, null, null, false);
         $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_ONE, array (

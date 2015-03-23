@@ -4,9 +4,10 @@ namespace Base;
 
 use \Participante as ChildParticipante;
 use \ParticipanteQuery as ChildParticipanteQuery;
+use \RedeCinema as ChildRedeCinema;
+use \RedeCinemaQuery as ChildRedeCinemaQuery;
+use \Usuario as ChildUsuario;
 use \UsuarioQuery as ChildUsuarioQuery;
-use \UsuarioRedeCinema as ChildUsuarioRedeCinema;
-use \UsuarioRedeCinemaQuery as ChildUsuarioRedeCinemaQuery;
 use \DateTime;
 use \Exception;
 use \PDO;
@@ -16,6 +17,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -103,14 +105,22 @@ abstract class Usuario implements ActiveRecordInterface
     protected $senha;
 
     /**
-     * @var        ChildParticipante one-to-one related ChildParticipante object
+     * The value for the tipo field.
+     * @var        int
      */
-    protected $singleParticipante;
+    protected $tipo;
 
     /**
-     * @var        ChildUsuarioRedeCinema one-to-one related ChildUsuarioRedeCinema object
+     * @var        ObjectCollection|ChildParticipante[] Collection to store aggregation of ChildParticipante objects.
      */
-    protected $singleUsuarioRedeCinema;
+    protected $collParticipantes;
+    protected $collParticipantesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildRedeCinema[] Collection to store aggregation of ChildRedeCinema objects.
+     */
+    protected $collRedeCinemas;
+    protected $collRedeCinemasPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -119,6 +129,18 @@ abstract class Usuario implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildParticipante[]
+     */
+    protected $participantesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildRedeCinema[]
+     */
+    protected $redeCinemasScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -431,6 +453,25 @@ abstract class Usuario implements ActiveRecordInterface
     }
 
     /**
+     * Get the [tipo] column value.
+     *
+     * @return string
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getTipo()
+    {
+        if (null === $this->tipo) {
+            return null;
+        }
+        $valueSet = UsuarioTableMap::getValueSet(UsuarioTableMap::COL_TIPO);
+        if (!isset($valueSet[$this->tipo])) {
+            throw new PropelException('Unknown stored enum key: ' . $this->tipo);
+        }
+
+        return $valueSet[$this->tipo];
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -559,6 +600,31 @@ abstract class Usuario implements ActiveRecordInterface
     } // setSenha()
 
     /**
+     * Set the value of [tipo] column.
+     *
+     * @param  string $v new value
+     * @return $this|\Usuario The current object (for fluent API support)
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function setTipo($v)
+    {
+        if ($v !== null) {
+            $valueSet = UsuarioTableMap::getValueSet(UsuarioTableMap::COL_TIPO);
+            if (!in_array($v, $valueSet)) {
+                throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $v));
+            }
+            $v = array_search($v, $valueSet);
+        }
+
+        if ($this->tipo !== $v) {
+            $this->tipo = $v;
+            $this->modifiedColumns[UsuarioTableMap::COL_TIPO] = true;
+        }
+
+        return $this;
+    } // setTipo()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -615,6 +681,9 @@ abstract class Usuario implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : UsuarioTableMap::translateFieldName('Senha', TableMap::TYPE_PHPNAME, $indexType)];
             $this->senha = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : UsuarioTableMap::translateFieldName('Tipo', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->tipo = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -623,7 +692,7 @@ abstract class Usuario implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = UsuarioTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = UsuarioTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Usuario'), 0, $e);
@@ -684,9 +753,9 @@ abstract class Usuario implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleParticipante = null;
+            $this->collParticipantes = null;
 
-            $this->singleUsuarioRedeCinema = null;
+            $this->collRedeCinemas = null;
 
         } // if (deep)
     }
@@ -798,15 +867,37 @@ abstract class Usuario implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->singleParticipante !== null) {
-                if (!$this->singleParticipante->isDeleted() && ($this->singleParticipante->isNew() || $this->singleParticipante->isModified())) {
-                    $affectedRows += $this->singleParticipante->save($con);
+            if ($this->participantesScheduledForDeletion !== null) {
+                if (!$this->participantesScheduledForDeletion->isEmpty()) {
+                    \ParticipanteQuery::create()
+                        ->filterByPrimaryKeys($this->participantesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->participantesScheduledForDeletion = null;
                 }
             }
 
-            if ($this->singleUsuarioRedeCinema !== null) {
-                if (!$this->singleUsuarioRedeCinema->isDeleted() && ($this->singleUsuarioRedeCinema->isNew() || $this->singleUsuarioRedeCinema->isModified())) {
-                    $affectedRows += $this->singleUsuarioRedeCinema->save($con);
+            if ($this->collParticipantes !== null) {
+                foreach ($this->collParticipantes as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->redeCinemasScheduledForDeletion !== null) {
+                if (!$this->redeCinemasScheduledForDeletion->isEmpty()) {
+                    \RedeCinemaQuery::create()
+                        ->filterByPrimaryKeys($this->redeCinemasScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->redeCinemasScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collRedeCinemas !== null) {
+                foreach ($this->collRedeCinemas as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
                 }
             }
 
@@ -863,6 +954,9 @@ abstract class Usuario implements ActiveRecordInterface
         if ($this->isColumnModified(UsuarioTableMap::COL_SENHA)) {
             $modifiedColumns[':p' . $index++]  = 'senha';
         }
+        if ($this->isColumnModified(UsuarioTableMap::COL_TIPO)) {
+            $modifiedColumns[':p' . $index++]  = 'tipo';
+        }
 
         $sql = sprintf(
             'INSERT INTO usuarios (%s) VALUES (%s)',
@@ -891,6 +985,9 @@ abstract class Usuario implements ActiveRecordInterface
                         break;
                     case 'senha':
                         $stmt->bindValue($identifier, $this->senha, PDO::PARAM_STR);
+                        break;
+                    case 'tipo':
+                        $stmt->bindValue($identifier, $this->tipo, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -965,6 +1062,9 @@ abstract class Usuario implements ActiveRecordInterface
             case 5:
                 return $this->getSenha();
                 break;
+            case 6:
+                return $this->getTipo();
+                break;
             default:
                 return null;
                 break;
@@ -1001,6 +1101,7 @@ abstract class Usuario implements ActiveRecordInterface
             $keys[3] => $this->getLiberado(),
             $keys[4] => $this->getNomeUsuario(),
             $keys[5] => $this->getSenha(),
+            $keys[6] => $this->getTipo(),
         );
 
         $utc = new \DateTimeZone('utc');
@@ -1016,35 +1117,35 @@ abstract class Usuario implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->singleParticipante) {
+            if (null !== $this->collParticipantes) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'participante';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
                         $key = 'participantes';
                         break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'participantess';
+                        break;
                     default:
-                        $key = 'Participante';
+                        $key = 'Participantes';
                 }
 
-                $result[$key] = $this->singleParticipante->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+                $result[$key] = $this->collParticipantes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->singleUsuarioRedeCinema) {
+            if (null !== $this->collRedeCinemas) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'usuarioRedeCinema';
+                        $key = 'redeCinemas';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'usuarios_rede_cinema';
+                        $key = 'redes_cinemas';
                         break;
                     default:
-                        $key = 'UsuarioRedeCinema';
+                        $key = 'RedeCinemas';
                 }
 
-                $result[$key] = $this->singleUsuarioRedeCinema->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+                $result[$key] = $this->collRedeCinemas->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1098,6 +1199,13 @@ abstract class Usuario implements ActiveRecordInterface
             case 5:
                 $this->setSenha($value);
                 break;
+            case 6:
+                $valueSet = UsuarioTableMap::getValueSet(UsuarioTableMap::COL_TIPO);
+                if (isset($valueSet[$value])) {
+                    $value = $valueSet[$value];
+                }
+                $this->setTipo($value);
+                break;
         } // switch()
 
         return $this;
@@ -1141,6 +1249,9 @@ abstract class Usuario implements ActiveRecordInterface
         }
         if (array_key_exists($keys[5], $arr)) {
             $this->setSenha($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setTipo($arr[$keys[6]]);
         }
     }
 
@@ -1200,6 +1311,9 @@ abstract class Usuario implements ActiveRecordInterface
         }
         if ($this->isColumnModified(UsuarioTableMap::COL_SENHA)) {
             $criteria->add(UsuarioTableMap::COL_SENHA, $this->senha);
+        }
+        if ($this->isColumnModified(UsuarioTableMap::COL_TIPO)) {
+            $criteria->add(UsuarioTableMap::COL_TIPO, $this->tipo);
         }
 
         return $criteria;
@@ -1292,20 +1406,23 @@ abstract class Usuario implements ActiveRecordInterface
         $copyObj->setLiberado($this->getLiberado());
         $copyObj->setNomeUsuario($this->getNomeUsuario());
         $copyObj->setSenha($this->getSenha());
+        $copyObj->setTipo($this->getTipo());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            $relObj = $this->getParticipante();
-            if ($relObj) {
-                $copyObj->setParticipante($relObj->copy($deepCopy));
+            foreach ($this->getParticipantes() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addParticipante($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getUsuarioRedeCinema();
-            if ($relObj) {
-                $copyObj->setUsuarioRedeCinema($relObj->copy($deepCopy));
+            foreach ($this->getRedeCinemas() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addRedeCinema($relObj->copy($deepCopy));
+                }
             }
 
         } // if ($deepCopy)
@@ -1349,75 +1466,448 @@ abstract class Usuario implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('Participante' == $relationName) {
+            return $this->initParticipantes();
+        }
+        if ('RedeCinema' == $relationName) {
+            return $this->initRedeCinemas();
+        }
     }
 
     /**
-     * Gets a single ChildParticipante object, which is related to this object by a one-to-one relationship.
+     * Clears out the collParticipantes collection
      *
-     * @param  ConnectionInterface $con optional connection object
-     * @return ChildParticipante
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addParticipantes()
+     */
+    public function clearParticipantes()
+    {
+        $this->collParticipantes = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collParticipantes collection loaded partially.
+     */
+    public function resetPartialParticipantes($v = true)
+    {
+        $this->collParticipantesPartial = $v;
+    }
+
+    /**
+     * Initializes the collParticipantes collection.
+     *
+     * By default this just sets the collParticipantes collection to an empty array (like clearcollParticipantes());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initParticipantes($overrideExisting = true)
+    {
+        if (null !== $this->collParticipantes && !$overrideExisting) {
+            return;
+        }
+        $this->collParticipantes = new ObjectCollection();
+        $this->collParticipantes->setModel('\Participante');
+    }
+
+    /**
+     * Gets an array of ChildParticipante objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUsuario is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildParticipante[] List of ChildParticipante objects
      * @throws PropelException
      */
-    public function getParticipante(ConnectionInterface $con = null)
+    public function getParticipantes(Criteria $criteria = null, ConnectionInterface $con = null)
     {
+        $partial = $this->collParticipantesPartial && !$this->isNew();
+        if (null === $this->collParticipantes || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collParticipantes) {
+                // return empty collection
+                $this->initParticipantes();
+            } else {
+                $collParticipantes = ChildParticipanteQuery::create(null, $criteria)
+                    ->filterByUsuario($this)
+                    ->find($con);
 
-        if ($this->singleParticipante === null && !$this->isNew()) {
-            $this->singleParticipante = ChildParticipanteQuery::create()->findPk($this->getPrimaryKey(), $con);
+                if (null !== $criteria) {
+                    if (false !== $this->collParticipantesPartial && count($collParticipantes)) {
+                        $this->initParticipantes(false);
+
+                        foreach ($collParticipantes as $obj) {
+                            if (false == $this->collParticipantes->contains($obj)) {
+                                $this->collParticipantes->append($obj);
+                            }
+                        }
+
+                        $this->collParticipantesPartial = true;
+                    }
+
+                    return $collParticipantes;
+                }
+
+                if ($partial && $this->collParticipantes) {
+                    foreach ($this->collParticipantes as $obj) {
+                        if ($obj->isNew()) {
+                            $collParticipantes[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collParticipantes = $collParticipantes;
+                $this->collParticipantesPartial = false;
+            }
         }
 
-        return $this->singleParticipante;
+        return $this->collParticipantes;
     }
 
     /**
-     * Sets a single ChildParticipante object as related to this object by a one-to-one relationship.
+     * Sets a collection of ChildParticipante objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
      *
-     * @param  ChildParticipante $v ChildParticipante
-     * @return $this|\Usuario The current object (for fluent API support)
+     * @param      Collection $participantes A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildUsuario The current object (for fluent API support)
+     */
+    public function setParticipantes(Collection $participantes, ConnectionInterface $con = null)
+    {
+        /** @var ChildParticipante[] $participantesToDelete */
+        $participantesToDelete = $this->getParticipantes(new Criteria(), $con)->diff($participantes);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->participantesScheduledForDeletion = clone $participantesToDelete;
+
+        foreach ($participantesToDelete as $participanteRemoved) {
+            $participanteRemoved->setUsuario(null);
+        }
+
+        $this->collParticipantes = null;
+        foreach ($participantes as $participante) {
+            $this->addParticipante($participante);
+        }
+
+        $this->collParticipantes = $participantes;
+        $this->collParticipantesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Participante objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Participante objects.
      * @throws PropelException
      */
-    public function setParticipante(ChildParticipante $v = null)
+    public function countParticipantes(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $this->singleParticipante = $v;
+        $partial = $this->collParticipantesPartial && !$this->isNew();
+        if (null === $this->collParticipantes || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collParticipantes) {
+                return 0;
+            }
 
-        // Make sure that that the passed-in ChildParticipante isn't already associated with this object
-        if ($v !== null && $v->getUsuario(null, false) === null) {
-            $v->setUsuario($this);
+            if ($partial && !$criteria) {
+                return count($this->getParticipantes());
+            }
+
+            $query = ChildParticipanteQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUsuario($this)
+                ->count($con);
+        }
+
+        return count($this->collParticipantes);
+    }
+
+    /**
+     * Method called to associate a ChildParticipante object to this object
+     * through the ChildParticipante foreign key attribute.
+     *
+     * @param  ChildParticipante $l ChildParticipante
+     * @return $this|\Usuario The current object (for fluent API support)
+     */
+    public function addParticipante(ChildParticipante $l)
+    {
+        if ($this->collParticipantes === null) {
+            $this->initParticipantes();
+            $this->collParticipantesPartial = true;
+        }
+
+        if (!$this->collParticipantes->contains($l)) {
+            $this->doAddParticipante($l);
         }
 
         return $this;
     }
 
     /**
-     * Gets a single ChildUsuarioRedeCinema object, which is related to this object by a one-to-one relationship.
-     *
-     * @param  ConnectionInterface $con optional connection object
-     * @return ChildUsuarioRedeCinema
-     * @throws PropelException
+     * @param ChildParticipante $participante The ChildParticipante object to add.
      */
-    public function getUsuarioRedeCinema(ConnectionInterface $con = null)
+    protected function doAddParticipante(ChildParticipante $participante)
     {
-
-        if ($this->singleUsuarioRedeCinema === null && !$this->isNew()) {
-            $this->singleUsuarioRedeCinema = ChildUsuarioRedeCinemaQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleUsuarioRedeCinema;
+        $this->collParticipantes[]= $participante;
+        $participante->setUsuario($this);
     }
 
     /**
-     * Sets a single ChildUsuarioRedeCinema object as related to this object by a one-to-one relationship.
+     * @param  ChildParticipante $participante The ChildParticipante object to remove.
+     * @return $this|ChildUsuario The current object (for fluent API support)
+     */
+    public function removeParticipante(ChildParticipante $participante)
+    {
+        if ($this->getParticipantes()->contains($participante)) {
+            $pos = $this->collParticipantes->search($participante);
+            $this->collParticipantes->remove($pos);
+            if (null === $this->participantesScheduledForDeletion) {
+                $this->participantesScheduledForDeletion = clone $this->collParticipantes;
+                $this->participantesScheduledForDeletion->clear();
+            }
+            $this->participantesScheduledForDeletion[]= clone $participante;
+            $participante->setUsuario(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collRedeCinemas collection
      *
-     * @param  ChildUsuarioRedeCinema $v ChildUsuarioRedeCinema
-     * @return $this|\Usuario The current object (for fluent API support)
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addRedeCinemas()
+     */
+    public function clearRedeCinemas()
+    {
+        $this->collRedeCinemas = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collRedeCinemas collection loaded partially.
+     */
+    public function resetPartialRedeCinemas($v = true)
+    {
+        $this->collRedeCinemasPartial = $v;
+    }
+
+    /**
+     * Initializes the collRedeCinemas collection.
+     *
+     * By default this just sets the collRedeCinemas collection to an empty array (like clearcollRedeCinemas());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initRedeCinemas($overrideExisting = true)
+    {
+        if (null !== $this->collRedeCinemas && !$overrideExisting) {
+            return;
+        }
+        $this->collRedeCinemas = new ObjectCollection();
+        $this->collRedeCinemas->setModel('\RedeCinema');
+    }
+
+    /**
+     * Gets an array of ChildRedeCinema objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUsuario is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildRedeCinema[] List of ChildRedeCinema objects
      * @throws PropelException
      */
-    public function setUsuarioRedeCinema(ChildUsuarioRedeCinema $v = null)
+    public function getRedeCinemas(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $this->singleUsuarioRedeCinema = $v;
+        $partial = $this->collRedeCinemasPartial && !$this->isNew();
+        if (null === $this->collRedeCinemas || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRedeCinemas) {
+                // return empty collection
+                $this->initRedeCinemas();
+            } else {
+                $collRedeCinemas = ChildRedeCinemaQuery::create(null, $criteria)
+                    ->filterByUsuario($this)
+                    ->find($con);
 
-        // Make sure that that the passed-in ChildUsuarioRedeCinema isn't already associated with this object
-        if ($v !== null && $v->getUsuario(null, false) === null) {
-            $v->setUsuario($this);
+                if (null !== $criteria) {
+                    if (false !== $this->collRedeCinemasPartial && count($collRedeCinemas)) {
+                        $this->initRedeCinemas(false);
+
+                        foreach ($collRedeCinemas as $obj) {
+                            if (false == $this->collRedeCinemas->contains($obj)) {
+                                $this->collRedeCinemas->append($obj);
+                            }
+                        }
+
+                        $this->collRedeCinemasPartial = true;
+                    }
+
+                    return $collRedeCinemas;
+                }
+
+                if ($partial && $this->collRedeCinemas) {
+                    foreach ($this->collRedeCinemas as $obj) {
+                        if ($obj->isNew()) {
+                            $collRedeCinemas[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collRedeCinemas = $collRedeCinemas;
+                $this->collRedeCinemasPartial = false;
+            }
+        }
+
+        return $this->collRedeCinemas;
+    }
+
+    /**
+     * Sets a collection of ChildRedeCinema objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $redeCinemas A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildUsuario The current object (for fluent API support)
+     */
+    public function setRedeCinemas(Collection $redeCinemas, ConnectionInterface $con = null)
+    {
+        /** @var ChildRedeCinema[] $redeCinemasToDelete */
+        $redeCinemasToDelete = $this->getRedeCinemas(new Criteria(), $con)->diff($redeCinemas);
+
+
+        $this->redeCinemasScheduledForDeletion = $redeCinemasToDelete;
+
+        foreach ($redeCinemasToDelete as $redeCinemaRemoved) {
+            $redeCinemaRemoved->setUsuario(null);
+        }
+
+        $this->collRedeCinemas = null;
+        foreach ($redeCinemas as $redeCinema) {
+            $this->addRedeCinema($redeCinema);
+        }
+
+        $this->collRedeCinemas = $redeCinemas;
+        $this->collRedeCinemasPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related RedeCinema objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related RedeCinema objects.
+     * @throws PropelException
+     */
+    public function countRedeCinemas(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collRedeCinemasPartial && !$this->isNew();
+        if (null === $this->collRedeCinemas || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRedeCinemas) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getRedeCinemas());
+            }
+
+            $query = ChildRedeCinemaQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUsuario($this)
+                ->count($con);
+        }
+
+        return count($this->collRedeCinemas);
+    }
+
+    /**
+     * Method called to associate a ChildRedeCinema object to this object
+     * through the ChildRedeCinema foreign key attribute.
+     *
+     * @param  ChildRedeCinema $l ChildRedeCinema
+     * @return $this|\Usuario The current object (for fluent API support)
+     */
+    public function addRedeCinema(ChildRedeCinema $l)
+    {
+        if ($this->collRedeCinemas === null) {
+            $this->initRedeCinemas();
+            $this->collRedeCinemasPartial = true;
+        }
+
+        if (!$this->collRedeCinemas->contains($l)) {
+            $this->doAddRedeCinema($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildRedeCinema $redeCinema The ChildRedeCinema object to add.
+     */
+    protected function doAddRedeCinema(ChildRedeCinema $redeCinema)
+    {
+        $this->collRedeCinemas[]= $redeCinema;
+        $redeCinema->setUsuario($this);
+    }
+
+    /**
+     * @param  ChildRedeCinema $redeCinema The ChildRedeCinema object to remove.
+     * @return $this|ChildUsuario The current object (for fluent API support)
+     */
+    public function removeRedeCinema(ChildRedeCinema $redeCinema)
+    {
+        if ($this->getRedeCinemas()->contains($redeCinema)) {
+            $pos = $this->collRedeCinemas->search($redeCinema);
+            $this->collRedeCinemas->remove($pos);
+            if (null === $this->redeCinemasScheduledForDeletion) {
+                $this->redeCinemasScheduledForDeletion = clone $this->collRedeCinemas;
+                $this->redeCinemasScheduledForDeletion->clear();
+            }
+            $this->redeCinemasScheduledForDeletion[]= clone $redeCinema;
+            $redeCinema->setUsuario(null);
         }
 
         return $this;
@@ -1436,6 +1926,7 @@ abstract class Usuario implements ActiveRecordInterface
         $this->liberado = null;
         $this->nome_usuario = null;
         $this->senha = null;
+        $this->tipo = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -1455,16 +1946,20 @@ abstract class Usuario implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleParticipante) {
-                $this->singleParticipante->clearAllReferences($deep);
+            if ($this->collParticipantes) {
+                foreach ($this->collParticipantes as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
-            if ($this->singleUsuarioRedeCinema) {
-                $this->singleUsuarioRedeCinema->clearAllReferences($deep);
+            if ($this->collRedeCinemas) {
+                foreach ($this->collRedeCinemas as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
         } // if ($deep)
 
-        $this->singleParticipante = null;
-        $this->singleUsuarioRedeCinema = null;
+        $this->collParticipantes = null;
+        $this->collRedeCinemas = null;
     }
 
     /**

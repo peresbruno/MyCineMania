@@ -59,7 +59,7 @@ class RedeCinemaTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class RedeCinemaTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
@@ -80,6 +80,11 @@ class RedeCinemaTableMap extends TableMap
      * the column name for the cnpj field
      */
     const COL_CNPJ = 'redes_cinema.cnpj';
+
+    /**
+     * the column name for the usuario_id field
+     */
+    const COL_USUARIO_ID = 'redes_cinema.usuario_id';
 
     /**
      * the column name for the nome_fantasia field
@@ -108,11 +113,11 @@ class RedeCinemaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Cnpj', 'NomeFantasia', 'RazaoSocial', 'Endereco', ),
-        self::TYPE_CAMELNAME     => array('id', 'cnpj', 'nomeFantasia', 'razaoSocial', 'endereco', ),
-        self::TYPE_COLNAME       => array(RedeCinemaTableMap::COL_ID, RedeCinemaTableMap::COL_CNPJ, RedeCinemaTableMap::COL_NOME_FANTASIA, RedeCinemaTableMap::COL_RAZAO_SOCIAL, RedeCinemaTableMap::COL_ENDERECO, ),
-        self::TYPE_FIELDNAME     => array('id', 'cnpj', 'nome_fantasia', 'razao_social', 'endereco', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'Cnpj', 'UsuarioId', 'NomeFantasia', 'RazaoSocial', 'Endereco', ),
+        self::TYPE_CAMELNAME     => array('id', 'cnpj', 'usuarioId', 'nomeFantasia', 'razaoSocial', 'endereco', ),
+        self::TYPE_COLNAME       => array(RedeCinemaTableMap::COL_ID, RedeCinemaTableMap::COL_CNPJ, RedeCinemaTableMap::COL_USUARIO_ID, RedeCinemaTableMap::COL_NOME_FANTASIA, RedeCinemaTableMap::COL_RAZAO_SOCIAL, RedeCinemaTableMap::COL_ENDERECO, ),
+        self::TYPE_FIELDNAME     => array('id', 'cnpj', 'usuario_id', 'nome_fantasia', 'razao_social', 'endereco', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -122,11 +127,11 @@ class RedeCinemaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Cnpj' => 1, 'NomeFantasia' => 2, 'RazaoSocial' => 3, 'Endereco' => 4, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'cnpj' => 1, 'nomeFantasia' => 2, 'razaoSocial' => 3, 'endereco' => 4, ),
-        self::TYPE_COLNAME       => array(RedeCinemaTableMap::COL_ID => 0, RedeCinemaTableMap::COL_CNPJ => 1, RedeCinemaTableMap::COL_NOME_FANTASIA => 2, RedeCinemaTableMap::COL_RAZAO_SOCIAL => 3, RedeCinemaTableMap::COL_ENDERECO => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'cnpj' => 1, 'nome_fantasia' => 2, 'razao_social' => 3, 'endereco' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Cnpj' => 1, 'UsuarioId' => 2, 'NomeFantasia' => 3, 'RazaoSocial' => 4, 'Endereco' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'cnpj' => 1, 'usuarioId' => 2, 'nomeFantasia' => 3, 'razaoSocial' => 4, 'endereco' => 5, ),
+        self::TYPE_COLNAME       => array(RedeCinemaTableMap::COL_ID => 0, RedeCinemaTableMap::COL_CNPJ => 1, RedeCinemaTableMap::COL_USUARIO_ID => 2, RedeCinemaTableMap::COL_NOME_FANTASIA => 3, RedeCinemaTableMap::COL_RAZAO_SOCIAL => 4, RedeCinemaTableMap::COL_ENDERECO => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'cnpj' => 1, 'usuario_id' => 2, 'nome_fantasia' => 3, 'razao_social' => 4, 'endereco' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -149,6 +154,7 @@ class RedeCinemaTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('cnpj', 'Cnpj', 'VARCHAR', true, 50, null);
+        $this->addForeignKey('usuario_id', 'UsuarioId', 'INTEGER', 'usuarios', 'id', true, null, null);
         $this->addColumn('nome_fantasia', 'NomeFantasia', 'VARCHAR', true, 255, null);
         $this->addColumn('razao_social', 'RazaoSocial', 'VARCHAR', true, 255, null);
         $this->addColumn('endereco', 'Endereco', 'LONGVARCHAR', true, null, null);
@@ -159,6 +165,13 @@ class RedeCinemaTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Usuario', '\\Usuario', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':usuario_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
         $this->addRelation('Beneficio', '\\Beneficio', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -167,6 +180,19 @@ class RedeCinemaTableMap extends TableMap
   ),
 ), null, null, 'Beneficios', false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'delegate' => array('to' => 'usuarios', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -311,12 +337,14 @@ class RedeCinemaTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(RedeCinemaTableMap::COL_ID);
             $criteria->addSelectColumn(RedeCinemaTableMap::COL_CNPJ);
+            $criteria->addSelectColumn(RedeCinemaTableMap::COL_USUARIO_ID);
             $criteria->addSelectColumn(RedeCinemaTableMap::COL_NOME_FANTASIA);
             $criteria->addSelectColumn(RedeCinemaTableMap::COL_RAZAO_SOCIAL);
             $criteria->addSelectColumn(RedeCinemaTableMap::COL_ENDERECO);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.cnpj');
+            $criteria->addSelectColumn($alias . '.usuario_id');
             $criteria->addSelectColumn($alias . '.nome_fantasia');
             $criteria->addSelectColumn($alias . '.razao_social');
             $criteria->addSelectColumn($alias . '.endereco');

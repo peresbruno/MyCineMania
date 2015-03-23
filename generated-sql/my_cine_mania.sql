@@ -27,6 +27,7 @@ CREATE TABLE "usuarios"
     "liberado" BOOLEAN DEFAULT 'f' NOT NULL,
     "nome_usuario" VARCHAR(255) NOT NULL,
     "senha" VARCHAR(255) NOT NULL,
+    "tipo" INT2 NOT NULL,
     PRIMARY KEY ("id"),
     CONSTRAINT "usuarios_u_ce4c89" UNIQUE ("email"),
     CONSTRAINT "usuarios_u_bb1308" UNIQUE ("nome_usuario")
@@ -40,13 +41,15 @@ DROP TABLE IF EXISTS "participantes" CASCADE;
 
 CREATE TABLE "participantes"
 (
+    "id" serial NOT NULL,
     "usuario_id" INTEGER NOT NULL,
     "cpf" VARCHAR(50) NOT NULL,
     "fim_validade" DATE,
     "nome" VARCHAR(255),
     "sobrenome" VARCHAR(255),
-    PRIMARY KEY ("usuario_id"),
-    CONSTRAINT "participantes_u_5c58ee" UNIQUE ("cpf")
+    PRIMARY KEY ("id","usuario_id"),
+    CONSTRAINT "participantes_u_5c58ee" UNIQUE ("cpf"),
+    CONSTRAINT "participantes_u_db2f7c" UNIQUE ("id")
 );
 
 -----------------------------------------------------------------------
@@ -59,23 +62,12 @@ CREATE TABLE "redes_cinema"
 (
     "id" serial NOT NULL,
     "cnpj" VARCHAR(50) NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
     "nome_fantasia" VARCHAR(255) NOT NULL,
     "razao_social" VARCHAR(255) NOT NULL,
     "endereco" TEXT NOT NULL,
     PRIMARY KEY ("id"),
     CONSTRAINT "redes_cinema_u_654f55" UNIQUE ("cnpj")
-);
-
------------------------------------------------------------------------
--- usuarios_rede_cinema
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "usuarios_rede_cinema" CASCADE;
-
-CREATE TABLE "usuarios_rede_cinema"
-(
-    "usuario_id" INTEGER NOT NULL,
-    PRIMARY KEY ("usuario_id")
 );
 
 -----------------------------------------------------------------------
@@ -161,7 +153,7 @@ ALTER TABLE "participantes" ADD CONSTRAINT "participantes_fk_614747"
     FOREIGN KEY ("usuario_id")
     REFERENCES "usuarios" ("id");
 
-ALTER TABLE "usuarios_rede_cinema" ADD CONSTRAINT "usuarios_rede_cinema_fk_614747"
+ALTER TABLE "redes_cinema" ADD CONSTRAINT "redes_cinema_fk_614747"
     FOREIGN KEY ("usuario_id")
     REFERENCES "usuarios" ("id");
 
@@ -177,22 +169,22 @@ ALTER TABLE "beneficios_preferencias" ADD CONSTRAINT "beneficios_preferencias_fk
     FOREIGN KEY ("beneficio_id")
     REFERENCES "beneficios" ("id");
 
-ALTER TABLE "participantes_preferencias" ADD CONSTRAINT "participantes_preferencias_fk_d58b2e"
+ALTER TABLE "participantes_preferencias" ADD CONSTRAINT "participantes_preferencias_fk_c65b3e"
     FOREIGN KEY ("participante_id")
-    REFERENCES "participantes" ("usuario_id");
+    REFERENCES "participantes" ("id");
 
 ALTER TABLE "participantes_preferencias" ADD CONSTRAINT "participantes_preferencias_fk_9665b2"
     FOREIGN KEY ("beneficio_id")
     REFERENCES "beneficios" ("id");
 
-ALTER TABLE "pagamentos" ADD CONSTRAINT "pagamentos_fk_d58b2e"
+ALTER TABLE "pagamentos" ADD CONSTRAINT "pagamentos_fk_c65b3e"
     FOREIGN KEY ("participante_id")
-    REFERENCES "participantes" ("usuario_id");
+    REFERENCES "participantes" ("id");
 
 ALTER TABLE "vouchers" ADD CONSTRAINT "vouchers_fk_9665b2"
     FOREIGN KEY ("beneficio_id")
     REFERENCES "beneficios" ("id");
 
-ALTER TABLE "vouchers" ADD CONSTRAINT "vouchers_fk_d58b2e"
+ALTER TABLE "vouchers" ADD CONSTRAINT "vouchers_fk_c65b3e"
     FOREIGN KEY ("participante_id")
-    REFERENCES "participantes" ("usuario_id");
+    REFERENCES "participantes" ("id");

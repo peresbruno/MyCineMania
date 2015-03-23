@@ -944,7 +944,7 @@ abstract class Beneficio implements ActiveRecordInterface
                         $entryPk = [];
 
                         $entryPk[1] = $this->getId();
-                        $entryPk[0] = $entry->getUsuarioId();
+                        $entryPk[0] = $entry->getId();
                         $pks[] = $entryPk;
                     }
 

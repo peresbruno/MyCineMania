@@ -2,8 +2,11 @@
 
 namespace Base;
 
+use \RedeCinema as ChildRedeCinema;
+use \RedeCinemaQuery as ChildRedeCinemaQuery;
 use \Usuario as ChildUsuario;
 use \UsuarioQuery as ChildUsuarioQuery;
+use \UsuarioRedeCinema as ChildUsuarioRedeCinema;
 use \UsuarioRedeCinemaQuery as ChildUsuarioRedeCinemaQuery;
 use \Exception;
 use \PDO;
@@ -13,6 +16,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -73,12 +77,24 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     protected $aUsuario;
 
     /**
+     * @var        ObjectCollection|ChildRedeCinema[] Collection to store aggregation of ChildRedeCinema objects.
+     */
+    protected $collRedeCinemas;
+    protected $collRedeCinemasPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildRedeCinema[]
+     */
+    protected $redeCinemasScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Base\UsuarioRedeCinema object.
@@ -442,6 +458,8 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aUsuario = null;
+            $this->collRedeCinemas = null;
+
         } // if (deep)
     }
 
@@ -562,6 +580,23 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->redeCinemasScheduledForDeletion !== null) {
+                if (!$this->redeCinemasScheduledForDeletion->isEmpty()) {
+                    \RedeCinemaQuery::create()
+                        ->filterByPrimaryKeys($this->redeCinemasScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->redeCinemasScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collRedeCinemas !== null) {
+                foreach ($this->collRedeCinemas as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -713,6 +748,21 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aUsuario->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collRedeCinemas) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'redeCinemas';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'redes_cinemas';
+                        break;
+                    default:
+                        $key = 'RedeCinemas';
+                }
+
+                $result[$key] = $this->collRedeCinemas->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -918,6 +968,20 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setUsuarioId($this->getUsuarioId());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getRedeCinemas() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addRedeCinema($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -990,6 +1054,240 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
         return $this->aUsuario;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('RedeCinema' == $relationName) {
+            return $this->initRedeCinemas();
+        }
+    }
+
+    /**
+     * Clears out the collRedeCinemas collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addRedeCinemas()
+     */
+    public function clearRedeCinemas()
+    {
+        $this->collRedeCinemas = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collRedeCinemas collection loaded partially.
+     */
+    public function resetPartialRedeCinemas($v = true)
+    {
+        $this->collRedeCinemasPartial = $v;
+    }
+
+    /**
+     * Initializes the collRedeCinemas collection.
+     *
+     * By default this just sets the collRedeCinemas collection to an empty array (like clearcollRedeCinemas());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initRedeCinemas($overrideExisting = true)
+    {
+        if (null !== $this->collRedeCinemas && !$overrideExisting) {
+            return;
+        }
+        $this->collRedeCinemas = new ObjectCollection();
+        $this->collRedeCinemas->setModel('\RedeCinema');
+    }
+
+    /**
+     * Gets an array of ChildRedeCinema objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUsuarioRedeCinema is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildRedeCinema[] List of ChildRedeCinema objects
+     * @throws PropelException
+     */
+    public function getRedeCinemas(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collRedeCinemasPartial && !$this->isNew();
+        if (null === $this->collRedeCinemas || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRedeCinemas) {
+                // return empty collection
+                $this->initRedeCinemas();
+            } else {
+                $collRedeCinemas = ChildRedeCinemaQuery::create(null, $criteria)
+                    ->filterByUsuarioRedeCinema($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collRedeCinemasPartial && count($collRedeCinemas)) {
+                        $this->initRedeCinemas(false);
+
+                        foreach ($collRedeCinemas as $obj) {
+                            if (false == $this->collRedeCinemas->contains($obj)) {
+                                $this->collRedeCinemas->append($obj);
+                            }
+                        }
+
+                        $this->collRedeCinemasPartial = true;
+                    }
+
+                    return $collRedeCinemas;
+                }
+
+                if ($partial && $this->collRedeCinemas) {
+                    foreach ($this->collRedeCinemas as $obj) {
+                        if ($obj->isNew()) {
+                            $collRedeCinemas[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collRedeCinemas = $collRedeCinemas;
+                $this->collRedeCinemasPartial = false;
+            }
+        }
+
+        return $this->collRedeCinemas;
+    }
+
+    /**
+     * Sets a collection of ChildRedeCinema objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $redeCinemas A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildUsuarioRedeCinema The current object (for fluent API support)
+     */
+    public function setRedeCinemas(Collection $redeCinemas, ConnectionInterface $con = null)
+    {
+        /** @var ChildRedeCinema[] $redeCinemasToDelete */
+        $redeCinemasToDelete = $this->getRedeCinemas(new Criteria(), $con)->diff($redeCinemas);
+
+
+        $this->redeCinemasScheduledForDeletion = $redeCinemasToDelete;
+
+        foreach ($redeCinemasToDelete as $redeCinemaRemoved) {
+            $redeCinemaRemoved->setUsuarioRedeCinema(null);
+        }
+
+        $this->collRedeCinemas = null;
+        foreach ($redeCinemas as $redeCinema) {
+            $this->addRedeCinema($redeCinema);
+        }
+
+        $this->collRedeCinemas = $redeCinemas;
+        $this->collRedeCinemasPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related RedeCinema objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related RedeCinema objects.
+     * @throws PropelException
+     */
+    public function countRedeCinemas(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collRedeCinemasPartial && !$this->isNew();
+        if (null === $this->collRedeCinemas || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRedeCinemas) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getRedeCinemas());
+            }
+
+            $query = ChildRedeCinemaQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUsuarioRedeCinema($this)
+                ->count($con);
+        }
+
+        return count($this->collRedeCinemas);
+    }
+
+    /**
+     * Method called to associate a ChildRedeCinema object to this object
+     * through the ChildRedeCinema foreign key attribute.
+     *
+     * @param  ChildRedeCinema $l ChildRedeCinema
+     * @return $this|\UsuarioRedeCinema The current object (for fluent API support)
+     */
+    public function addRedeCinema(ChildRedeCinema $l)
+    {
+        if ($this->collRedeCinemas === null) {
+            $this->initRedeCinemas();
+            $this->collRedeCinemasPartial = true;
+        }
+
+        if (!$this->collRedeCinemas->contains($l)) {
+            $this->doAddRedeCinema($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildRedeCinema $redeCinema The ChildRedeCinema object to add.
+     */
+    protected function doAddRedeCinema(ChildRedeCinema $redeCinema)
+    {
+        $this->collRedeCinemas[]= $redeCinema;
+        $redeCinema->setUsuarioRedeCinema($this);
+    }
+
+    /**
+     * @param  ChildRedeCinema $redeCinema The ChildRedeCinema object to remove.
+     * @return $this|ChildUsuarioRedeCinema The current object (for fluent API support)
+     */
+    public function removeRedeCinema(ChildRedeCinema $redeCinema)
+    {
+        if ($this->getRedeCinemas()->contains($redeCinema)) {
+            $pos = $this->collRedeCinemas->search($redeCinema);
+            $this->collRedeCinemas->remove($pos);
+            if (null === $this->redeCinemasScheduledForDeletion) {
+                $this->redeCinemasScheduledForDeletion = clone $this->collRedeCinemas;
+                $this->redeCinemasScheduledForDeletion->clear();
+            }
+            $this->redeCinemasScheduledForDeletion[]= clone $redeCinema;
+            $redeCinema->setUsuarioRedeCinema(null);
+        }
+
+        return $this;
+    }
+
     /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
@@ -1019,8 +1317,14 @@ abstract class UsuarioRedeCinema implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collRedeCinemas) {
+                foreach ($this->collRedeCinemas as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collRedeCinemas = null;
         $this->aUsuario = null;
     }
 
