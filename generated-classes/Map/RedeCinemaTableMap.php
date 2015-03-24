@@ -191,6 +191,7 @@ class RedeCinemaTableMap extends TableMap
     {
         return array(
             'delegate' => array('to' => 'usuarios', ),
+            'validate' => array('rule3' => array ('column' => 'cnpj','validator' => 'Unique',), ),
         );
     } // getBehaviors()
 

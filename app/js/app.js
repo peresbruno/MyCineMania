@@ -3,7 +3,9 @@ var myCineMania = angular.module('myCineMania',
 	 'ngResource',
 	 'oitozero.ngSweetAlert',
 	 'ng.httpLoader',
-	 'LocalStorageModule'
+	 'LocalStorageModule',
+	 'ui.utils'
+
 	]);
 
 myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInterceptorProvider) {
@@ -49,6 +51,26 @@ myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInter
 			}
 		}
 	})
+	.state('beneficios', {
+		url: '/beneficios',
+		templateUrl: 'templates/beneficios.html',
+		controller: 'ListarBeneficiosCtrl',
+		resolve : {
+			beneficios : function (BeneficiosResource) {
+				return BeneficiosResource.query();
+			}
+		}
+	})
+	.state('detalhes_beneficio', {
+		url: '/beneficios/:id',
+		templateUrl: 'templates/beneficio_detalhes.html',
+		controller: 'DetalhesBeneficioCtrl',
+		resolve : {
+			beneficio : function (BeneficiosResource, $stateParams) {
+				return BeneficiosResource.get({id : $stateParams.id});
+			}
+		}
+	})
 	.state('login', {
 		url: "/login",
 		templateUrl: "templates/login.html",
@@ -88,7 +110,7 @@ myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInter
 
 }).run(
 	function ($http, localStorageService) {
-		$http.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+		
 		if (localStorageService.get('auth') !== null)
 			$http.defaults.headers.common.Authorization = 'Basic ' + localStorageService.get('auth');
 

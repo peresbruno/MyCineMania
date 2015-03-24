@@ -1,7 +1,7 @@
 <?php
 	class RedesCinemaController {
 		
-		private static function getRedeCinema($id) {
+		public static function getRedeCinema($id) {
 			$rede = RedeCinemaQuery::create()->select(array(
 				'id' => 'Id',
 				'cnpj' => 'Cnpj',

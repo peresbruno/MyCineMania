@@ -27,7 +27,10 @@
 	$router->map('PUT','/redes_cinema', "RedesCinemaController::update");
 
 	$router->map('GET', '/beneficios', "BeneficiosController::getAll");
+	$router->map('GET', '/beneficios/[i:id]', "BeneficiosController::get");
 	$router->map('POST', '/beneficios', "BeneficiosController::post");
+
+	$router->map('POST', '/voucher', "VouchersController::post");	
 
 	$match = $router->match();
 

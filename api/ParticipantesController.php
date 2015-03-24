@@ -37,7 +37,40 @@
 			$participante->setUsuario($usuario);
 			
 			try {
-				$participante->save();
+
+				if (!$usuario->validate() || !$participante->validate()) {
+
+					$failures = array();
+					$erros = array();
+					$failures = $usuario->getValidationFailures();
+					
+				  foreach ($failures as $failure) {
+				  	array_push($erros, $failure->getPropertyPath() . ' já cadastrado.');
+	        }
+
+					$failures = $participante->getValidationFailures();
+					
+				  foreach ($failures as $failure) {
+				  	$campo = $failure->getPropertyPath();
+				  	if ($campo == 'email')
+				  		$campo = 'E-mail';
+				  	else if ($campo == 'cpf')
+				  		$campo = 'CPF';
+				  	else if ($campo == 'nome_usuario')
+				  		$campo = 'Nome de usuário';
+
+				  	array_push($erros, $campo . ' já cadastrado.');
+	        }
+
+	        $erros = array('erros' => $erros);
+
+					header( $_SERVER["SERVER_PROTOCOL"] . ' 400 Bad Request');
+					die(json_encode($erros));
+				}
+				else {
+					$participante->save();	
+				}
+
 				$participante = ParticipantesController::getParticipante($participante->getId());
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 201 Created');
 				die(json_encode($participante));				

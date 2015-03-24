@@ -3,24 +3,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
-                    <div class="row" ng-show="cadastroParticipante.$invalid && cadastroParticipante.submetido">
-                        <div class="alert alert-warning" role="alert">
-                             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
-                            <p ng-show="cadastroParticipante.nome.$error.required">O campo "Nome" é obrigatório</p>
-                            <p ng-show="cadastroParticipante.sobrenome.$error.required">O campo "Sobrenome" é obrigatório</p>
-                            <p ng-show="cadastroParticipante.usuario.$error.required">O campo "Usuário" é obrigatório</p>
-                            <p ng-show="cadastroParticipante.senha.$error.required">O campo "Senha" é obrigatório</p>
-                            <p ng-show="cadastroParticipante.repetirSenha.$error.required">O campo "Repetir senha" é obrigatório</p>
-                            <p ng-show="cadastroParticipante.email.$error.required">O campo "E-mail" é obrigatório</p>  
-                            <p ng-show="cadastroParticipante.email.$invalid">O e-mail digitado é inválido</p>
-                            <p ng-show="cadastroParticipante.repetirEmail.$error.required">O campo "Repetir E-mail" é obrigatório</p>  
-                            <p ng-show="cadastroParticipante.repetirEmail.$invalid">O e-mail digitado é inválido</p>
-                            <p ng-show="cadastroParticipante.cpf.$error.required">O campo "CPF" é obrigatório</p>  
-                            <p ng-show="!senhasIguais()">As senhas digitadas não são iguais</p>  
-                            <p ng-show="!emailsIguais()">Os emails digitados não são iguais</p>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <h2>Desejo me inscrever!</h2>
@@ -45,12 +27,6 @@
                             <div class="form-group">
                                 <label for="usuario" class="control-label">Usuário: </label>
                                 <input name="usuario" type="text" ng-model="participante.NomeUsuario" class="form-control" required id="usuario" placeholder="Usuário">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="control-label">&nbsp;</label>
-                                <div><span style="color:darkgreen" class="glyphicon glyphicon-ok-sign"></span> Nome disponível</div>
                             </div>
                         </div>
                     </div>
@@ -86,13 +62,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="cpf" class="control-label">CPF: </label>
-                                <input name="cpf" type="text" ng-model="participante.Cpf" class="form-control" required id="cpf" placeholder="CPF" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Digite o CPF no formato nnn.nnn.nnn-nn">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="control-label">&nbsp;</label>
-                                <div><span style="color:darkgreen" class="glyphicon glyphicon-ok-sign"></span> CPF válido</div>
+                                <input name="cpf" ng-model="participante.Cpf" ng-cpf class="form-control" ui-mask="999.999.999-99" required />
                             </div>
                         </div>
                     </div>
@@ -145,7 +115,7 @@
                                 </div>
                                 <div class="checkbox">
                                     <label>
-                                        <input ng-model="opcoes.politica_privacidade" type="checkbox" value="" >
+                                        <input ng-model="opcoes.politica_privacidade" type="checkbox" value=""  >
                                         Estou ciente e concordo com a <a href="#">política de privacidade</a> do programa.
                                     </label>
                                 </div>

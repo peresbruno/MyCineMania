@@ -7,14 +7,17 @@ myCineMania.controller('LoginCtrl', function ($scope, $state, PerfilResource, Sw
 			function (data) {
 				
 				if (data.Tipo === 0)
-					$state.go('');
+					$state.go('beneficios');
 				else if (data.Tipo === 1)
 					$state.go('cadastrar_beneficio');
 				else if (data.Tipo === 2)
 					$state.go('');
 
-			}, function () {
-				SweetAlert.swal("Usuário e senha inválidos.", null, "error");
+			}, function (err) {
+				if ( err.data && err.data.erros )
+					SweetAlert.swal(err.data.erros[0], null, "error");	
+				else
+					SweetAlert.swal("Usuário e senha inválidos.", null, "error");
 			}
 		);
 	};

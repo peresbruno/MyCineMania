@@ -23,6 +23,11 @@
     <unique>
       <unique-column name="nome_usuario" />
     </unique>
+    <behavior name="validate">
+      <parameter name="rule1" value="{column: email, validator: Unique}" />
+      <parameter name="rule2" value="{column: nome_usuario, validator: Unique}" />
+    </behavior>
+
   </table>
 
   <table name="participantes" phpName="Participante">
@@ -41,6 +46,9 @@
     <behavior name="delegate">
       <parameter name="to" value="usuarios" />
     </behavior>
+    <behavior name="validate">
+      <parameter name="rule3" value="{column: cpf, validator: Unique}" />
+    </behavior>
   </table>
 
   <table name="redes_cinema" phpName="RedeCinema">
@@ -58,6 +66,9 @@
       </foreign-key>
       <behavior name="delegate">
         <parameter name="to" value="usuarios" />
+      </behavior>
+      <behavior name="validate">
+        <parameter name="rule3" value="{column: cnpj, validator: Unique}" />
       </behavior>
   </table>
 

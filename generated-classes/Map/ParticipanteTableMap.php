@@ -206,6 +206,7 @@ class ParticipanteTableMap extends TableMap
     {
         return array(
             'delegate' => array('to' => 'usuarios', ),
+            'validate' => array('rule3' => array ('column' => 'cpf','validator' => 'Unique',), ),
         );
     } // getBehaviors()
 

@@ -9,10 +9,16 @@
 				'inicio_validade' => 'InicioValidade',
 				'fim_validade' => 'FimValidade',
 				'descricao' => 'Descricao',
-				'condicoes' => 'Condicoes'
+				'condicoes' => 'Condicoes',
+				'rede_cinema_id' => 'rede_cinema_id'
 			))
 			->filterById($id)
 			->findOne();
+
+			if ($beneficio) {
+				$beneficio['RedeCinema'] = RedesCinemaController::getRedeCinema($beneficio['rede_cinema_id']);
+				unset($beneficio['rede_cinema_id']);
+			}
 
 			return $beneficio;
 		}
@@ -45,6 +51,33 @@
 
 		}
 
+		public static function get ($id) {
+			$beneficio = BeneficiosController::getBeneficio($id);
+
+			if ($beneficio) {
+
+				$usuario = PerfilController::getUsuario();
+				if ($usuario && $usuario['Tipo'] == 0) {
+
+					$voucher = VoucherQuery::create()
+					->filterByParticipanteId($usuario['Id'])
+					->filterByBeneficioId($beneficio['Id'])
+					->findOne()
+					->toArray();
+
+					$beneficio['Emitido'] = !empty($voucher);
+
+				}
+
+				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
+				die(json_encode($beneficio));				
+			}
+			else {
+				header( $_SERVER["SERVER_PROTOCOL"] . ' 204 No Content');
+				exit;
+			}
+		}
+
 		public static function getAll() {
 			$beneficios = BeneficioQuery::create()
 			->select(array(
@@ -58,7 +91,7 @@
 			->find()
 			->toArray();
 
-		  if ($beneficios->count() > 0) {
+		  if ($beneficios) {
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
 				die(json_encode($beneficios));
 		  }

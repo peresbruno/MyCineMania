@@ -1,0 +1,23 @@
+<div class="espaco-topo">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>Benefícios</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 beneficios-img" ng-repeat="beneficio in beneficios">
+                <h4>{{beneficio.Titulo}}</h4>
+                <img src="templates/img/beneficio.jpg"/>
+                <br />
+                <a ng-href="#/beneficios/{{beneficio.Id}}" class="btn btn-default btn-block">
+                    <span class="glyphicon glyphicon glyphicon-info-sign" aria-hidden="true"></span> Detalhes do benefício
+                </a>
+            </div>
+        </div>
+    </div> 
+</div>  

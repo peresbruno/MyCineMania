@@ -1,0 +1,60 @@
+<div class="espaco-topo">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>Detalhes do Benefício</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12" style="text-align: center">
+                        <img src="templates/img/beneficio.jpg"/>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 30px; text-align: right">
+                    <a ng-hide="beneficio.Emitido" href="?pg=emitir_voucher" class="btn btn-primary">Emitir Voucher</a>
+<div ng-show="beneficio.Emitido" class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  <span class="sr-only">Error:</span>
+  Voucher já emitido
+</div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12" style="font-size: 18px; font-weight: bold">
+                        {{beneficio.RedeCinema.NomeFantasia}}
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 20px">
+                    <div class="col-md-12 ">
+                        <b>Local: </b>{{beneficio.RedeCinema.NomeFantasia}}<br/>
+                        <b>Início da validade: </b>{{beneficio.InicioValidade | date }}<br/>
+                        <b>Fim da validade: </b>{{beneficio.FimValidade | date }}<br/>
+                        <b>Descrição: </b><br/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 justify">
+                        {{beneficio.Descricao}}
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 20px">
+                    <div class="col-md-12 ">
+                        <b>Condições: </b><br/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 justify">
+                        {{beneficio.Condicoes}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>  

@@ -20,6 +20,7 @@
 				if ($usuario) {
 					if ($usuario['Tipo'] == 0) {
 						$usuario = ParticipanteQuery::create()->select(array(
+							'id' => 'Id',
 							'cpf' => 'Cpf',
 							'fim_validade' => 'FimValidade',
 							'nome' => 'Nome',
@@ -65,6 +66,12 @@
 				exit;
 			}
 			else {
+				if (!$usuario['Liberado']) {
+					$erros = array('erros' => array("Usuário não aprovado."));
+					header( $_SERVER["SERVER_PROTOCOL"] . ' 401 Unauthorized');
+					die(json_encode($erros));
+					exit;		
+				}
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
 				die(json_encode($usuario));
 			}
