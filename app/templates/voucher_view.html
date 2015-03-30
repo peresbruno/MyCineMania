@@ -1,0 +1,86 @@
+<div class="espaco-topo" style="margin-left: 40px;">
+    <div class="row">
+        <div class="col-md-8" style="border: 1px solid #000">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img class="logo" height="130" src="img/logocine.png">
+                        </div>
+                        <div class="col-md-4">                                
+                            <img style="padding-top: 30px;" src="img/codigo.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12" style="border-bottom: 1px solid #000; border-bottom-style: dashed;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6 justify">
+                            <b><h4>{{voucher.Beneficio.RedeCinema.NomeFantasia}}</h4></b><br/>
+                            <b>Descrição do benefício:<br/></b>
+                            {{voucher.Beneficio.Descricao}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12" style="border-bottom: 1px solid #000; border-bottom-style: dashed;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" style="text-align: center;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4><b>Código: </b>{{voucher.Codigo}}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12" style="border-bottom: 1px solid #000; border-bottom-style: dashed;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6 justify" style="border-right: 1px solid #000; border-right-style: dashed;">
+                            <b>Condições:<br/></b>
+                            {{voucher.Beneficio.Condicoes}}
+                        </div>
+                        <div class="col-md-6 justify">
+                            <b>Local: </b>{{voucher.Beneficio.RedeCinema.Endereco}}<br/>
+                            <b>Data: </b>{{voucher.DataEmissao | date : 'dd/MM/yyyy'}}<br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12" style="padding: 10px 0 10px 0; border-top: 1px solid #000; border-top-style: dashed; text-align: center">
+                            &COPY; My Cine Mania 2014
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <a href="javascript:window.print();">Imprimir Voucher</a><br/>
+            <a href="#">Voltar</a>
+        </div>  
+    </div>  
+</div>

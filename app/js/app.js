@@ -1,22 +1,24 @@
 var myCineMania = angular.module('myCineMania', 
-	['ui.router',
-	 'ngResource',
-	 'oitozero.ngSweetAlert',
-	 'ng.httpLoader',
-	 'LocalStorageModule',
-	 'ui.utils'
-
+	[
+		'ui.router',
+		'ngResource',
+		'oitozero.ngSweetAlert',
+		'ng.httpLoader',
+		'LocalStorageModule',
+		'ui.utils',
+		'checklist-model',
+		'ngDialog'
 	]);
 
 myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInterceptorProvider) {
 
-	$urlRouterProvider.otherwise("/login");
+	$urlRouterProvider.otherwise("/beneficios");
 
 	httpMethodInterceptorProvider.whitelistDomain('mycinemania');
 
 	$stateProvider
 	.state('cadastro_participante', {
-		url: "/cadastrar_participante/:id",
+		url: "/cadastrar_participante",
 		controller: 'CadastrarParticipanteCtrl',
 		templateUrl: "templates/participante_cadastro.html",
 		resolve: {
@@ -25,11 +27,14 @@ myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInter
 					return ParticipantesResource.get({id: $stateParams.id})
 				else 
 					return new ParticipantesResource;					
+			},
+			preferencias : function (PreferenciasResource) {
+				return PreferenciasResource.query();
 			}
 		}
 	})
 	.state('cadastro_rede', {
-		url: "/cadastrar_rede/:id",
+		url: "/cadastrar_rede",
 		controller: 'CadastrarRedeCtrl',
 		templateUrl: "templates/rede_cinema_cadastro.html",
 		resolve: {
@@ -48,6 +53,9 @@ myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInter
 		resolve : {
 			beneficio : function (BeneficiosResource) {
 				return new BeneficiosResource;
+			},
+			preferencias: function (PreferenciasResource) {
+				return PreferenciasResource.query();
 			}
 		}
 	})
@@ -71,6 +79,21 @@ myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInter
 			}
 		}
 	})
+	.state('voucher', {
+		url: '/vouchers/:codigo',
+		templateUrl: 'templates/voucher_view.html',
+		controller: 'VoucherCtrl',
+		resolve: {
+			voucher : function (VouchersResource, $stateParams) {
+				return VouchersResource.get({codigo : $stateParams.codigo});
+			}
+		}
+	})
+	.state('validar_voucher', {
+		url: '/validar_voucher',
+		templateUrl: 'templates/valida_voucher.html',
+		controller: 'ValidarVoucherCtrl'
+	})
 	.state('login', {
 		url: "/login",
 		templateUrl: "templates/login.html",
@@ -80,7 +103,6 @@ myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInter
 	/* Rotas administrador */
 	.state('admin', {
 		url: "/admin",
-		abstract: true,
 		template: "<div ui-view></div>"
 	})
 	.state('listar_redes', {
@@ -104,6 +126,20 @@ myCineMania.config(function ($stateProvider, $urlRouterProvider, httpMethodInter
 				return ParticipantesResource.query();
 			}
 		}
+	})
+	.state('configuracoes', {
+		url: "/configuracoes",
+		templateUrl: "templates/admin/configuracoes.html",
+		controller: "ConfiguracoesCtrl",
+		resolve : {
+			configuracoes : function (ConfiguracoesResource) {
+				return ConfiguracoesResource.get();
+			},
+			preferencias: function (PreferenciasResource) {
+				return PreferenciasResource.query();
+			}
+		},
+		parent: "admin"
 	})
 	;
 	

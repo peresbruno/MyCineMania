@@ -71,33 +71,9 @@
                             <div class="form-group">
                                 <label for="regulamento" class="control-label">Interesses:</label>
                                 <div>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Suspense
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Terror
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Ação
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Comédia
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Drama
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Animação
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Ficção científica
+                                    <label class="checkbox-inline" ng-repeat="preferencia in preferencias">
+                                        <input type="checkbox" checklist-model="participante.preferencias" checklist-value="preferencia.Id">
+                                        {{preferencia.Descricao}}
                                     </label>
                                 </div>
                             </div>

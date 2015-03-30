@@ -6,6 +6,10 @@ use \Beneficio as ChildBeneficio;
 use \BeneficioQuery as ChildBeneficioQuery;
 use \BeneficiosPreferencias as ChildBeneficiosPreferencias;
 use \BeneficiosPreferenciasQuery as ChildBeneficiosPreferenciasQuery;
+use \Participante as ChildParticipante;
+use \ParticipanteQuery as ChildParticipanteQuery;
+use \ParticipantesPreferencias as ChildParticipantesPreferencias;
+use \ParticipantesPreferenciasQuery as ChildParticipantesPreferenciasQuery;
 use \Preferencia as ChildPreferencia;
 use \PreferenciaQuery as ChildPreferenciaQuery;
 use \Exception;
@@ -23,6 +27,16 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Validator\Constraints\Unique;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\DefaultTranslator;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
+use Symfony\Component\Validator\Validator\LegacyValidator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Base class that represents a row from the 'preferencias' table.
@@ -84,6 +98,12 @@ abstract class Preferencia implements ActiveRecordInterface
     protected $collBeneficiosPreferenciassPartial;
 
     /**
+     * @var        ObjectCollection|ChildParticipantesPreferencias[] Collection to store aggregation of ChildParticipantesPreferencias objects.
+     */
+    protected $collParticipantesPreferenciass;
+    protected $collParticipantesPreferenciassPartial;
+
+    /**
      * @var        ObjectCollection|ChildBeneficio[] Cross Collection to store aggregation of ChildBeneficio objects.
      */
     protected $collBeneficios;
@@ -94,12 +114,39 @@ abstract class Preferencia implements ActiveRecordInterface
     protected $collBeneficiosPartial;
 
     /**
+     * @var        ObjectCollection|ChildParticipante[] Cross Collection to store aggregation of ChildParticipante objects.
+     */
+    protected $collParticipantes;
+
+    /**
+     * @var bool
+     */
+    protected $collParticipantesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    // validate behavior
+
+    /**
+     * Flag to prevent endless validation loop, if this object is referenced
+     * by another object which falls in this transaction.
+     * @var        boolean
+     */
+    protected $alreadyInValidation = false;
+
+    /**
+     * ConstraintViolationList object
+     *
+     * @see     http://api.symfony.com/2.0/Symfony/Component/Validator/ConstraintViolationList.html
+     * @var     ConstraintViolationList
+     */
+    protected $validationFailures;
 
     /**
      * An array of objects scheduled for deletion.
@@ -109,9 +156,21 @@ abstract class Preferencia implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildParticipante[]
+     */
+    protected $participantesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildBeneficiosPreferencias[]
      */
     protected $beneficiosPreferenciassScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildParticipantesPreferencias[]
+     */
+    protected $participantesPreferenciassScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Base\Preferencia object.
@@ -502,7 +561,10 @@ abstract class Preferencia implements ActiveRecordInterface
 
             $this->collBeneficiosPreferenciass = null;
 
+            $this->collParticipantesPreferenciass = null;
+
             $this->collBeneficios = null;
+            $this->collParticipantes = null;
         } // if (deep)
     }
 
@@ -642,6 +704,35 @@ abstract class Preferencia implements ActiveRecordInterface
             }
 
 
+            if ($this->participantesScheduledForDeletion !== null) {
+                if (!$this->participantesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    foreach ($this->participantesScheduledForDeletion as $entry) {
+                        $entryPk = [];
+
+                        $entryPk[0] = $this->getId();
+                        $entryPk[1] = $entry->getId();
+                        $pks[] = $entryPk;
+                    }
+
+                    \ParticipantesPreferenciasQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+
+                    $this->participantesScheduledForDeletion = null;
+                }
+
+            }
+
+            if ($this->collParticipantes) {
+                foreach ($this->collParticipantes as $participante) {
+                    if (!$participante->isDeleted() && ($participante->isNew() || $participante->isModified())) {
+                        $participante->save($con);
+                    }
+                }
+            }
+
+
             if ($this->beneficiosPreferenciassScheduledForDeletion !== null) {
                 if (!$this->beneficiosPreferenciassScheduledForDeletion->isEmpty()) {
                     \BeneficiosPreferenciasQuery::create()
@@ -653,6 +744,23 @@ abstract class Preferencia implements ActiveRecordInterface
 
             if ($this->collBeneficiosPreferenciass !== null) {
                 foreach ($this->collBeneficiosPreferenciass as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->participantesPreferenciassScheduledForDeletion !== null) {
+                if (!$this->participantesPreferenciassScheduledForDeletion->isEmpty()) {
+                    \ParticipantesPreferenciasQuery::create()
+                        ->filterByPrimaryKeys($this->participantesPreferenciassScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->participantesPreferenciassScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collParticipantesPreferenciass !== null) {
+                foreach ($this->collParticipantesPreferenciass as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -831,6 +939,21 @@ abstract class Preferencia implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collBeneficiosPreferenciass->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collParticipantesPreferenciass) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'participantesPreferenciass';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'participantes_preferenciass';
+                        break;
+                    default:
+                        $key = 'ParticipantesPreferenciass';
+                }
+
+                $result[$key] = $this->collParticipantesPreferenciass->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1050,6 +1173,12 @@ abstract class Preferencia implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getParticipantesPreferenciass() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addParticipantesPreferencias($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1093,6 +1222,9 @@ abstract class Preferencia implements ActiveRecordInterface
     {
         if ('BeneficiosPreferencias' == $relationName) {
             return $this->initBeneficiosPreferenciass();
+        }
+        if ('ParticipantesPreferencias' == $relationName) {
+            return $this->initParticipantesPreferenciass();
         }
     }
 
@@ -1343,6 +1475,252 @@ abstract class Preferencia implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collParticipantesPreferenciass collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addParticipantesPreferenciass()
+     */
+    public function clearParticipantesPreferenciass()
+    {
+        $this->collParticipantesPreferenciass = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collParticipantesPreferenciass collection loaded partially.
+     */
+    public function resetPartialParticipantesPreferenciass($v = true)
+    {
+        $this->collParticipantesPreferenciassPartial = $v;
+    }
+
+    /**
+     * Initializes the collParticipantesPreferenciass collection.
+     *
+     * By default this just sets the collParticipantesPreferenciass collection to an empty array (like clearcollParticipantesPreferenciass());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initParticipantesPreferenciass($overrideExisting = true)
+    {
+        if (null !== $this->collParticipantesPreferenciass && !$overrideExisting) {
+            return;
+        }
+        $this->collParticipantesPreferenciass = new ObjectCollection();
+        $this->collParticipantesPreferenciass->setModel('\ParticipantesPreferencias');
+    }
+
+    /**
+     * Gets an array of ChildParticipantesPreferencias objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildPreferencia is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildParticipantesPreferencias[] List of ChildParticipantesPreferencias objects
+     * @throws PropelException
+     */
+    public function getParticipantesPreferenciass(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collParticipantesPreferenciassPartial && !$this->isNew();
+        if (null === $this->collParticipantesPreferenciass || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collParticipantesPreferenciass) {
+                // return empty collection
+                $this->initParticipantesPreferenciass();
+            } else {
+                $collParticipantesPreferenciass = ChildParticipantesPreferenciasQuery::create(null, $criteria)
+                    ->filterByPreferencia($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collParticipantesPreferenciassPartial && count($collParticipantesPreferenciass)) {
+                        $this->initParticipantesPreferenciass(false);
+
+                        foreach ($collParticipantesPreferenciass as $obj) {
+                            if (false == $this->collParticipantesPreferenciass->contains($obj)) {
+                                $this->collParticipantesPreferenciass->append($obj);
+                            }
+                        }
+
+                        $this->collParticipantesPreferenciassPartial = true;
+                    }
+
+                    return $collParticipantesPreferenciass;
+                }
+
+                if ($partial && $this->collParticipantesPreferenciass) {
+                    foreach ($this->collParticipantesPreferenciass as $obj) {
+                        if ($obj->isNew()) {
+                            $collParticipantesPreferenciass[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collParticipantesPreferenciass = $collParticipantesPreferenciass;
+                $this->collParticipantesPreferenciassPartial = false;
+            }
+        }
+
+        return $this->collParticipantesPreferenciass;
+    }
+
+    /**
+     * Sets a collection of ChildParticipantesPreferencias objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $participantesPreferenciass A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildPreferencia The current object (for fluent API support)
+     */
+    public function setParticipantesPreferenciass(Collection $participantesPreferenciass, ConnectionInterface $con = null)
+    {
+        /** @var ChildParticipantesPreferencias[] $participantesPreferenciassToDelete */
+        $participantesPreferenciassToDelete = $this->getParticipantesPreferenciass(new Criteria(), $con)->diff($participantesPreferenciass);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->participantesPreferenciassScheduledForDeletion = clone $participantesPreferenciassToDelete;
+
+        foreach ($participantesPreferenciassToDelete as $participantesPreferenciasRemoved) {
+            $participantesPreferenciasRemoved->setPreferencia(null);
+        }
+
+        $this->collParticipantesPreferenciass = null;
+        foreach ($participantesPreferenciass as $participantesPreferencias) {
+            $this->addParticipantesPreferencias($participantesPreferencias);
+        }
+
+        $this->collParticipantesPreferenciass = $participantesPreferenciass;
+        $this->collParticipantesPreferenciassPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ParticipantesPreferencias objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ParticipantesPreferencias objects.
+     * @throws PropelException
+     */
+    public function countParticipantesPreferenciass(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collParticipantesPreferenciassPartial && !$this->isNew();
+        if (null === $this->collParticipantesPreferenciass || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collParticipantesPreferenciass) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getParticipantesPreferenciass());
+            }
+
+            $query = ChildParticipantesPreferenciasQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPreferencia($this)
+                ->count($con);
+        }
+
+        return count($this->collParticipantesPreferenciass);
+    }
+
+    /**
+     * Method called to associate a ChildParticipantesPreferencias object to this object
+     * through the ChildParticipantesPreferencias foreign key attribute.
+     *
+     * @param  ChildParticipantesPreferencias $l ChildParticipantesPreferencias
+     * @return $this|\Preferencia The current object (for fluent API support)
+     */
+    public function addParticipantesPreferencias(ChildParticipantesPreferencias $l)
+    {
+        if ($this->collParticipantesPreferenciass === null) {
+            $this->initParticipantesPreferenciass();
+            $this->collParticipantesPreferenciassPartial = true;
+        }
+
+        if (!$this->collParticipantesPreferenciass->contains($l)) {
+            $this->doAddParticipantesPreferencias($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildParticipantesPreferencias $participantesPreferencias The ChildParticipantesPreferencias object to add.
+     */
+    protected function doAddParticipantesPreferencias(ChildParticipantesPreferencias $participantesPreferencias)
+    {
+        $this->collParticipantesPreferenciass[]= $participantesPreferencias;
+        $participantesPreferencias->setPreferencia($this);
+    }
+
+    /**
+     * @param  ChildParticipantesPreferencias $participantesPreferencias The ChildParticipantesPreferencias object to remove.
+     * @return $this|ChildPreferencia The current object (for fluent API support)
+     */
+    public function removeParticipantesPreferencias(ChildParticipantesPreferencias $participantesPreferencias)
+    {
+        if ($this->getParticipantesPreferenciass()->contains($participantesPreferencias)) {
+            $pos = $this->collParticipantesPreferenciass->search($participantesPreferencias);
+            $this->collParticipantesPreferenciass->remove($pos);
+            if (null === $this->participantesPreferenciassScheduledForDeletion) {
+                $this->participantesPreferenciassScheduledForDeletion = clone $this->collParticipantesPreferenciass;
+                $this->participantesPreferenciassScheduledForDeletion->clear();
+            }
+            $this->participantesPreferenciassScheduledForDeletion[]= clone $participantesPreferencias;
+            $participantesPreferencias->setPreferencia(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Preferencia is new, it will return
+     * an empty collection; or if this Preferencia has previously
+     * been saved, it will retrieve related ParticipantesPreferenciass from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Preferencia.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildParticipantesPreferencias[] List of ChildParticipantesPreferencias objects
+     */
+    public function getParticipantesPreferenciassJoinParticipante(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildParticipantesPreferenciasQuery::create(null, $criteria);
+        $query->joinWith('Participante', $joinBehavior);
+
+        return $this->getParticipantesPreferenciass($query, $con);
+    }
+
+    /**
      * Clears out the collBeneficios collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1585,6 +1963,248 @@ abstract class Preferencia implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collParticipantes collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addParticipantes()
+     */
+    public function clearParticipantes()
+    {
+        $this->collParticipantes = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Initializes the collParticipantes crossRef collection.
+     *
+     * By default this just sets the collParticipantes collection to an empty collection (like clearParticipantes());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initParticipantes()
+    {
+        $this->collParticipantes = new ObjectCollection();
+        $this->collParticipantesPartial = true;
+
+        $this->collParticipantes->setModel('\Participante');
+    }
+
+    /**
+     * Checks if the collParticipantes collection is loaded.
+     *
+     * @return bool
+     */
+    public function isParticipantesLoaded()
+    {
+        return null !== $this->collParticipantes;
+    }
+
+    /**
+     * Gets a collection of ChildParticipante objects related by a many-to-many relationship
+     * to the current object by way of the participantes_preferencias cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildPreferencia is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildParticipante[] List of ChildParticipante objects
+     */
+    public function getParticipantes(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collParticipantesPartial && !$this->isNew();
+        if (null === $this->collParticipantes || null !== $criteria || $partial) {
+            if ($this->isNew()) {
+                // return empty collection
+                if (null === $this->collParticipantes) {
+                    $this->initParticipantes();
+                }
+            } else {
+
+                $query = ChildParticipanteQuery::create(null, $criteria)
+                    ->filterByPreferencia($this);
+                $collParticipantes = $query->find($con);
+                if (null !== $criteria) {
+                    return $collParticipantes;
+                }
+
+                if ($partial && $this->collParticipantes) {
+                    //make sure that already added objects gets added to the list of the database.
+                    foreach ($this->collParticipantes as $obj) {
+                        if (!$collParticipantes->contains($obj)) {
+                            $collParticipantes[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collParticipantes = $collParticipantes;
+                $this->collParticipantesPartial = false;
+            }
+        }
+
+        return $this->collParticipantes;
+    }
+
+    /**
+     * Sets a collection of Participante objects related by a many-to-many relationship
+     * to the current object by way of the participantes_preferencias cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $participantes A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return $this|ChildPreferencia The current object (for fluent API support)
+     */
+    public function setParticipantes(Collection $participantes, ConnectionInterface $con = null)
+    {
+        $this->clearParticipantes();
+        $currentParticipantes = $this->getParticipantes();
+
+        $participantesScheduledForDeletion = $currentParticipantes->diff($participantes);
+
+        foreach ($participantesScheduledForDeletion as $toDelete) {
+            $this->removeParticipante($toDelete);
+        }
+
+        foreach ($participantes as $participante) {
+            if (!$currentParticipantes->contains($participante)) {
+                $this->doAddParticipante($participante);
+            }
+        }
+
+        $this->collParticipantesPartial = false;
+        $this->collParticipantes = $participantes;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Participante objects related by a many-to-many relationship
+     * to the current object by way of the participantes_preferencias cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related Participante objects
+     */
+    public function countParticipantes(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collParticipantesPartial && !$this->isNew();
+        if (null === $this->collParticipantes || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collParticipantes) {
+                return 0;
+            } else {
+
+                if ($partial && !$criteria) {
+                    return count($this->getParticipantes());
+                }
+
+                $query = ChildParticipanteQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPreferencia($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collParticipantes);
+        }
+    }
+
+    /**
+     * Associate a ChildParticipante to this object
+     * through the participantes_preferencias cross reference table.
+     *
+     * @param ChildParticipante $participante
+     * @return ChildPreferencia The current object (for fluent API support)
+     */
+    public function addParticipante(ChildParticipante $participante)
+    {
+        if ($this->collParticipantes === null) {
+            $this->initParticipantes();
+        }
+
+        if (!$this->getParticipantes()->contains($participante)) {
+            // only add it if the **same** object is not already associated
+            $this->collParticipantes->push($participante);
+            $this->doAddParticipante($participante);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param ChildParticipante $participante
+     */
+    protected function doAddParticipante(ChildParticipante $participante)
+    {
+        $participantesPreferencias = new ChildParticipantesPreferencias();
+
+        $participantesPreferencias->setParticipante($participante);
+
+        $participantesPreferencias->setPreferencia($this);
+
+        $this->addParticipantesPreferencias($participantesPreferencias);
+
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$participante->isPreferenciasLoaded()) {
+            $participante->initPreferencias();
+            $participante->getPreferencias()->push($this);
+        } elseif (!$participante->getPreferencias()->contains($this)) {
+            $participante->getPreferencias()->push($this);
+        }
+
+    }
+
+    /**
+     * Remove participante of this object
+     * through the participantes_preferencias cross reference table.
+     *
+     * @param ChildParticipante $participante
+     * @return ChildPreferencia The current object (for fluent API support)
+     */
+    public function removeParticipante(ChildParticipante $participante)
+    {
+        if ($this->getParticipantes()->contains($participante)) { $participantesPreferencias = new ChildParticipantesPreferencias();
+
+            $participantesPreferencias->setParticipante($participante);
+            if ($participante->isPreferenciasLoaded()) {
+                //remove the back reference if available
+                $participante->getPreferencias()->removeObject($this);
+            }
+
+            $participantesPreferencias->setPreferencia($this);
+            $this->removeParticipantesPreferencias(clone $participantesPreferencias);
+            $participantesPreferencias->clear();
+
+            $this->collParticipantes->remove($this->collParticipantes->search($participante));
+
+            if (null === $this->participantesScheduledForDeletion) {
+                $this->participantesScheduledForDeletion = clone $this->collParticipantes;
+                $this->participantesScheduledForDeletion->clear();
+            }
+
+            $this->participantesScheduledForDeletion->push($participante);
+        }
+
+
+        return $this;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -1616,15 +2236,27 @@ abstract class Preferencia implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collParticipantesPreferenciass) {
+                foreach ($this->collParticipantesPreferenciass as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collBeneficios) {
                 foreach ($this->collBeneficios as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collParticipantes) {
+                foreach ($this->collParticipantes as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
         $this->collBeneficiosPreferenciass = null;
+        $this->collParticipantesPreferenciass = null;
         $this->collBeneficios = null;
+        $this->collParticipantes = null;
     }
 
     /**
@@ -1635,6 +2267,96 @@ abstract class Preferencia implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(PreferenciaTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // validate behavior
+
+    /**
+     * Configure validators constraints. The Validator object uses this method
+     * to perform object validation.
+     *
+     * @param ClassMetadata $metadata
+     */
+    static public function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('descricao', new Unique());
+    }
+
+    /**
+     * Validates the object and all objects related to this table.
+     *
+     * @see        getValidationFailures()
+     * @param      object $validator A Validator class instance
+     * @return     boolean Whether all objects pass validation.
+     */
+    public function validate(ValidatorInterface $validator = null)
+    {
+        if (null === $validator) {
+            if(class_exists('Symfony\\Component\\Validator\\Validator\\LegacyValidator')){
+                $validator = new LegacyValidator(
+                            new ExecutionContextFactory(new DefaultTranslator()),
+                            new ClassMetaDataFactory(new StaticMethodLoader()),
+                            new ConstraintValidatorFactory()
+                );
+            }else{
+                $validator = new Validator(
+                            new ClassMetadataFactory(new StaticMethodLoader()),
+                            new ConstraintValidatorFactory(),
+                            new DefaultTranslator()
+                );
+            }
+        }
+
+        $failureMap = new ConstraintViolationList();
+
+        if (!$this->alreadyInValidation) {
+            $this->alreadyInValidation = true;
+            $retval = null;
+
+
+            $retval = $validator->validate($this);
+            if (count($retval) > 0) {
+                $failureMap->addAll($retval);
+            }
+
+            if (null !== $this->collBeneficiosPreferenciass) {
+                foreach ($this->collBeneficiosPreferenciass as $referrerFK) {
+                    if (method_exists($referrerFK, 'validate')) {
+                        if (!$referrerFK->validate($validator)) {
+                            $failureMap->addAll($referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+            }
+            if (null !== $this->collParticipantesPreferenciass) {
+                foreach ($this->collParticipantesPreferenciass as $referrerFK) {
+                    if (method_exists($referrerFK, 'validate')) {
+                        if (!$referrerFK->validate($validator)) {
+                            $failureMap->addAll($referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+            }
+
+            $this->alreadyInValidation = false;
+        }
+
+        $this->validationFailures = $failureMap;
+
+        return (Boolean) (!(count($this->validationFailures) > 0));
+
+    }
+
+    /**
+     * Gets any ConstraintViolation objects that resulted from last call to validate().
+     *
+     *
+     * @return     object ConstraintViolationList
+     * @see        validate()
+     */
+    public function getValidationFailures()
+    {
+        return $this->validationFailures;
     }
 
     /**

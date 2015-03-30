@@ -59,33 +59,9 @@
                             <div class="form-group">
                                 <label for="regulamento" class="control-label">Recomendar para quem tem os interesses:</label>
                                 <div>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Suspense
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Terror
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Ação
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Comédia
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Drama
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Animação
-                                    </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" value="">
-                                        Ficção científica
+                                    <label class="checkbox-inline" ng-repeat="preferencia in preferencias">
+                                        <input type="checkbox" checklist-model="beneficio.preferencias" checklist-value="preferencia.Id">
+                                        {{preferencia.Descricao}}
                                     </label>
                                 </div>
                             </div>
@@ -97,7 +73,7 @@
                                 <label for="regulamento">Regulamento e Termos: </label>
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" value="" required>
+                                        <input type="checkbox" value="" ng-model="opcoes.regulamento" required>
                                         Estou ciente e concordo com o <a href="#">regulamento</a> do programa.
                                     </label>
                                 </div>

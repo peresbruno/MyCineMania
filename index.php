@@ -1,13 +1,16 @@
 <?php
 	require_once 'vendor/autoload.php';
+	require_once 'vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
+	require_once 'vendor/html2pdf/html2pdf.class.php';
 	require_once 'generated-conf/config.php';
-	require_once 'api/BaseController.php';
 	require_once 'api/ParticipantesController.php';
 	require_once 'api/PreferenciasController.php';
 	require_once 'api/RedesCinemaController.php';
 	require_once 'api/PerfilController.php';
 	require_once 'api/BeneficiosController.php';
-	
+	require_once 'api/VouchersController.php';
+	require_once 'api/ConfiguracoesController.php';
+
 
 	$router = new AltoRouter();
 
@@ -20,6 +23,7 @@
 	$router->map('POST','/participantes', "ParticipantesController::post");
 	$router->map('GET','/participantes/[i:id]', "ParticipantesController::get");
 	$router->map('GET','/participantes', "ParticipantesController::getAll");
+	$router->map('PUT','/participantes', "ParticipantesController::update");
 
 	$router->map('POST','/redes_cinema', "RedesCinemaController::post");
 	$router->map('GET','/redes_cinema/[i:id]', "RedesCinemaController::get");
@@ -30,7 +34,12 @@
 	$router->map('GET', '/beneficios/[i:id]', "BeneficiosController::get");
 	$router->map('POST', '/beneficios', "BeneficiosController::post");
 
-	$router->map('POST', '/voucher', "VouchersController::post");	
+	$router->map('POST', '/vouchers', "VouchersController::post");	
+	$router->map('GET', '/vouchers/[i:id]', "VouchersController::get");	
+	$router->map('PUT', '/vouchers', "VouchersController::update");	
+
+	$router->map('GET', '/configuracoes', "ConfiguracoesController::get");	
+	$router->map('PUT', '/configuracoes', "ConfiguracoesController::update");	
 
 	$match = $router->match();
 

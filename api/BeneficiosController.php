@@ -38,8 +38,16 @@
 			$beneficio->fromArray($postData);
 			$beneficio->setRedeCinemaId($usuario['Id']);
 
+			$preferencias = $postData['preferencias'];
+
 			try {
 				$beneficio->save();
+				foreach ($preferencias as $preferenciaId) {
+					$beneficioPreferencias = new BeneficiosPreferencias();
+					$beneficioPreferencias->setBeneficioId($beneficio->getId());
+					$beneficioPreferencias->setPreferenciaId($preferenciaId);
+					$beneficioPreferencias->save();	
+				}
 				$beneficio = BeneficiosController::getBeneficio($beneficio->getId());
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 201 Created');
 				die(json_encode($beneficio));
@@ -62,10 +70,9 @@
 					$voucher = VoucherQuery::create()
 					->filterByParticipanteId($usuario['Id'])
 					->filterByBeneficioId($beneficio['Id'])
-					->findOne()
-					->toArray();
+					->findOne();
 
-					$beneficio['Emitido'] = !empty($voucher);
+					$beneficio['Emitido'] = $voucher !== NULL;
 
 				}
 

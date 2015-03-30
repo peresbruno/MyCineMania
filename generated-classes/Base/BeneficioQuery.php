@@ -48,15 +48,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBeneficioQuery rightJoinBeneficiosPreferencias($relationAlias = null) Adds a RIGHT JOIN clause to the query using the BeneficiosPreferencias relation
  * @method     ChildBeneficioQuery innerJoinBeneficiosPreferencias($relationAlias = null) Adds a INNER JOIN clause to the query using the BeneficiosPreferencias relation
  *
- * @method     ChildBeneficioQuery leftJoinParticipantesPreferencias($relationAlias = null) Adds a LEFT JOIN clause to the query using the ParticipantesPreferencias relation
- * @method     ChildBeneficioQuery rightJoinParticipantesPreferencias($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ParticipantesPreferencias relation
- * @method     ChildBeneficioQuery innerJoinParticipantesPreferencias($relationAlias = null) Adds a INNER JOIN clause to the query using the ParticipantesPreferencias relation
- *
  * @method     ChildBeneficioQuery leftJoinVoucher($relationAlias = null) Adds a LEFT JOIN clause to the query using the Voucher relation
  * @method     ChildBeneficioQuery rightJoinVoucher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Voucher relation
  * @method     ChildBeneficioQuery innerJoinVoucher($relationAlias = null) Adds a INNER JOIN clause to the query using the Voucher relation
  *
- * @method     \RedeCinemaQuery|\BeneficiosPreferenciasQuery|\ParticipantesPreferenciasQuery|\VoucherQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \RedeCinemaQuery|\BeneficiosPreferenciasQuery|\VoucherQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildBeneficio findOne(ConnectionInterface $con = null) Return the first ChildBeneficio matching the query
  * @method     ChildBeneficio findOneOrCreate(ConnectionInterface $con = null) Return the first ChildBeneficio matching the query, or a new ChildBeneficio object populated from the query conditions when no match is found
@@ -678,79 +674,6 @@ abstract class BeneficioQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \ParticipantesPreferencias object
-     *
-     * @param \ParticipantesPreferencias|ObjectCollection $participantesPreferencias the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildBeneficioQuery The current query, for fluid interface
-     */
-    public function filterByParticipantesPreferencias($participantesPreferencias, $comparison = null)
-    {
-        if ($participantesPreferencias instanceof \ParticipantesPreferencias) {
-            return $this
-                ->addUsingAlias(BeneficioTableMap::COL_ID, $participantesPreferencias->getBeneficioId(), $comparison);
-        } elseif ($participantesPreferencias instanceof ObjectCollection) {
-            return $this
-                ->useParticipantesPreferenciasQuery()
-                ->filterByPrimaryKeys($participantesPreferencias->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByParticipantesPreferencias() only accepts arguments of type \ParticipantesPreferencias or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the ParticipantesPreferencias relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildBeneficioQuery The current query, for fluid interface
-     */
-    public function joinParticipantesPreferencias($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ParticipantesPreferencias');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'ParticipantesPreferencias');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the ParticipantesPreferencias relation ParticipantesPreferencias object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \ParticipantesPreferenciasQuery A secondary query class using the current class as primary query
-     */
-    public function useParticipantesPreferenciasQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinParticipantesPreferencias($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ParticipantesPreferencias', '\ParticipantesPreferenciasQuery');
-    }
-
-    /**
      * Filter the query by a related \Voucher object
      *
      * @param \Voucher|ObjectCollection $voucher the related object to use as filter
@@ -837,23 +760,6 @@ abstract class BeneficioQuery extends ModelCriteria
         return $this
             ->useBeneficiosPreferenciasQuery()
             ->filterByPreferencia($preferencia, $comparison)
-            ->endUse();
-    }
-
-    /**
-     * Filter the query by a related Participante object
-     * using the participantes_preferencias table as cross reference
-     *
-     * @param Participante $participante the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildBeneficioQuery The current query, for fluid interface
-     */
-    public function filterByParticipante($participante, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useParticipantesPreferenciasQuery()
-            ->filterByParticipante($participante, $comparison)
             ->endUse();
     }
 

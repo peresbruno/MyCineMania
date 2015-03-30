@@ -185,13 +185,6 @@ class BeneficioTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'BeneficiosPreferenciass', false);
-        $this->addRelation('ParticipantesPreferencias', '\\ParticipantesPreferencias', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':beneficio_id',
-    1 => ':id',
-  ),
-), null, null, 'ParticipantesPreferenciass', false);
         $this->addRelation('Voucher', '\\Voucher', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -200,7 +193,6 @@ class BeneficioTableMap extends TableMap
   ),
 ), null, null, 'Vouchers', false);
         $this->addRelation('Preferencia', '\\Preferencia', RelationMap::MANY_TO_MANY, array(), null, null, 'Preferencias');
-        $this->addRelation('Participante', '\\Participante', RelationMap::MANY_TO_MANY, array(), null, null, 'Participantes');
     } // buildRelations()
 
     /**

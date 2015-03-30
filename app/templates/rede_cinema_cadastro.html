@@ -1,26 +1,7 @@
+<div class="espaco-topo">
 <form name="cadastroRede" role="form" id="rede_cinema_cadastro" novalidate>
     <div class="container">
         <div class="row">
-            <div class="col-md-8" ng-show="cadastroRede.$invalid && cadastroRede.submetido">
-                <div class="alert alert-warning" role="alert">
-                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
-                    <p ng-show="cadastroRede.nome.$error.required">O campo "Nome" é obrigatório</p>
-                    <p ng-show="cadastroRede.sobrenome.$error.required">O campo "Sobrenome" é obrigatório</p>
-                    <p ng-show="cadastroRede.usuario.$error.required">O campo "Usuário" é obrigatório</p>
-                    <p ng-show="cadastroRede.senha.$error.required">O campo "Senha" é obrigatório</p>
-                    <p ng-show="cadastroRede.repetirSenha.$error.required">O campo "Repetir senha" é obrigatório</p>
-                    <p ng-show="cadastroRede.email.$error.required">O campo "E-mail" é obrigatório</p>  
-                    <p ng-show="cadastroRede.email.$invalid">O e-mail digitado é inválido</p>
-                    <p ng-show="cadastroRede.repetirEmail.$error.required">O campo "Repetir E-mail" é obrigatório</p>  
-                    <p ng-show="cadastroRede.repetirEmail.$invalid">O e-mail digitado é inválido</p>
-                    <p ng-show="cadastroRede.razaoSocial.$error.required">O campo "Razão Social" é obrigatório</p>  
-                    <p ng-show="cadastroRede.nomeFantasia.$error.required">O campo "Nome Fantasia" é obrigatório</p>  
-                    <p ng-show="cadastroRede.cnpj.$error.required">O campo "CNPJ" é obrigatório</p>  
-                    <p ng-show="!senhasIguais()">As senhas digitadas não são iguais</p>  
-                    <p ng-show="!emailsIguais()">Os emails digitados não são iguais</p>
-                </div>
-            </div>
             <div class="col-md-8">
                 <div class="row">
                     <div class="col-md-12">
@@ -91,7 +72,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="nome_fantasia" class="control-label">Nome Fantasia: </label>
-                                    <input name="nomeFantasia" ng-model="rede.NomeFantasia" type="text" class="form-control" required id="razao_social" placeholder="Razão Social" required>
+                                    <input name="nomeFantasia" ng-model="rede.NomeFantasia" type="text" class="form-control" required id="razao_social" placeholder="Nome Fantasia" required>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +80,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="cnpj" class="control-label">CNPJ: </label>
-                                    <input name="cnpj" ng-model="rede.Cnpj" type="text" class="form-control" required id="cnpj" placeholder="CNPJ" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}" title="Digite o CPF no formato nn.nnn.nnn/nnnn-nn" required>
+                                    <input name="cnpj" ng-model="rede.Cnpj" type="text" class="form-control" required id="cnpj" ng-cnpj ui-mask="99.999.999/9999-99" title="Digite o CPF no formato nn.nnn.nnn/nnnn-nn" required>
                                 </div>
                             </div>
                         </div>
@@ -117,13 +98,13 @@
                             <label for="regulamento">Regulamento e Termos: </label>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" value="" required>
+                                    <input type="checkbox" value="" ng-model="opcoes.regulamento" >
                                     Estou ciente e concordo com o <a href="#">regulamento</a> do programa.
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" value="" required>
+                                    <input type="checkbox" ng-model="opcoes.politica_privacidade" value="">
                                     Estou ciente e concordo com a <a href="#">política de privacidade</a> do programa.
                                 </label>
                             </div>
@@ -151,3 +132,4 @@
         </div>
     </div> <!-- /container -->
 </form>
+</div>

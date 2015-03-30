@@ -114,6 +114,7 @@ class UsuarioTableMap extends TableMap
     /** The enumerated values for the tipo field */
     const COL_TIPO_PARTICIPANTE = 'participante';
     const COL_TIPO_REDE_CINEMA = 'rede_cinema';
+    const COL_TIPO_ADMINISTRADOR = 'administrador';
 
     /**
      * holds an array of fieldnames
@@ -148,6 +149,7 @@ class UsuarioTableMap extends TableMap
                 UsuarioTableMap::COL_TIPO => array(
                             self::COL_TIPO_PARTICIPANTE,
             self::COL_TIPO_REDE_CINEMA,
+            self::COL_TIPO_ADMINISTRADOR,
         ),
     );
 
@@ -200,6 +202,7 @@ class UsuarioTableMap extends TableMap
         $this->getColumn('tipo')->setValueSet(array (
   0 => 'participante',
   1 => 'rede_cinema',
+  2 => 'administrador',
 ));
     } // initialize()
 

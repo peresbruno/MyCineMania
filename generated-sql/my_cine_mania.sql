@@ -109,9 +109,9 @@ DROP TABLE IF EXISTS "participantes_preferencias" CASCADE;
 
 CREATE TABLE "participantes_preferencias"
 (
+    "preferencia_id" INTEGER NOT NULL,
     "participante_id" INTEGER NOT NULL,
-    "beneficio_id" INTEGER NOT NULL,
-    PRIMARY KEY ("participante_id","beneficio_id")
+    PRIMARY KEY ("preferencia_id","participante_id")
 );
 
 -----------------------------------------------------------------------
@@ -149,6 +149,19 @@ CREATE TABLE "vouchers"
     PRIMARY KEY ("id")
 );
 
+-----------------------------------------------------------------------
+-- settings
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "settings" CASCADE;
+
+CREATE TABLE "settings"
+(
+    "id" serial NOT NULL,
+    "valor_inscricao" DOUBLE PRECISION NOT NULL,
+    PRIMARY KEY ("id")
+);
+
 ALTER TABLE "participantes" ADD CONSTRAINT "participantes_fk_614747"
     FOREIGN KEY ("usuario_id")
     REFERENCES "usuarios" ("id");
@@ -173,9 +186,9 @@ ALTER TABLE "participantes_preferencias" ADD CONSTRAINT "participantes_preferenc
     FOREIGN KEY ("participante_id")
     REFERENCES "participantes" ("id");
 
-ALTER TABLE "participantes_preferencias" ADD CONSTRAINT "participantes_preferencias_fk_9665b2"
-    FOREIGN KEY ("beneficio_id")
-    REFERENCES "beneficios" ("id");
+ALTER TABLE "participantes_preferencias" ADD CONSTRAINT "participantes_preferencias_fk_4019bf"
+    FOREIGN KEY ("preferencia_id")
+    REFERENCES "preferencias" ("id");
 
 ALTER TABLE "pagamentos" ADD CONSTRAINT "pagamentos_fk_c65b3e"
     FOREIGN KEY ("participante_id")

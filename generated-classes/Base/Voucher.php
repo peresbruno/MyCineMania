@@ -551,8 +551,8 @@ abstract class Voucher implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->data_emissao !== null || $dt !== null) {
-            if ($dt !== $this->data_emissao) {
-                $this->data_emissao = $dt;
+            if ($this->data_emissao === null || $dt === null || $dt->format("Y-m-d") !== $this->data_emissao->format("Y-m-d")) {
+                $this->data_emissao = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[VoucherTableMap::COL_DATA_EMISSAO] = true;
             }
         } // if either are not null
@@ -571,8 +571,8 @@ abstract class Voucher implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->hora_emissao !== null || $dt !== null) {
-            if ($dt !== $this->hora_emissao) {
-                $this->hora_emissao = $dt;
+            if ($this->hora_emissao === null || $dt === null || $dt->format("H:i:s") !== $this->hora_emissao->format("H:i:s")) {
+                $this->hora_emissao = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[VoucherTableMap::COL_HORA_EMISSAO] = true;
             }
         } // if either are not null

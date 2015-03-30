@@ -16,14 +16,29 @@
                         <img src="templates/img/beneficio.jpg"/>
                     </div>
                 </div>
-                <div class="row" style="margin-top: 30px; text-align: right">
-                    <a ng-hide="beneficio.Emitido" href="?pg=emitir_voucher" class="btn btn-primary">Emitir Voucher</a>
-<div ng-show="beneficio.Emitido" class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-  <span class="sr-only">Error:</span>
-  Voucher já emitido
-</div>
+
+                <div ng-show="logado()">
+                    <div ng-show="tipo() == 'participante'" class="row" style="margin-top: 30px; text-align: right">
+                        <button ng-hide="beneficio.Emitido" ng-click="emitir()" class="btn btn-primary">Emitir Voucher</button>
+                        <div ng-show="beneficio.Emitido" class="alert alert-danger" role="alert">
+                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Error:</span>
+                          Voucher já emitido
+                        </div>
+                    </div>                    
                 </div>
+                <div ng-hide="logado()">
+                    <div class="row" style="margin-top: 30px; text-align: right">
+                        <div class="alert alert-danger" role="alert">
+                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Error:</span>
+                          Você precisa estar logado  <a href="#/login"> (login) </a>
+                        </div>
+                    </div>
+
+                </div>
+
+
             </div>
             <div class="col-md-8">
                 <div class="row">

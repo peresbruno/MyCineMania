@@ -193,7 +193,7 @@ class ParticipanteTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'Vouchers', false);
-        $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_MANY, array(), null, null, 'Beneficios');
+        $this->addRelation('Preferencia', '\\Preferencia', RelationMap::MANY_TO_MANY, array(), null, null, 'Preferencias');
     } // buildRelations()
 
     /**

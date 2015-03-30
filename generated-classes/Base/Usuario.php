@@ -529,8 +529,8 @@ abstract class Usuario implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->data_inscricao !== null || $dt !== null) {
-            if ($dt !== $this->data_inscricao) {
-                $this->data_inscricao = $dt;
+            if ($this->data_inscricao === null || $dt === null || $dt->format("Y-m-d") !== $this->data_inscricao->format("Y-m-d")) {
+                $this->data_inscricao = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[UsuarioTableMap::COL_DATA_INSCRICAO] = true;
             }
         } // if either are not null

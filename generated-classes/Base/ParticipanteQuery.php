@@ -788,19 +788,19 @@ abstract class ParticipanteQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Beneficio object
+     * Filter the query by a related Preferencia object
      * using the participantes_preferencias table as cross reference
      *
-     * @param Beneficio $beneficio the related object to use as filter
+     * @param Preferencia $preferencia the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildParticipanteQuery The current query, for fluid interface
      */
-    public function filterByBeneficio($beneficio, $comparison = Criteria::EQUAL)
+    public function filterByPreferencia($preferencia, $comparison = Criteria::EQUAL)
     {
         return $this
             ->useParticipantesPreferenciasQuery()
-            ->filterByBeneficio($beneficio, $comparison)
+            ->filterByPreferencia($preferencia, $comparison)
             ->endUse();
     }
 

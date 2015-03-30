@@ -1,4 +1,4 @@
-myCineMania.controller('LoginCtrl', function ($scope, $state, PerfilResource, SweetAlert) {
+myCineMania.controller('LoginCtrl', function ($scope, $state, PerfilResource, SweetAlert, localStorageService) {
 
 	$scope.credencial = {};
 
@@ -6,12 +6,18 @@ myCineMania.controller('LoginCtrl', function ($scope, $state, PerfilResource, Sw
 		PerfilResource.login($scope.credencial.usuario, $scope.credencial.senha).then(
 			function (data) {
 				
-				if (data.Tipo === 0)
+				if (data.Tipo === 0) {
 					$state.go('beneficios');
-				else if (data.Tipo === 1)
+					localStorageService.set('tipo', 'participante');					
+				}
+				else if (data.Tipo === 1) {
 					$state.go('cadastrar_beneficio');
-				else if (data.Tipo === 2)
-					$state.go('');
+					localStorageService.set('tipo', 'rede');					
+				}
+				else if (data.Tipo === 2) {
+					$state.go('admin');
+					localStorageService.set('tipo', 'admin');					
+				}
 
 			}, function (err) {
 				if ( err.data && err.data.erros )

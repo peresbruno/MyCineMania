@@ -38,6 +38,39 @@
 			$redeCinema->setUsuario($usuario);
 			
 			try {
+				if (!$usuario->validate() || !$redeCinema->validate()) {
+					$failures = array();
+					$erros = array();
+					$failures = $usuario->getValidationFailures();
+					
+				  foreach ($failures as $failure) {
+
+				  	$campo = $failure->getPropertyPath();
+				  	if ($campo == 'email')
+				  		$campo = 'E-mail';
+				  	else if ($campo == 'nome_usuario')
+				  		$campo = 'Nome de usuário';
+
+				  	array_push($erros, $campo . ' já cadastrado.');
+	        }
+
+					$failures = $redeCinema->getValidationFailures();
+					
+
+				  foreach ($failures as $failure) {
+				  	$campo = $failure->getPropertyPath();
+				  	if ($campo == 'cnpj')
+				  		$campo = 'CNPJ';
+
+				  	array_push($erros, $campo . ' já cadastrado.');
+	        }
+
+	        $erros = array('erros' => $erros);
+
+					header( $_SERVER["SERVER_PROTOCOL"] . ' 400 Bad Request');
+					die(json_encode($erros));
+				}
+
 				$redeCinema->save();
 				$redeCinema = RedesCinemaController::getRedeCinema($redeCinema->getId());
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 201 Created');

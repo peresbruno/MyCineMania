@@ -2,11 +2,11 @@
 
 namespace Base;
 
-use \Beneficio as ChildBeneficio;
-use \BeneficioQuery as ChildBeneficioQuery;
 use \Participante as ChildParticipante;
 use \ParticipanteQuery as ChildParticipanteQuery;
 use \ParticipantesPreferenciasQuery as ChildParticipantesPreferenciasQuery;
+use \Preferencia as ChildPreferencia;
+use \PreferenciaQuery as ChildPreferenciaQuery;
 use \Exception;
 use \PDO;
 use Map\ParticipantesPreferenciasTableMap;
@@ -64,16 +64,16 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
+     * The value for the preferencia_id field.
+     * @var        int
+     */
+    protected $preferencia_id;
+
+    /**
      * The value for the participante_id field.
      * @var        int
      */
     protected $participante_id;
-
-    /**
-     * The value for the beneficio_id field.
-     * @var        int
-     */
-    protected $beneficio_id;
 
     /**
      * @var        ChildParticipante
@@ -81,9 +81,9 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     protected $aParticipante;
 
     /**
-     * @var        ChildBeneficio
+     * @var        ChildPreferencia
      */
-    protected $aBeneficio;
+    protected $aPreferencia;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -311,6 +311,16 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     }
 
     /**
+     * Get the [preferencia_id] column value.
+     *
+     * @return int
+     */
+    public function getPreferenciaId()
+    {
+        return $this->preferencia_id;
+    }
+
+    /**
      * Get the [participante_id] column value.
      *
      * @return int
@@ -321,14 +331,28 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     }
 
     /**
-     * Get the [beneficio_id] column value.
+     * Set the value of [preferencia_id] column.
      *
-     * @return int
+     * @param int $v new value
+     * @return $this|\ParticipantesPreferencias The current object (for fluent API support)
      */
-    public function getBeneficioId()
+    public function setPreferenciaId($v)
     {
-        return $this->beneficio_id;
-    }
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->preferencia_id !== $v) {
+            $this->preferencia_id = $v;
+            $this->modifiedColumns[ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID] = true;
+        }
+
+        if ($this->aPreferencia !== null && $this->aPreferencia->getId() !== $v) {
+            $this->aPreferencia = null;
+        }
+
+        return $this;
+    } // setPreferenciaId()
 
     /**
      * Set the value of [participante_id] column.
@@ -353,30 +377,6 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
 
         return $this;
     } // setParticipanteId()
-
-    /**
-     * Set the value of [beneficio_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\ParticipantesPreferencias The current object (for fluent API support)
-     */
-    public function setBeneficioId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->beneficio_id !== $v) {
-            $this->beneficio_id = $v;
-            $this->modifiedColumns[ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID] = true;
-        }
-
-        if ($this->aBeneficio !== null && $this->aBeneficio->getId() !== $v) {
-            $this->aBeneficio = null;
-        }
-
-        return $this;
-    } // setBeneficioId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -414,11 +414,11 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ParticipantesPreferenciasTableMap::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->participante_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ParticipantesPreferenciasTableMap::translateFieldName('PreferenciaId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->preferencia_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ParticipantesPreferenciasTableMap::translateFieldName('BeneficioId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->beneficio_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ParticipantesPreferenciasTableMap::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->participante_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -449,11 +449,11 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aPreferencia !== null && $this->preferencia_id !== $this->aPreferencia->getId()) {
+            $this->aPreferencia = null;
+        }
         if ($this->aParticipante !== null && $this->participante_id !== $this->aParticipante->getId()) {
             $this->aParticipante = null;
-        }
-        if ($this->aBeneficio !== null && $this->beneficio_id !== $this->aBeneficio->getId()) {
-            $this->aBeneficio = null;
         }
     } // ensureConsistency
 
@@ -495,7 +495,7 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aParticipante = null;
-            $this->aBeneficio = null;
+            $this->aPreferencia = null;
         } // if (deep)
     }
 
@@ -607,11 +607,11 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
                 $this->setParticipante($this->aParticipante);
             }
 
-            if ($this->aBeneficio !== null) {
-                if ($this->aBeneficio->isModified() || $this->aBeneficio->isNew()) {
-                    $affectedRows += $this->aBeneficio->save($con);
+            if ($this->aPreferencia !== null) {
+                if ($this->aPreferencia->isModified() || $this->aPreferencia->isNew()) {
+                    $affectedRows += $this->aPreferencia->save($con);
                 }
-                $this->setBeneficio($this->aBeneficio);
+                $this->setPreferencia($this->aPreferencia);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -647,11 +647,11 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'preferencia_id';
+        }
         if ($this->isColumnModified(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'participante_id';
-        }
-        if ($this->isColumnModified(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'beneficio_id';
         }
 
         $sql = sprintf(
@@ -664,11 +664,11 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case 'preferencia_id':
+                        $stmt->bindValue($identifier, $this->preferencia_id, PDO::PARAM_INT);
+                        break;
                     case 'participante_id':
                         $stmt->bindValue($identifier, $this->participante_id, PDO::PARAM_INT);
-                        break;
-                    case 'beneficio_id':
-                        $stmt->bindValue($identifier, $this->beneficio_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -726,10 +726,10 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getParticipanteId();
+                return $this->getPreferenciaId();
                 break;
             case 1:
-                return $this->getBeneficioId();
+                return $this->getParticipanteId();
                 break;
             default:
                 return null;
@@ -761,8 +761,8 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
         $alreadyDumpedObjects['ParticipantesPreferencias'][$this->hashCode()] = true;
         $keys = ParticipantesPreferenciasTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getParticipanteId(),
-            $keys[1] => $this->getBeneficioId(),
+            $keys[0] => $this->getPreferenciaId(),
+            $keys[1] => $this->getParticipanteId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -785,20 +785,20 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
 
                 $result[$key] = $this->aParticipante->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aBeneficio) {
+            if (null !== $this->aPreferencia) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'beneficio';
+                        $key = 'preferencia';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'beneficios';
+                        $key = 'preferencias';
                         break;
                     default:
-                        $key = 'Beneficio';
+                        $key = 'Preferencia';
                 }
 
-                $result[$key] = $this->aBeneficio->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->aPreferencia->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -835,10 +835,10 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setParticipanteId($value);
+                $this->setPreferenciaId($value);
                 break;
             case 1:
-                $this->setBeneficioId($value);
+                $this->setParticipanteId($value);
                 break;
         } // switch()
 
@@ -867,10 +867,10 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
         $keys = ParticipantesPreferenciasTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setParticipanteId($arr[$keys[0]]);
+            $this->setPreferenciaId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setBeneficioId($arr[$keys[1]]);
+            $this->setParticipanteId($arr[$keys[1]]);
         }
     }
 
@@ -913,11 +913,11 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     {
         $criteria = new Criteria(ParticipantesPreferenciasTableMap::DATABASE_NAME);
 
+        if ($this->isColumnModified(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID)) {
+            $criteria->add(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $this->preferencia_id);
+        }
         if ($this->isColumnModified(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID)) {
             $criteria->add(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $this->participante_id);
-        }
-        if ($this->isColumnModified(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID)) {
-            $criteria->add(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $this->beneficio_id);
         }
 
         return $criteria;
@@ -936,8 +936,8 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = ChildParticipantesPreferenciasQuery::create();
+        $criteria->add(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $this->preferencia_id);
         $criteria->add(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $this->participante_id);
-        $criteria->add(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $this->beneficio_id);
 
         return $criteria;
     }
@@ -950,8 +950,8 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getParticipanteId() &&
-            null !== $this->getBeneficioId();
+        $validPk = null !== $this->getPreferenciaId() &&
+            null !== $this->getParticipanteId();
 
         $validPrimaryKeyFKs = 2;
         $primaryKeyFKs = [];
@@ -963,8 +963,8 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
             $validPrimaryKeyFKs = false;
         }
 
-        //relation participantes_preferencias_fk_9665b2 to table beneficios
-        if ($this->aBeneficio && $hash = spl_object_hash($this->aBeneficio)) {
+        //relation participantes_preferencias_fk_4019bf to table preferencias
+        if ($this->aPreferencia && $hash = spl_object_hash($this->aPreferencia)) {
             $primaryKeyFKs[] = $hash;
         } else {
             $validPrimaryKeyFKs = false;
@@ -987,8 +987,8 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getParticipanteId();
-        $pks[1] = $this->getBeneficioId();
+        $pks[0] = $this->getPreferenciaId();
+        $pks[1] = $this->getParticipanteId();
 
         return $pks;
     }
@@ -1001,8 +1001,8 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
      */
     public function setPrimaryKey($keys)
     {
-        $this->setParticipanteId($keys[0]);
-        $this->setBeneficioId($keys[1]);
+        $this->setPreferenciaId($keys[0]);
+        $this->setParticipanteId($keys[1]);
     }
 
     /**
@@ -1011,7 +1011,7 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return (null === $this->getParticipanteId()) && (null === $this->getBeneficioId());
+        return (null === $this->getPreferenciaId()) && (null === $this->getParticipanteId());
     }
 
     /**
@@ -1027,8 +1027,8 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setPreferenciaId($this->getPreferenciaId());
         $copyObj->setParticipanteId($this->getParticipanteId());
-        $copyObj->setBeneficioId($this->getBeneficioId());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1110,24 +1110,24 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildBeneficio object.
+     * Declares an association between this object and a ChildPreferencia object.
      *
-     * @param  ChildBeneficio $v
+     * @param  ChildPreferencia $v
      * @return $this|\ParticipantesPreferencias The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setBeneficio(ChildBeneficio $v = null)
+    public function setPreferencia(ChildPreferencia $v = null)
     {
         if ($v === null) {
-            $this->setBeneficioId(NULL);
+            $this->setPreferenciaId(NULL);
         } else {
-            $this->setBeneficioId($v->getId());
+            $this->setPreferenciaId($v->getId());
         }
 
-        $this->aBeneficio = $v;
+        $this->aPreferencia = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildBeneficio object, it will not be re-added.
+        // If this object has already been added to the ChildPreferencia object, it will not be re-added.
         if ($v !== null) {
             $v->addParticipantesPreferencias($this);
         }
@@ -1138,26 +1138,26 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildBeneficio object
+     * Get the associated ChildPreferencia object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildBeneficio The associated ChildBeneficio object.
+     * @return ChildPreferencia The associated ChildPreferencia object.
      * @throws PropelException
      */
-    public function getBeneficio(ConnectionInterface $con = null)
+    public function getPreferencia(ConnectionInterface $con = null)
     {
-        if ($this->aBeneficio === null && ($this->beneficio_id !== null)) {
-            $this->aBeneficio = ChildBeneficioQuery::create()->findPk($this->beneficio_id, $con);
+        if ($this->aPreferencia === null && ($this->preferencia_id !== null)) {
+            $this->aPreferencia = ChildPreferenciaQuery::create()->findPk($this->preferencia_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aBeneficio->addParticipantesPreferenciass($this);
+                $this->aPreferencia->addParticipantesPreferenciass($this);
              */
         }
 
-        return $this->aBeneficio;
+        return $this->aPreferencia;
     }
 
     /**
@@ -1170,11 +1170,11 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
         if (null !== $this->aParticipante) {
             $this->aParticipante->removeParticipantesPreferencias($this);
         }
-        if (null !== $this->aBeneficio) {
-            $this->aBeneficio->removeParticipantesPreferencias($this);
+        if (null !== $this->aPreferencia) {
+            $this->aPreferencia->removeParticipantesPreferencias($this);
         }
+        $this->preferencia_id = null;
         $this->participante_id = null;
-        $this->beneficio_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1196,7 +1196,7 @@ abstract class ParticipantesPreferencias implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aParticipante = null;
-        $this->aBeneficio = null;
+        $this->aPreferencia = null;
     }
 
     /**

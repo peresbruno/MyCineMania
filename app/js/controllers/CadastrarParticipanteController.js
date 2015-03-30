@@ -1,5 +1,7 @@
-myCineMania.controller('CadastrarParticipanteCtrl', function ($scope, participante, SweetAlert) {
+myCineMania.controller('CadastrarParticipanteCtrl', function ($scope, participante, preferencias, SweetAlert, $state) {
 	$scope.participante = participante;
+	$scope.participante.preferencias = [];
+	$scope.preferencias = preferencias;
 
 	$scope.opcoes = {politica_privacidade: false, regulamento: false}
 
@@ -57,17 +59,14 @@ myCineMania.controller('CadastrarParticipanteCtrl', function ($scope, participan
 			SweetAlert.swal("Ocorreu um erro ao salvar!", "Você precisa concordar com a política de privacidade do programa.", "error");
 			return;
 		}
-
-		if ($scope.$scope.cadastroParticipante.$invalid || !$scope.senhasIguais() || !$scope.emailsIguais()) {
-			$scope.$scope.cadastroParticipante.submetido = true;	
-		}
-			else
-				$scope.participante.$save().then(
-					function (data) {
-						SweetAlert.swal("Cadastro realizado!", "Um boleto será gerado e enviado ao seu e-mail.", "success");
-					}, function (err) {
-						SweetAlert.swal("Ocorreu um erro ao salvar!", err.data.erros[0], "error");
-					}
-				);
+			
+		$scope.participante.$save().then(
+			function (data) {
+				SweetAlert.swal("Cadastro realizado!", "Um boleto será gerado e enviado ao seu e-mail.", "success");
+				$state.go('login');
+			}, function (err) {
+				SweetAlert.swal("Ocorreu um erro ao salvar!", err.data.erros[0], "error");
+			}
+		);
 	};
 });

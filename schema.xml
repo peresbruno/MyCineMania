@@ -7,6 +7,9 @@
     <unique>
       <unique-column name="descricao" />
     </unique>
+    <behavior name="validate">
+      <parameter name="rule505" value="{column: descricao, validator: Unique}" />
+    </behavior>
   </table>
 
   <table name="usuarios" phpName="Usuario">
@@ -16,7 +19,7 @@
     <column name="liberado" type="boolean" defaultValue="false" required="true" />
     <column name="nome_usuario" type="varchar" size="255" required="true" />
     <column name="senha" type="varchar" size="255" required="true" />
-    <column name="tipo" type="enum" valueSet="participante,rede_cinema" required="true" />
+    <column name="tipo" type="enum" valueSet="participante,rede_cinema,administrador" required="true" />
     <unique>
       <unique-column name="email" />
     </unique>
@@ -97,13 +100,13 @@
   </table>
 
   <table name="participantes_preferencias" isCrossRef="true">
+    <column name="preferencia_id" type="integer" primaryKey="true"/>
     <column name="participante_id" type="integer" primaryKey="true"/>
-    <column name="beneficio_id" type="integer" primaryKey="true"/>
     <foreign-key foreignTable="participantes">
       <reference local="participante_id" foreign="id"/>
     </foreign-key>
-    <foreign-key foreignTable="beneficios">
-      <reference local="beneficio_id" foreign="id"/>
+    <foreign-key foreignTable="preferencias">
+      <reference local="preferencia_id" foreign="id"/>
     </foreign-key>
   </table>
 
@@ -135,4 +138,9 @@
     </foreign-key>
   </table>
 
+  <table name="settings">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="valor_inscricao" type="double" required="true" />
+  </table>
+  
 </database>

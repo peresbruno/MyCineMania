@@ -464,8 +464,8 @@ abstract class Pagamento implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->data_pagamento !== null || $dt !== null) {
-            if ($dt !== $this->data_pagamento) {
-                $this->data_pagamento = $dt;
+            if ($this->data_pagamento === null || $dt === null || $dt->format("Y-m-d") !== $this->data_pagamento->format("Y-m-d")) {
+                $this->data_pagamento = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[PagamentoTableMap::COL_DATA_PAGAMENTO] = true;
             }
         } // if either are not null
@@ -484,8 +484,8 @@ abstract class Pagamento implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->data_vencimento !== null || $dt !== null) {
-            if ($dt !== $this->data_vencimento) {
-                $this->data_vencimento = $dt;
+            if ($this->data_vencimento === null || $dt === null || $dt->format("Y-m-d") !== $this->data_vencimento->format("Y-m-d")) {
+                $this->data_vencimento = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[PagamentoTableMap::COL_DATA_VENCIMENTO] = true;
             }
         } // if either are not null

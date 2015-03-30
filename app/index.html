@@ -12,6 +12,7 @@
 	<link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="libs/sweetalert/lib/sweet-alert.css">
+	<link rel="stylesheet" href="libs/ngDialog/css/ngDialog.min.css">
 
 	<link rel="stylesheet" href="css/style.css">
 
@@ -26,6 +27,8 @@
 	<script src="libs/cpf_cnpj/build/cnpj.min.js"></script>
 	<script src="libs/cpf_cnpj/build/cpf.min.js"></script>
 	<script src="libs/ng-cpf-cnpj/lib/ngCpfCnpj.js"></script>
+	<script src="libs/checklist-model/checklist-model.js"></script>
+	<script src="libs/ngDialog/js/ngDialog.min.js"></script>
 
 
 	<!-- Resources -->
@@ -33,6 +36,9 @@
 	<script src="js/resources/RedesResource.js"></script>
 	<script src="js/resources/PerfilResource.js"></script>
 	<script src="js/resources/BeneficiosResource.js"></script>
+	<script src="js/resources/VoucherResource.js"></script>
+	<script src="js/resources/ConfiguracoesResource.js"></script>
+	<script src="js/resources/PreferenciasResource.js"></script>
 
 	<!-- Controllers -->
 	<script src="js/controllers/CadastrarParticipanteController.js"></script>
@@ -43,9 +49,14 @@
 	<script src="js/controllers/ListarParticipantesController.js"></script>
 	<script src="js/controllers/DetalhesBeneficioController.js"></script>
 	<script src="js/controllers/LoginController.js"></script>
+	<script src="js/controllers/ConfiguracoesController.js"></script>
+	<script src="js/controllers/VoucherController.js"></script>
+	<script src="js/controllers/ValidarVoucherController.js"></script>
+	<script src="js/controllers/MenuController.js"></script>
 
 </head>
 <body ng-app="myCineMania">
+	<ng-include src="'templates/topo.html'"></ng-include>
 	<div ui-view></div>
 </body>
 </html>

@@ -1,0 +1,40 @@
+<div class="espaco-topo">
+    <div class="container">
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-md-8">
+                <div class="row">
+                    Área destinada ao operador de caixa da rede de cinema para validação de Vouchers.
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-md-8">
+                <div class="row">
+                    Código do voucher:
+                    <input type="number" ng-model="codigo.valor" />
+                    <button ng-click="buscar()" class="emitir-voucher"> Buscar </button>
+                </div>
+            </div>
+        </div>
+        <div ng-show="voucher.Id" class="row" style="margin-top: 20px">
+            <div class="col-md-12 ">
+                <b>Código: </b>{{voucher.Codigo}}<br/>
+                <b>Data emissão: </b>{{voucher.DataEmissao | date: 'dd/MM/yyyy' }}<br/>
+                <b>Hora emissão: </b>{{voucher.HoraEmissao | date }}<br/>
+                <b>Status: </b></b>{{ voucher.Status }}<br/> 
+            </div>
+            <br>
+            <div ng-hide="voucher.Expirado">
+                <button ng-click="registrarUso()" ng-show="voucher.Status == 'emitido'" style="margin-top: 30px;" class="emitir-voucher" type="submit">Registrar utilização do voucher</button>
+                <button ng-show="voucher.Status == 'utilizado'" style="margin-top: 30px;" class="emitir-voucher" type="submit">Voucher já utilizado</button>    
+            </div>
+            <div ng-show="voucher.Expirado" class="alert alert-danger" role="alert">
+              <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              Voucher expirado
+            </div>
+        </div>
+        
+        
+    </div>
+</div>

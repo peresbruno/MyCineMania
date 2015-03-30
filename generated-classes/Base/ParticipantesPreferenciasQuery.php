@@ -20,11 +20,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
+ * @method     ChildParticipantesPreferenciasQuery orderByPreferenciaId($order = Criteria::ASC) Order by the preferencia_id column
  * @method     ChildParticipantesPreferenciasQuery orderByParticipanteId($order = Criteria::ASC) Order by the participante_id column
- * @method     ChildParticipantesPreferenciasQuery orderByBeneficioId($order = Criteria::ASC) Order by the beneficio_id column
  *
+ * @method     ChildParticipantesPreferenciasQuery groupByPreferenciaId() Group by the preferencia_id column
  * @method     ChildParticipantesPreferenciasQuery groupByParticipanteId() Group by the participante_id column
- * @method     ChildParticipantesPreferenciasQuery groupByBeneficioId() Group by the beneficio_id column
  *
  * @method     ChildParticipantesPreferenciasQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildParticipantesPreferenciasQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -34,27 +34,27 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildParticipantesPreferenciasQuery rightJoinParticipante($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Participante relation
  * @method     ChildParticipantesPreferenciasQuery innerJoinParticipante($relationAlias = null) Adds a INNER JOIN clause to the query using the Participante relation
  *
- * @method     ChildParticipantesPreferenciasQuery leftJoinBeneficio($relationAlias = null) Adds a LEFT JOIN clause to the query using the Beneficio relation
- * @method     ChildParticipantesPreferenciasQuery rightJoinBeneficio($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Beneficio relation
- * @method     ChildParticipantesPreferenciasQuery innerJoinBeneficio($relationAlias = null) Adds a INNER JOIN clause to the query using the Beneficio relation
+ * @method     ChildParticipantesPreferenciasQuery leftJoinPreferencia($relationAlias = null) Adds a LEFT JOIN clause to the query using the Preferencia relation
+ * @method     ChildParticipantesPreferenciasQuery rightJoinPreferencia($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Preferencia relation
+ * @method     ChildParticipantesPreferenciasQuery innerJoinPreferencia($relationAlias = null) Adds a INNER JOIN clause to the query using the Preferencia relation
  *
- * @method     \ParticipanteQuery|\BeneficioQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \ParticipanteQuery|\PreferenciaQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildParticipantesPreferencias findOne(ConnectionInterface $con = null) Return the first ChildParticipantesPreferencias matching the query
  * @method     ChildParticipantesPreferencias findOneOrCreate(ConnectionInterface $con = null) Return the first ChildParticipantesPreferencias matching the query, or a new ChildParticipantesPreferencias object populated from the query conditions when no match is found
  *
- * @method     ChildParticipantesPreferencias findOneByParticipanteId(int $participante_id) Return the first ChildParticipantesPreferencias filtered by the participante_id column
- * @method     ChildParticipantesPreferencias findOneByBeneficioId(int $beneficio_id) Return the first ChildParticipantesPreferencias filtered by the beneficio_id column *
+ * @method     ChildParticipantesPreferencias findOneByPreferenciaId(int $preferencia_id) Return the first ChildParticipantesPreferencias filtered by the preferencia_id column
+ * @method     ChildParticipantesPreferencias findOneByParticipanteId(int $participante_id) Return the first ChildParticipantesPreferencias filtered by the participante_id column *
 
  * @method     ChildParticipantesPreferencias requirePk($key, ConnectionInterface $con = null) Return the ChildParticipantesPreferencias by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildParticipantesPreferencias requireOne(ConnectionInterface $con = null) Return the first ChildParticipantesPreferencias matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
+ * @method     ChildParticipantesPreferencias requireOneByPreferenciaId(int $preferencia_id) Return the first ChildParticipantesPreferencias filtered by the preferencia_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildParticipantesPreferencias requireOneByParticipanteId(int $participante_id) Return the first ChildParticipantesPreferencias filtered by the participante_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildParticipantesPreferencias requireOneByBeneficioId(int $beneficio_id) Return the first ChildParticipantesPreferencias filtered by the beneficio_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildParticipantesPreferencias[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildParticipantesPreferencias objects based on current ModelCriteria
+ * @method     ChildParticipantesPreferencias[]|ObjectCollection findByPreferenciaId(int $preferencia_id) Return ChildParticipantesPreferencias objects filtered by the preferencia_id column
  * @method     ChildParticipantesPreferencias[]|ObjectCollection findByParticipanteId(int $participante_id) Return ChildParticipantesPreferencias objects filtered by the participante_id column
- * @method     ChildParticipantesPreferencias[]|ObjectCollection findByBeneficioId(int $beneficio_id) Return ChildParticipantesPreferencias objects filtered by the beneficio_id column
  * @method     ChildParticipantesPreferencias[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -107,7 +107,7 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
      * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param array[$participante_id, $beneficio_id] $key Primary key to use for the query
+     * @param array[$preferencia_id, $participante_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildParticipantesPreferencias|array|mixed the result, formatted by the current formatter
@@ -147,7 +147,7 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT participante_id, beneficio_id FROM participantes_preferencias WHERE participante_id = :p0 AND beneficio_id = :p1';
+        $sql = 'SELECT preferencia_id, participante_id FROM participantes_preferencias WHERE preferencia_id = :p0 AND participante_id = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -221,8 +221,8 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $key[1], Criteria::EQUAL);
 
         return $this;
     }
@@ -240,13 +240,56 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
             $this->addOr($cton0);
         }
 
         return $this;
+    }
+
+    /**
+     * Filter the query on the preferencia_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPreferenciaId(1234); // WHERE preferencia_id = 1234
+     * $query->filterByPreferenciaId(array(12, 34)); // WHERE preferencia_id IN (12, 34)
+     * $query->filterByPreferenciaId(array('min' => 12)); // WHERE preferencia_id > 12
+     * </code>
+     *
+     * @see       filterByPreferencia()
+     *
+     * @param     mixed $preferenciaId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildParticipantesPreferenciasQuery The current query, for fluid interface
+     */
+    public function filterByPreferenciaId($preferenciaId = null, $comparison = null)
+    {
+        if (is_array($preferenciaId)) {
+            $useMinMax = false;
+            if (isset($preferenciaId['min'])) {
+                $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $preferenciaId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($preferenciaId['max'])) {
+                $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $preferenciaId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $preferenciaId, $comparison);
     }
 
     /**
@@ -290,49 +333,6 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $participanteId, $comparison);
-    }
-
-    /**
-     * Filter the query on the beneficio_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByBeneficioId(1234); // WHERE beneficio_id = 1234
-     * $query->filterByBeneficioId(array(12, 34)); // WHERE beneficio_id IN (12, 34)
-     * $query->filterByBeneficioId(array('min' => 12)); // WHERE beneficio_id > 12
-     * </code>
-     *
-     * @see       filterByBeneficio()
-     *
-     * @param     mixed $beneficioId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildParticipantesPreferenciasQuery The current query, for fluid interface
-     */
-    public function filterByBeneficioId($beneficioId = null, $comparison = null)
-    {
-        if (is_array($beneficioId)) {
-            $useMinMax = false;
-            if (isset($beneficioId['min'])) {
-                $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $beneficioId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($beneficioId['max'])) {
-                $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $beneficioId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $beneficioId, $comparison);
     }
 
     /**
@@ -413,44 +413,44 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Beneficio object
+     * Filter the query by a related \Preferencia object
      *
-     * @param \Beneficio|ObjectCollection $beneficio The related object(s) to use as filter
+     * @param \Preferencia|ObjectCollection $preferencia The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return ChildParticipantesPreferenciasQuery The current query, for fluid interface
      */
-    public function filterByBeneficio($beneficio, $comparison = null)
+    public function filterByPreferencia($preferencia, $comparison = null)
     {
-        if ($beneficio instanceof \Beneficio) {
+        if ($preferencia instanceof \Preferencia) {
             return $this
-                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $beneficio->getId(), $comparison);
-        } elseif ($beneficio instanceof ObjectCollection) {
+                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $preferencia->getId(), $comparison);
+        } elseif ($preferencia instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $beneficio->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $preferencia->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByBeneficio() only accepts arguments of type \Beneficio or Collection');
+            throw new PropelException('filterByPreferencia() only accepts arguments of type \Preferencia or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Beneficio relation
+     * Adds a JOIN clause to the query using the Preferencia relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildParticipantesPreferenciasQuery The current query, for fluid interface
      */
-    public function joinBeneficio($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPreferencia($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Beneficio');
+        $relationMap = $tableMap->getRelation('Preferencia');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -465,14 +465,14 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Beneficio');
+            $this->addJoinObject($join, 'Preferencia');
         }
 
         return $this;
     }
 
     /**
-     * Use the Beneficio relation Beneficio object
+     * Use the Preferencia relation Preferencia object
      *
      * @see useQuery()
      *
@@ -480,13 +480,13 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \BeneficioQuery A secondary query class using the current class as primary query
+     * @return \PreferenciaQuery A secondary query class using the current class as primary query
      */
-    public function useBeneficioQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePreferenciaQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinBeneficio($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Beneficio', '\BeneficioQuery');
+            ->joinPreferencia($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Preferencia', '\PreferenciaQuery');
     }
 
     /**
@@ -499,8 +499,8 @@ abstract class ParticipantesPreferenciasQuery extends ModelCriteria
     public function prune($participantesPreferencias = null)
     {
         if ($participantesPreferencias) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID), $participantesPreferencias->getParticipanteId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID), $participantesPreferencias->getBeneficioId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID), $participantesPreferencias->getPreferenciaId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID), $participantesPreferencias->getParticipanteId(), Criteria::NOT_EQUAL);
             $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 

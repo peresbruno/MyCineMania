@@ -148,8 +148,29 @@ class PreferenciaTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'BeneficiosPreferenciass', false);
+        $this->addRelation('ParticipantesPreferencias', '\\ParticipantesPreferencias', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':preferencia_id',
+    1 => ':id',
+  ),
+), null, null, 'ParticipantesPreferenciass', false);
         $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_MANY, array(), null, null, 'Beneficios');
+        $this->addRelation('Participante', '\\Participante', RelationMap::MANY_TO_MANY, array(), null, null, 'Participantes');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'validate' => array('rule505' => array ('column' => 'descricao','validator' => 'Unique',), ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.

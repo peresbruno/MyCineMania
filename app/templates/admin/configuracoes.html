@@ -1,0 +1,72 @@
+<div class="espaco-topo">
+    
+    <div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Configurações</h1>
+            <form id="configuracoes">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="taxa_adesao" class="control-label">Valor da Taxa de Adesão ao Programa (em R$): </label>
+                            <input type="number" ng-model="configuracoes.ValorInscricao" step="0.01" class="form-control" required id="taxa_adesao" placeholder="Valor da Taxa de Adesão ao Programa">
+                        </div>                    
+                    </div>
+                </div>
+                <!-- <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="aceitando_inscricoes" class="control-label">Aceitando Inscrições:</label>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="">
+                                    Aceitando Inscrições de Participantes
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="">
+                                    Aceitando Inscrições de Redes de Cinema
+                                </label>
+                            </div>
+                        </div>                    
+                    </div>
+                </div> -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" ng-click="salvarValorInscricao()" class="btn btn-primary pull-right">Salvar valor</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="dsc_preferencia" class="control-label">Adicionar preferência: </label>
+                        <div class="input-group">
+                            <input type="text" ng-model="preferencia.value" class="form-control" id="dsc_preferencia" placeholder="Descrição da nova preferência">                        
+                             <span class="input-group-btn">
+                                <button ng-click="salvarPreferencia()" class="btn btn-default" type="button">Adicionar preferência</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <!-- Default panel contents -->
+                            <div class="panel-heading">Preferências</div>
+
+                          <!-- Table -->
+                            <table class="table">
+                                <tr ng-repeat="preferencia in preferencias">
+                                    <td>{{preferencia.Descricao}}</td>
+                                </tr>        
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div> <!-- /container -->
+</div>

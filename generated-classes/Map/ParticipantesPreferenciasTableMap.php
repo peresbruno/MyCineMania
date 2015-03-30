@@ -72,14 +72,14 @@ class ParticipantesPreferenciasTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 2;
 
     /**
+     * the column name for the preferencia_id field
+     */
+    const COL_PREFERENCIA_ID = 'participantes_preferencias.preferencia_id';
+
+    /**
      * the column name for the participante_id field
      */
     const COL_PARTICIPANTE_ID = 'participantes_preferencias.participante_id';
-
-    /**
-     * the column name for the beneficio_id field
-     */
-    const COL_BENEFICIO_ID = 'participantes_preferencias.beneficio_id';
 
     /**
      * The default string format for model objects of the related table
@@ -93,10 +93,10 @@ class ParticipantesPreferenciasTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ParticipanteId', 'BeneficioId', ),
-        self::TYPE_CAMELNAME     => array('participanteId', 'beneficioId', ),
-        self::TYPE_COLNAME       => array(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, ),
-        self::TYPE_FIELDNAME     => array('participante_id', 'beneficio_id', ),
+        self::TYPE_PHPNAME       => array('PreferenciaId', 'ParticipanteId', ),
+        self::TYPE_CAMELNAME     => array('preferenciaId', 'participanteId', ),
+        self::TYPE_COLNAME       => array(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, ),
+        self::TYPE_FIELDNAME     => array('preferencia_id', 'participante_id', ),
         self::TYPE_NUM           => array(0, 1, )
     );
 
@@ -107,10 +107,10 @@ class ParticipantesPreferenciasTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ParticipanteId' => 0, 'BeneficioId' => 1, ),
-        self::TYPE_CAMELNAME     => array('participanteId' => 0, 'beneficioId' => 1, ),
-        self::TYPE_COLNAME       => array(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID => 0, ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID => 1, ),
-        self::TYPE_FIELDNAME     => array('participante_id' => 0, 'beneficio_id' => 1, ),
+        self::TYPE_PHPNAME       => array('PreferenciaId' => 0, 'ParticipanteId' => 1, ),
+        self::TYPE_CAMELNAME     => array('preferenciaId' => 0, 'participanteId' => 1, ),
+        self::TYPE_COLNAME       => array(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID => 0, ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID => 1, ),
+        self::TYPE_FIELDNAME     => array('preferencia_id' => 0, 'participante_id' => 1, ),
         self::TYPE_NUM           => array(0, 1, )
     );
 
@@ -132,8 +132,8 @@ class ParticipantesPreferenciasTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
+        $this->addForeignPrimaryKey('preferencia_id', 'PreferenciaId', 'INTEGER' , 'preferencias', 'id', true, null, null);
         $this->addForeignPrimaryKey('participante_id', 'ParticipanteId', 'INTEGER' , 'participantes', 'id', true, null, null);
-        $this->addForeignPrimaryKey('beneficio_id', 'BeneficioId', 'INTEGER' , 'beneficios', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -148,10 +148,10 @@ class ParticipantesPreferenciasTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
-        $this->addRelation('Beneficio', '\\Beneficio', RelationMap::MANY_TO_ONE, array (
+        $this->addRelation('Preferencia', '\\Preferencia', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':beneficio_id',
+    0 => ':preferencia_id',
     1 => ':id',
   ),
 ), null, null, null, false);
@@ -172,7 +172,7 @@ class ParticipantesPreferenciasTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getParticipanteId(), (string) $obj->getBeneficioId()));
+                $key = serialize(array((string) $obj->getPreferenciaId(), (string) $obj->getParticipanteId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -192,7 +192,7 @@ class ParticipantesPreferenciasTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
             if (is_object($value) && $value instanceof \ParticipantesPreferencias) {
-                $key = serialize(array((string) $value->getParticipanteId(), (string) $value->getBeneficioId()));
+                $key = serialize(array((string) $value->getPreferenciaId(), (string) $value->getParticipanteId()));
 
             } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key";
@@ -226,11 +226,11 @@ class ParticipantesPreferenciasTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('BeneficioId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('PreferenciaId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('BeneficioId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('PreferenciaId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -252,12 +252,12 @@ class ParticipantesPreferenciasTableMap extends TableMap
         $pks[] = (int) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('PreferenciaId', TableMap::TYPE_PHPNAME, $indexType)
         ];
         $pks[] = (int) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 1 + $offset
-                : self::translateFieldName('BeneficioId', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('ParticipanteId', TableMap::TYPE_PHPNAME, $indexType)
         ];
 
         return $pks;
@@ -360,11 +360,11 @@ class ParticipantesPreferenciasTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID);
             $criteria->addSelectColumn(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID);
-            $criteria->addSelectColumn(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID);
         } else {
+            $criteria->addSelectColumn($alias . '.preferencia_id');
             $criteria->addSelectColumn($alias . '.participante_id');
-            $criteria->addSelectColumn($alias . '.beneficio_id');
         }
     }
 
@@ -423,8 +423,8 @@ class ParticipantesPreferenciasTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(ParticipantesPreferenciasTableMap::COL_BENEFICIO_ID, $value[1]));
+                $criterion = $criteria->getNewCriterion(ParticipantesPreferenciasTableMap::COL_PREFERENCIA_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ParticipantesPreferenciasTableMap::COL_PARTICIPANTE_ID, $value[1]));
                 $criteria->addOr($criterion);
             }
         }
