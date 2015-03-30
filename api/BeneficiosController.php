@@ -86,17 +86,42 @@
 		}
 
 		public static function getAll() {
-			$beneficios = BeneficioQuery::create()
-			->select(array(
-				'id' => 'Id',
-				'titulo' => 'Titulo',
-				'inicio_validade' => 'InicioValidade',
-				'fim_validade' => 'FimValidade',
-				'descricao' => 'Descricao',
-				'condicoes' => 'Condicoes'
-			))
-			->find()
-			->toArray();
+
+			$usuario = PerfilController::getUsuario();
+
+			if($usuario['Tipo'] == 1) {
+				
+				$beneficios = BeneficioQuery::create()
+				->select(array(
+					'id' => 'Id',
+					'titulo' => 'Titulo',
+					'inicio_validade' => 'InicioValidade',
+					'fim_validade' => 'FimValidade',
+					'descricao' => 'Descricao',
+					'condicoes' => 'Condicoes'
+				))
+				  ->useRedeCinemaQuery()
+				    ->filterById($usuario['Id'])
+				  ->endUse()
+				  ->find()
+				  ->toArray();
+
+			}
+			else { 
+				$beneficios = BeneficioQuery::create()
+				->select(array(
+					'id' => 'Id',
+					'titulo' => 'Titulo',
+					'inicio_validade' => 'InicioValidade',
+					'fim_validade' => 'FimValidade',
+					'descricao' => 'Descricao',
+					'condicoes' => 'Condicoes'
+				))
+				->find()
+				->toArray();
+			}
+
+
 
 		  if ($beneficios) {
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');

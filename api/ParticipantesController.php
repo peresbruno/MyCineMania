@@ -1,6 +1,63 @@
 <?php
 	class ParticipantesController {
 
+		private static function sendMailAprovacao($email, $nome){
+			//Create a new PHPMailer instance
+			$mail = new PHPMailer;
+
+			//Tell PHPMailer to use SMTP
+			$mail->isSMTP();
+
+			//Enable SMTP debugging
+			// 0 = off (for production use)
+			// 1 = client messages
+			// 2 = client and server messages
+			$mail->SMTPDebug = 0;
+
+			//Ask for HTML-friendly debug output
+			$mail->Debugoutput = 'html';
+
+			//Set the hostname of the mail server
+			$mail->Host = 'smtp.gmail.com';
+
+			//Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
+			$mail->Port = 587;
+
+			//Set the encryption system to use - ssl (deprecated) or tls
+			$mail->SMTPSecure = 'tls';
+
+			//Whether to use SMTP authentication
+			$mail->SMTPAuth = true;
+
+			//Username to use for SMTP authentication - use full email address for gmail
+			$mail->Username = "mycinemania@gmail.com";
+
+			//Password to use for SMTP authentication
+			$mail->Password = "mycine123";
+
+			//Set who the message is to be sent from
+			$mail->setFrom('mycinemania@gmail.com', 'MyCineMania');
+
+			//Set who the message is to be sent to
+			$mail->addAddress($email, $nome);
+
+			//Set the subject line
+			$mail->Subject = 'Programa MyCineMania';
+
+			//Read an HTML message body from an external file, convert referenced images to embedded,
+			//convert HTML into a basic plain-text alternative body
+			$mail->msgHTML('Olá. Sua inscrição no programa MyCine Mania, foi aprovada. Ela é válida até ' . date('d/m/Y', strtotime('+1 years')) . '. Att.');
+
+			//Replace the plain text body with one created manually
+			$mail->AltBody = 'This is a plain-text message body';
+
+
+			//send the message, check for errors
+			return $mail->send();
+
+			
+		}
+
 		private static function sendMail($email, $nome){
 			//Create a new PHPMailer instance
 			$mail = new PHPMailer;
@@ -51,7 +108,21 @@
 			//Replace the plain text body with one created manually
 			$mail->AltBody = 'This is a plain-text message body';
 			
-			$content = dirname(__FILE__) . "/boleto.html";
+			$conf = SettingsQuery::create()->findPK('1');
+
+			$filename = time() . "boleto.html";
+
+			copy(dirname(__FILE__) . "/boleto.html", dirname(__FILE__) . "/" . $filename);
+
+			$content = file_get_contents(dirname(__FILE__) . "/" . $filename);
+
+			$content = str_replace('#VALOR#', $conf->getValorInscricao(), $content);
+
+			$content = str_replace('#VENCIMENTO#', date('d/m/Y', strtotime('+1 days')), $content);
+
+			file_put_contents(dirname(__FILE__) . "/" . $filename, $content);
+
+			$content = dirname(__FILE__) . "/" . $filename;
 
 			$mail->addAttachment($content);
 
@@ -109,7 +180,15 @@
 					$failures = $usuario->getValidationFailures();
 					
 				  foreach ($failures as $failure) {
-				  	array_push($erros, $failure->getPropertyPath() . ' já cadastrado.');
+				  	$campo = $failure->getPropertyPath();
+				  	if ($campo == 'email')
+				  		$campo = 'E-mail';
+				  	else if ($campo == 'cpf')
+				  		$campo = 'CPF';
+				  	else if ($campo == 'nome_usuario')
+				  		$campo = 'Nome de usuário';
+				  		
+				  	array_push($erros, $campo . ' já cadastrado.');
 	        }
 
 					$failures = $participante->getValidationFailures();
@@ -169,6 +248,7 @@
 			try {
 				$participante->save();	
 				$participante = ParticipantesController::getParticipante($participante->getId());
+				ParticipantesController::sendMailAprovacao($participante['Email'], $participante['Nome'] . ' ' . $participante['Sobrenome']);
 				header( $_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
 				die(json_encode($participante));
 			} catch (Exception $e) {

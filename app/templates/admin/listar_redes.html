@@ -8,15 +8,15 @@
                 <form id="participantes" class="form-inline" role="form">
                     <div class="form-group">
                         <label for="rede" class="sr-only" class="control-label">Rede:</label>
-                        <input type="text" class="form-control" id="rede" placeholder="Rede" ng-model="filtros.rede" >
+                        <input type="text" class="form-control" id="rede" placeholder="Filtrar..." ng-model="filtros.rede" >
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="status" class="sr-only" class="control-label">Status:</label>
                         <select class="form-control" id="status" ng-model="filtros.status" >
                             <option value="true">Somente Aprovados</option>
                             <option value="false">Somente Pendentes</option>
                         </select>
-                    </div>
+                    </div> -->
                 </form>
             </div>
 
@@ -29,7 +29,8 @@
                         <th>Status</th>
                         <th>Opções</th>
                     </tr>
-                    <tr ng-repeat="rede in redes | filter : filtros.rede | filter : {Liberado:filtros.status} : filtroLiberado" >
+                    <!-- <tr ng-repeat="rede in redes | filter : filtros.rede | filter : {Liberado:filtros.status} : filtroLiberado" > -->
+                    <tr ng-repeat="rede in redes | filter : filtros.rede" >
 
                         <td>{{rede.NomeFantasia}}</td>
                         <td>{{rede.Cnpj}}</td>

@@ -8,15 +8,15 @@
                 <form id="participantes" class="form-inline" role="form">
                     <div class="form-group">
                         <label for="participante" class="sr-only" class="control-label">Participante:</label>
-                        <input type="text" class="form-control" id="participante" placeholder="Sobrenome" ng-model="filtros.participante" >
+                        <input type="text" ng-model="filtro" class="form-control" id="participante" placeholder="Sobrenome" ng-model="filtros.participante" >
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="status" class="sr-only" class="control-label">Status:</label>
                         <select class="form-control" id="status" ng-model="filtros.status">
                             <option value="true">Somente Aprovados</option>
                             <option value="false">Somente Pendentes</option>
                         </select>
-                    </div>
+                    </div> -->
                 </form>
             </div>
             <div class="table-responsive">
@@ -29,11 +29,11 @@
                         <th>Status</th>
                         <th>Opções</th>
                     </tr>
-                    <tr ng-repeat="participante in participantes">
+                    <tr ng-repeat="participante in participantes | filter : filtro ">
                         <td>{{ participante.Nome }} {{ participante.Sobrenome }}</td>
                         <td>{{participante.Cpf}}</td>
-                        <td>{{participante.DataCadastro}}</td>
-                        <td>{{participante.FimValidade}}</td>
+                        <td>{{participante.DataInscricao | date:'dd/MM/yyyy'}}</td>
+                        <td>{{participante.FimValidade | date:'dd/MM/yyyy'}}</td>
                         <td>{{participante.Liberado ? "Liberado" : "Bloqueado"}}</td>
                         <td>
                             <div class="btn-group">

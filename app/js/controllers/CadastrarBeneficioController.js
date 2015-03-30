@@ -1,4 +1,4 @@
-myCineMania.controller('CadastrarBeneficioCtrl', function ($scope, SweetAlert, beneficio, preferencias) {
+myCineMania.controller('CadastrarBeneficioCtrl', function ($scope, SweetAlert, beneficio, preferencias, $state) {
 
 	$scope.preferencias = preferencias;
 	$scope.beneficio = beneficio;
@@ -18,6 +18,12 @@ myCineMania.controller('CadastrarBeneficioCtrl', function ($scope, SweetAlert, b
 			else if ($scope.cadastroBeneficio.fimValidade.$error.required) {
 				SweetAlert.swal("Ocorreu um erro ao salvar!", "Campo obrigatório não preenchido: \"Fim validade\"", "error");
 			}
+			else if ($scope.cadastroBeneficio.inicioValidade.$invalid) {
+				SweetAlert.swal("Ocorreu um erro ao salvar!", "\"Início validade\": Data digitada inválida", "error");
+			}
+			else if ($scope.cadastroBeneficio.fimValidade.$invalid) {
+				SweetAlert.swal("Ocorreu um erro ao salvar!", "\"Fim validade\": Data digitada inválida", "error");
+			}
 			else if ($scope.cadastroBeneficio.descricao.$error.required) {
 				SweetAlert.swal("Ocorreu um erro ao salvar!", "Campo obrigatório não preenchido: \"Descrição\"", "error");
 			}
@@ -34,6 +40,7 @@ myCineMania.controller('CadastrarBeneficioCtrl', function ($scope, SweetAlert, b
 		$scope.beneficio.$save().then(
 			function (data) {
 				SweetAlert.swal("Benefício cadastrado!", null, "success");
+				$state.go('beneficios');
 			}, function (err) {
 				SweetAlert.swal("Erro ao cadastrar benefício.", null, "error");
 			}

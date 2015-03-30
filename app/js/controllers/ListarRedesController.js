@@ -2,7 +2,7 @@ myCineMania.controller('ListarRedesCtrl', function ($scope, redes, SweetAlert) {
 	$scope.redes = redes;
 
 	$scope.filtroLiberado = function (actual, expected) {
-		return expected == "" || actual == (expected === "true");
+		return expected == undefined || expected == "" || actual == Boolean("true");
 	};
 
 	$scope.aprovar = function(rede) {
